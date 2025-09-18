@@ -1,0 +1,97 @@
+/* In assets/css/style.css */
+@import url('base/reset.css');
+@import url('base/typography.css');
+@import url('base/variables.css');
+@import url('components/buttons.css');
+@import url('components/forms.css');
+@import url('components/cards.css');
+@import url('components/navigation.css');
+@import url('components/modals.css');
+@import url('layout/header.css');
+@import url('layout/footer.css');
+@import url('layout/grid.css');
+@import url('layout/sidebar.css');
+@import url('pages/landing.css'); /* Add this line */
+@import url('pages/home.css');
+@import url('pages/products.css');
+@import url('pages/logout.css');
+/* ... other imports ... */
+
+/* Auth styles are now loaded separately per page */
+/* @import url('pages/auth.css'); REMOVE THIS LINE */
+
+/* Utility styles */
+@import url('utilities/helpers.css');
+@import url('utilities/responsive.css');
+
+/* ===== GLOBAL STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,153,0,0.3);
+    border-radius: 50%;
+    border-top-color: #ff9900;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification.success {
+    background-color: #28a745;
+}
+
+.notification.error {
+    background-color: #dc3545;
+}
+
+.notification.warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.notification.info {
+    background-color: #17a2b8;
+}

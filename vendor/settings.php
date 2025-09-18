@@ -1,0 +1,2 @@
+<?php
+// Vendor settings page

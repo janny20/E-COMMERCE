@@ -1,0 +1,2 @@
+<?php
+// Access control middleware

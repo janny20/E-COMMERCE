@@ -1,0 +1,2 @@
+<?php
+// Admin logout page
