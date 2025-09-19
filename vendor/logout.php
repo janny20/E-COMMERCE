@@ -1,2 +1,0 @@
-<?php
-// Vendor logout page

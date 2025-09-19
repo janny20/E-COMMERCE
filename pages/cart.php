@@ -210,8 +210,8 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
                     </div>
 
                     <div class="checkout-actions">
-                        <a href="checkout.php" class="btn btn-primary btn-checkout">Proceed to Checkout</a>
-                        <a href="products.php" class="btn btn-outline">Continue Shopping</a>
+                        <a href="<?php echo BASE_URL; ?>pages/checkout.php" class="btn btn-primary btn-checkout">Proceed to Checkout</a>
+                        <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn btn-outline">Continue Shopping</a>
                     </div>
 
                     <div class="security-features">

@@ -23,12 +23,7 @@ $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
 $stmt->execute();
 $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
-if ($vendor && isset($vendor['id'])) {
-    $vendor_id = $vendor['id'];
-} else {
-    echo '<div class="alert alert-danger">Vendor account not found. Please contact support.</div>';
-    exit();
-}
+$vendor_id = $vendor['id'];
 
 // Get categories
 $query = "SELECT id, name FROM categories WHERE parent_id IS NULL ORDER BY name";
@@ -83,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 require_once '../includes/header.php';
 ?>
 
-<div class="container vendor-add-product">
+<div class="vendor-add-product">
     <div class="container">
         <div class="page-header">
             <h1>Add New Product</h1>

@@ -28,11 +28,11 @@ $stmt->execute();
 $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$vendor || !isset($vendor['id'])) {
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Vendor Profile</title>';
-    echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/style.css">';
+    echo '<link rel="stylesheet" href="/assets/css/style.css">';
     echo '</head><body>';
     echo '<div class="container" style="margin-top:2rem;">';
     echo '<div class="alert alert-danger" style="padding:2rem;text-align:center;">Vendor account not found. Please contact support.</div>';
-    echo '<a href="' . BASE_URL . 'vendor/dashboard.php" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>';
+    echo '<a href="dashboard.php" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a>';
     echo '</div></body></html>';
     error_log('Vendor profile page: vendor not found for user_id ' . ($_SESSION['user_id'] ?? 'N/A'));
     exit();

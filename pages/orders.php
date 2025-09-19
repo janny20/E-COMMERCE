@@ -183,7 +183,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/orders.css">
                     <?php if (!empty($status_filter) || !empty($date_filter)): ?>
                         <button class="btn btn-outline" onclick="resetFilters()">Clear Filters</button>
                     <?php else: ?>
-                        <a href="products.php" class="btn btn-primary">Start Shopping</a>
+                        <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn btn-primary">Start Shopping</a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

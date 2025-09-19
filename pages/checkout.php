@@ -330,7 +330,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 <i class="fas fa-lock"></i>
                                 Place Order
                             </button>
-                            <a href="cart.php" class="btn btn-outline">Back to Cart</a>
+                            <a href="<?php echo BASE_URL; ?>pages/cart.php" class="btn btn-outline">Back to Cart</a>
                         </div>
 
                         <div class="security-notice">

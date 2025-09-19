@@ -1,4 +1,9 @@
 <?php
+// Ensure session is started so config.php can read session variables
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Include config
 require_once '../includes/config.php';
 
@@ -7,6 +12,12 @@ if (!$isLoggedIn || !$userId) {
     // Instead of redirecting, show a message if session is missing
     echo '<div class="container"><div class="alert alert-error">You must be logged in to view your profile. Please register or log in.</div></div>';
     require_once '../includes/footer.php';
+    exit();
+}
+
+// If the logged-in user is a vendor, redirect to vendor profile
+if (isset($userType) && strtolower($userType) === 'vendor') {
+    header('Location: ' . BASE_URL . 'vendor/profile.php');
     exit();
 }
 
@@ -23,6 +34,16 @@ $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$user_data) {
+    // Include header so the nav loads, then show a helpful message
+    require_once '../includes/header.php';
+    echo '<div class="container" style="margin-top:2rem;">';
+    echo '<div class="alert alert-error">User profile not found. Please contact support.</div>';
+    echo '</div>';
+    require_once '../includes/footer.php';
+    error_log('pages/profile.php: no user data for user_id ' . ($userId ?? 'N/A'));
+    exit();
+}
 
 // Get user orders count
 $orders_query = "SELECT COUNT(*) as order_count FROM orders WHERE customer_id = :user_id";
@@ -91,28 +112,28 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
             <p>Manage your account information and preferences</p>
         </div>
 
-        <div class="profile-content">
-            <div class="profile-sidebar">
+                <nav class="profile-nav">
+                    <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-item active">
                 <div class="profile-card">
                     <div class="profile-avatar">
                         <div class="avatar-placeholder">
-                            <?php echo strtoupper(substr($user_data['first_name'] ?? 'U', 0, 1) . substr($user_data['last_name'] ?? 'S', 0, 1)); ?>
+                    <a href="<?php echo BASE_URL; ?>pages/orders.php" class="nav-item">
                         </div>
                         <button class="avatar-upload-btn" title="Upload photo">
                             <i class="fas fa-camera"></i>
-                        </button>
+                    <a href="<?php echo BASE_URL; ?>pages/wishlist.php" class="nav-item">
                     </div>
                     
                     <div class="profile-info">
-                        <h2><?php echo htmlspecialchars(($user_data['first_name'] ?? '') . ' ' . ($user_data['last_name'] ?? '')); ?></h2>
+                    <a href="<?php echo BASE_URL; ?>pages/addresses.php" class="nav-item">
                         <p class="profile-email"><?php echo htmlspecialchars($user_data['email']); ?></p>
                         <p class="profile-member">Member since <?php echo date('M Y', strtotime($user_data['created_at'])); ?></p>
                     </div>
-                    
+                    <a href="<?php echo BASE_URL; ?>pages/settings.php" class="nav-item">
                     <div class="profile-stats">
                         <div class="stat-item">
                             <div class="stat-number"><?php echo $orders_count; ?></div>
-                            <div class="stat-label">Orders</div>
+                    <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-item">
                         </div>
                         <div class="stat-item">
                             <div class="stat-number">0</div>
@@ -146,7 +167,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                    <a href="logout.php" class="nav-item">
+                    <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-item">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>

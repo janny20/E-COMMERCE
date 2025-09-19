@@ -59,11 +59,11 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
 <div class="product-detail-page">
     <div class="container">
         <nav class="breadcrumb">
-            <a href="index.php">Home</a>
+            <a href="<?php echo BASE_URL; ?>">Home</a>
             <span>/</span>
-            <a href="products.php">Products</a>
+            <a href="<?php echo BASE_URL; ?>pages/products.php">Products</a>
             <span>/</span>
-            <a href="products.php?category=<?php echo strtolower($product['category_name']); ?>"><?php echo $product['category_name']; ?></a>
+            <a href="<?php echo BASE_URL; ?>pages/products.php?category=<?php echo strtolower($product['category_name']); ?>"><?php echo $product['category_name']; ?></a>
             <span>/</span>
             <span><?php echo htmlspecialchars($product['name']); ?></span>
         </nav>
@@ -311,7 +311,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
                                     <div class="stat-label">Positive Reviews</div>
                                 </div>
                             </div>
-                            <a href="vendor.php?id=<?php echo $product['vendor_id']; ?>" class="btn btn-outline">View Vendor Profile</a>
+                            <a href="<?php echo BASE_URL; ?>vendor/profile.php?vendor_id=<?php echo $product['vendor_id']; ?>" class="btn btn-outline">View Vendor Profile</a>
                         </div>
                     </div>
                 </div>

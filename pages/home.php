@@ -49,17 +49,17 @@ require_once '../includes/header.php';
         <?php
         if (isset($_SESSION['welcome_message'])) {
             // New registration
-            echo '<h1>' . $_SESSION['welcome_message'] . '</h1>';
+            echo '<h1>' . htmlspecialchars($_SESSION['welcome_message']) . '</h1>';
             unset($_SESSION['welcome_message']);
         } else {
             // Regular login
-            echo '<h1>Welcome back, ' . htmlspecialchars($_SESSION['username']) . '!</h1>';
+            echo '<h1>Welcome back, ' . htmlspecialchars($username ?? $_SESSION['username'] ?? 'User') . '!</h1>';
         }
         ?>
         <p>Ready to continue shopping?</p>
-        <a href="products.php" class="btn">Shop Now</a>
-        <?php if($_SESSION['user_type'] == 'customer'): ?>
-            <a href="cart.php" class="btn btn-outline">View Cart</a>
+        <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn">Shop Now</a>
+        <?php if(isset($userType) ? strtolower($userType) === 'customer' : (isset($_SESSION['user_type']) && strtolower($_SESSION['user_type']) === 'customer')): ?>
+            <a href="<?php echo BASE_URL; ?>pages/cart.php" class="btn btn-outline">View Cart</a>
         <?php endif; ?>
     </div>
 </section>

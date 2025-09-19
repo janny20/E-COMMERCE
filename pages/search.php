@@ -293,7 +293,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">
                                 <li>Reduce the number of filters</li>
                             </ul>
                         </div>
-                        <a href="products.php" class="btn btn-primary">Browse All Products</a>
+                        <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn btn-primary">Browse All Products</a>
                     </div>
                 <?php endif; ?>
             </div>

@@ -1,158 +1,73 @@
 <?php
 // vendor/dashboard.php
-// Start session only if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/middleware.php';
+requireVendor();
 
-// Check if user is logged in and is a vendor
-if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'vendor') {
-    header('Location: ../pages/login.php');
-    exit();
-}
+// Get vendor ID
+$vendor_id = $_SESSION['vendor_id'] ?? null;
 
-// Include config
-require_once '../includes/config.php';
-
-// Get vendor data
+// Get database connection
 $database = new Database();
 $db = $database->getConnection();
 
-$query = "SELECT v.*, u.email 
-          FROM vendors v 
-          JOIN users u ON v.user_id = u.id 
-          WHERE v.user_id = :user_id";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
-$stmt->execute();
-$vendor = $stmt->fetch(PDO::FETCH_ASSOC);
+// products count
+$stmt = $db->prepare("SELECT COUNT(*) as cnt FROM products WHERE vendor_id = ?");
+$stmt->execute([$vendor_id]);
+$products_count = $stmt->fetchColumn();
 
-// Get vendor stats
-$stats = [
-    'total_products' => 0,
-    'total_orders' => 0,
-    'total_earnings' => 0,
-    'pending_orders' => 0
-];
+// order items count
+$stmt = $db->prepare("SELECT COUNT(DISTINCT order_id) FROM order_items WHERE vendor_id = ?");
+$stmt->execute([$vendor_id]);
+$orders_count = $stmt->fetchColumn();
 
-// Total products
-$query = "SELECT COUNT(*) as count FROM products WHERE vendor_id = :vendor_id";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':vendor_id', $vendor['id'], PDO::PARAM_INT);
-$stmt->execute();
-$stats['total_products'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+// pending items
+$stmt = $db->prepare("SELECT COUNT(*) FROM order_items oi
+                       JOIN orders o ON o.id = oi.order_id
+                       WHERE oi.vendor_id = ? AND o.status = 'pending'");
+$stmt->execute([$vendor_id]);
+$pending_count = $stmt->fetchColumn();
 
-// Total orders
-$query = "SELECT COUNT(DISTINCT oi.order_id) as count 
-          FROM order_items oi 
-          JOIN products p ON oi.product_id = p.id 
-          WHERE p.vendor_id = :vendor_id";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':vendor_id', $vendor['id'], PDO::PARAM_INT);
-$stmt->execute();
-$stats['total_orders'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-
-// Total earnings
-$query = "SELECT SUM(oi.total) as total 
-          FROM order_items oi 
-          JOIN products p ON oi.product_id = p.id 
-          WHERE p.vendor_id = :vendor_id";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':vendor_id', $vendor['id'], PDO::PARAM_INT);
-$stmt->execute();
-$stats['total_earnings'] = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-
-// Pending orders
-$query = "SELECT COUNT(DISTINCT oi.order_id) as count 
-          FROM order_items oi 
-          JOIN products p ON oi.product_id = p.id 
-          JOIN orders o ON oi.order_id = o.id 
-          WHERE p.vendor_id = :vendor_id AND o.status = 'pending'";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':vendor_id', $vendor['id'], PDO::PARAM_INT);
-$stmt->execute();
-$stats['pending_orders'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-
-// Include header
-require_once '../includes/header.php';
+// total earnings (sum of amounts in vendor_earnings)
+$stmt = $db->prepare("SELECT COALESCE(SUM(amount),0) FROM vendor_earnings WHERE vendor_id = ?");
+$stmt->execute([$vendor_id]);
+$total_earnings = $stmt->fetchColumn();
 ?>
+<?php require_once __DIR__ . '/../includes/header.php'; ?>
 
-<div class="vendor-dashboard">
-    <div class="container">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">Vendor Dashboard</h1>
-            <p class="dashboard-subtitle">Welcome back, <?php echo htmlspecialchars($vendor['business_name']); ?>!</p>
-        </div>
+<div class="vendor-dashboard container">
+  <div class="dashboard-header">
+    <h1>Vendor Dashboard</h1>
+    <p>Welcome, <?=htmlspecialchars($_SESSION['username'] ?? 'Vendor')?></p>
+  </div>
 
-        <!-- Stats Overview -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['total_products']; ?></div>
-                <div class="stat-label">Total Products</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['total_orders']; ?></div>
-                <div class="stat-label">Total Orders</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="stat-number">$<?php echo number_format($stats['total_earnings'], 2); ?></div>
-                <div class="stat-label">Total Earnings</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['pending_orders']; ?></div>
-                <div class="stat-label">Pending Orders</div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="products.php" class="action-btn">
-                <div class="action-icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="action-label">Manage Products</div>
-            </a>
-            
-            <a href="orders.php" class="action-btn">
-                <div class="action-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="action-label">View Orders</div>
-            </a>
-            
-            <a href="earnings.php" class="action-btn">
-                <div class="action-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="action-label">Earnings Report</div>
-            </a>
-            
-            <a href="profile.php" class="action-btn">
-                <div class="action-icon">
-                    <i class="fas fa-store"></i>
-                </div>
-                <div class="action-label">Vendor Profile</div>
-            </a>
-        </div>
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Total Products</h3>
+      <p class="stat-number"><?=htmlspecialchars($products_count)?></p>
     </div>
+    <div class="stat-card">
+      <h3>Total Orders</h3>
+      <p class="stat-number"><?=htmlspecialchars($orders_count)?></p>
+    </div>
+    <div class="stat-card">
+      <h3>Pending Orders</h3>
+      <p class="stat-number"><?=htmlspecialchars($pending_count)?></p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Earnings</h3>
+      <p class="stat-number">$<?=money($total_earnings)?></p>
+    </div>
+  </div>
+
+  <nav class="vendor-nav">
+    <a href="<?php echo BASE_URL; ?>vendor/products.php">Products</a> |
+    <a href="<?php echo BASE_URL; ?>vendor/orders.php">Orders</a> |
+    <a href="<?php echo BASE_URL; ?>vendor/earnings.php">Earnings</a> |
+    <a href="<?php echo BASE_URL; ?>vendor/profile.php">Profile</a> |
+    <a href="<?php echo BASE_URL; ?>pages/logout.php">Logout</a>
+  </nav>
+
 </div>
 
-<?php
-// Include footer
-require_once '../includes/footer.php';
-?>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
