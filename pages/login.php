@@ -21,8 +21,15 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    
-    if (empty($email) || empty($password)) {
+    $recaptcha_token = $_POST['g-recaptcha-response'] ?? '';
+    // Verify reCAPTCHA v3
+    $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
+    $recaptcha_secret = '6LeCBM8rAAAAAKgoK7zTnlTDCxeUdiLME1OPeZ4j';
+    $recaptcha_response = file_get_contents($recaptcha_url . '?secret=' . $recaptcha_secret . '&response=' . $recaptcha_token);
+    $recaptcha = json_decode($recaptcha_response, true);
+    if (empty($recaptcha['success']) || $recaptcha['score'] < 0.5) {
+        $error = 'reCAPTCHA verification failed. Please try again.';
+    } elseif (empty($email) || empty($password)) {
         $error = 'Please fill all fields.';
     } else {
         if ($auth->login($email, $password)) {
@@ -51,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="../assets/css/pages/auth.css">
     <!-- Add FontAwesome CDN for icons if not present -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Google reCAPTCHA CSS -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="login-page">
     <div class="auth-container">
@@ -84,14 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary btn-full">Login</button>
                     </div>
                     <!-- Back arrow at the bottom of the form, styled as a real arrow -->
-                    <div style="display:flex;justify-content:center;align-items:center;margin-top:24px;">
-                        <a href="../landing.php" class="back-arrow" style="display:inline-flex;align-items:center;gap:8px;color:#222;font-size:1.25rem;text-decoration:none;font-weight:500;">
-                            <i class="fas fa-arrow-left" style="font-size:2rem;"></i>
-                            <span style="font-size:1rem;">Back to Home</span>
+                    <div style="display:flex;justify-content:center;align-items:center;margin-top:12px;">
+                        <a href="../landing.php" class="back-arrow" style="display:inline-flex;align-items:center;gap:8px;color:#222;font-size:1.1rem;text-decoration:none;font-weight:500;">
+                            <i class="fas fa-arrow-left" style="font-size:1.5rem;"></i>
+                            <span style="font-size:0.95rem;">Back to Home</span>
                         </a>
                     </div>
                 </form>
@@ -126,6 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
+    });
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeCBM8rAAAAAHI7h5xUIvM46nOnAiZumCWLP3S6"></script>
+    <script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute('6LeCBM8rAAAAAHI7h5xUIvM46nOnAiZumCWLP3S6', {action: 'login'}).then(function(token) {
+            document.getElementById('g-recaptcha-response').value = token;
+        });
     });
     </script>
     <style>
