@@ -1,3 +1,14 @@
+@import url('pages/admin-dashboard.css');
+@import url('pages/admin-profile.css');
+@import url('pages/admin-header.css');
+@import url('pages/admin-login.css');
+@import url('pages/admin-categories.css');
+@import url('pages/admin-orders.css');
+@import url('pages/admin-products.css');
+@import url('pages/admin-reports.css');
+@import url('pages/admin-settings.css');
+@import url('pages/admin-users.css');
+@import url('pages/admin-vendors.css');
 /* In assets/css/style.css */
 @import url('base/reset.css');
 @import url('base/typography.css');
@@ -15,10 +26,16 @@
 @import url('pages/home.css');
 @import url('pages/products.css');
 @import url('pages/logout.css');
+<<<<<<< HEAD
 @import url('pages/vendor-dashboard.css');
 @import url('pages/vendor-earnings.css');
 @import url('pages/vendor-profile.css');
 @import url('pages/vendor-products.css');
+=======
+@import url('css/admin.css');
+@import url('css/admin profile.css');
+
+>>>>>>> ebb47525a15ab02a6b62127f98182234ea4ee14f
 /* ... other imports ... */
 
 /* Auth styles are now loaded separately per page */
