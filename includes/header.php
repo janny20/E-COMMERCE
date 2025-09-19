@@ -33,12 +33,16 @@ require_once 'config.php';
             </div>
             <div class="nav-right">
                 <?php if($isLoggedIn): ?>
-                    <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
+                    <?php if($userType == 'admin'): ?>
+                        <a href="<?php echo BASE_URL; ?>admin/admin-dashboard.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>pages/home.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
+                    <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon"><i class="fas fa-shopping-cart"></i> Cart (<?php echo $cartCount; ?>)</a>
                     <?php if($userType == 'vendor'): ?>
                         <a href="<?php echo BASE_URL; ?>vendor/dashboard.php" class="nav-icon"><i class="fas fa-store"></i> Vendor Dashboard</a>
                     <?php elseif($userType == 'admin'): ?>
-                        <a href="<?php echo BASE_URL; ?>admin/dashboard.php" class="nav-icon"><i class="fas fa-cog"></i> Admin Panel</a>
+                        <a href="<?php echo BASE_URL; ?>pages/home.php" class="nav-icon"><i class="fas fa-cog"></i> Admin Panel</a>
                     <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-icon"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 <?php else: ?>

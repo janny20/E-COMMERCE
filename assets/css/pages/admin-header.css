@@ -1,3 +1,131 @@
+/* Admin Sidebar and Topnav Styles (moved from admin-header.css) */
+.admin-sidebar {
+	width: 240px;
+	background: #2c3e50;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+	z-index: 100;
+}
+.sidebar-header {
+	padding: 24px 0 18px 0;
+	text-align: center;
+	border-bottom: 1px solid rgba(255,255,255,0.07);
+	background: #233140;
+}
+.sidebar-header h2 {
+	font-size: 1.4rem;
+	font-weight: 700;
+	margin: 0;
+	letter-spacing: 1px;
+}
+.sidebar-nav {
+	flex: 1;
+	overflow-y: auto;
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+}
+.sidebar-nav::-webkit-scrollbar {
+	display: none;
+}
+.sidebar-nav ul {
+	list-style: none;
+	padding: 12px 0;
+	margin: 0;
+}
+.nav-item {
+	margin: 0 18px 8px 18px;
+	border-radius: 7px;
+	overflow: hidden;
+	transition: background 0.2s;
+}
+.nav-item:hover {
+	background: #34495e;
+}
+.nav-item.active {
+	background: #34495e;
+	box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+}
+.nav-link {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 11px 14px;
+	color: #fff;
+	text-decoration: none;
+	font-size: 1rem;
+	font-weight: 500;
+	border: none;
+	background: none;
+	width: 100%;
+	transition: color 0.2s;
+}
+.nav-link i {
+	font-size: 1.1rem;
+	margin-right: 8px;
+}
+.nav-link span {
+	flex: 1;
+}
+.admin-main {
+	flex: 1;
+	padding: 30px;
+	overflow-y: auto;
+}
+.admin-topnav {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 18px 32px 18px 260px;
+	background: #fff;
+	border-bottom: 1px solid #e9ecef;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+	position: sticky;
+	top: 0;
+	z-index: 90;
+}
+.topnav-left {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+.topnav-left h1 {
+	font-size: 1.2rem;
+	font-weight: 700;
+	margin: 0 0 0 18px;
+	color: #2c3e50;
+	letter-spacing: 1px;
+}
+.topnav-right {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+.admin-user {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: #f8f9fa;
+	padding: 6px 14px;
+	border-radius: 18px;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.user-avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: #3498db;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	font-size: 1.5rem;
+}
 .navbar-nav {
 	display: flex;
 	flex-direction: column;

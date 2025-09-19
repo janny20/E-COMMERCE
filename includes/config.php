@@ -12,15 +12,23 @@ error_reporting(E_ALL);
 define('BASE_URL', 'http://localhost/multi-vendor-ecommerce/');
 
 // Database configuration
-define('DB_HOST', 'localhost');
+// Change port if your MySQL is not on 3306 (e.g., 'localhost:3307')
+define('DB_HOST', 'localhost:3307'); // MySQL is running on port 3307
 define('DB_NAME', 'ecommerce_db');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', ''); // Set your MySQL password if not empty
 
 // File upload paths
 define('PRODUCT_UPLOAD_PATH', $_SERVER['DOCUMENT_ROOT'] . '/multi-vendor-ecommerce/uploads/products/');
 define('VENDOR_UPLOAD_PATH', $_SERVER['DOCUMENT_ROOT'] . '/multi-vendor-ecommerce/uploads/vendors/');
 define('USER_UPLOAD_PATH', $_SERVER['DOCUMENT_ROOT'] . '/multi-vendor-ecommerce/uploads/users/');
+
+// --- TROUBLESHOOTING ---
+// 1. Make sure MySQL is running in XAMPP
+// 2. Confirm DB credentials above match phpMyAdmin
+// 3. If you changed MySQL port, update DB_HOST (e.g., 'localhost:3307')
+// 4. If you use a password for root, set DB_PASS
+// -----------------------
 
 // Include database connection
 require_once 'database.php';
