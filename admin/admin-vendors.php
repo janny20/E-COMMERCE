@@ -64,11 +64,11 @@ $stmt->execute();
 $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include admin header
-include_once 'includes/admin-header.php';
+include_once '../includes/admin-header.php';
 ?>
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-users-container">
+    <div class="admin-users-header">
         <h1>Vendors Management</h1>
         <p>Manage vendor accounts and approvals</p>
     </div>
@@ -114,7 +114,7 @@ include_once 'includes/admin-header.php';
         </div>
         <div class="card-body">
             <?php if (!empty($vendors)): ?>
-                <table class="data-table">
+                <table class="users-table">
                     <thead>
                         <tr>
                             <th>Business Name</th>
@@ -139,20 +139,20 @@ include_once 'includes/admin-header.php';
                                 <td><?php echo htmlspecialchars($vendor['username']); ?></td>
                                 <td><?php echo htmlspecialchars($vendor['email']); ?></td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $vendor['status']; ?>">
+                                    <span class="user-status <?php echo $vendor['status']; ?>">
                                         <?php echo ucfirst($vendor['status']); ?>
                                     </span>
                                 </td>
                                 <td><?php echo date('M j, Y', strtotime($vendor['joined_date'])); ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-sm">View Details</a>
+                                        <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-edit">View Details</a>
                                         <div class="dropdown">
-                                            <button class="btn btn-sm btn-primary dropdown-toggle">Change Status</button>
+                                            <button class="btn btn-edit dropdown-toggle">Change Status</button>
                                             <div class="dropdown-content">
-                                                <a href="vendors.php?action=approved&id=<?php echo $vendor['id']; ?>">Approve</a>
-                                                <a href="vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>">Reject</a>
-                                                <a href="vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>">Suspend</a>
+                                                <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>">Approve</a>
+                                                <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>">Reject</a>
+                                                <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>">Suspend</a>
                                             </div>
                                         </div>
                                     </div>
@@ -170,5 +170,5 @@ include_once 'includes/admin-header.php';
 
 <?php
 // Include admin footer
-include_once 'includes/admin-footer.php';
+include_once '../includes/admin-footer.php';
 ?>

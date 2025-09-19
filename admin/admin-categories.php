@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
 session_start();
 require_once '../includes/config.php';
@@ -128,11 +129,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['id'])) {
 }
 
 // Include admin header
-include_once 'includes/admin-header.php';
+include_once '../includes/admin-header.php';
 ?>
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-users-container">
+    <div class="admin-users-header">
         <h1>Categories Management</h1>
         <p>Manage product categories and subcategories</p>
     </div>
@@ -201,7 +202,7 @@ include_once 'includes/admin-header.php';
                 </div>
                 <div class="card-body">
                     <?php if (!empty($categories)): ?>
-                        <table class="data-table">
+                        <table class="users-table">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -230,8 +231,8 @@ include_once 'includes/admin-header.php';
                                         <td><?php echo $product_count; ?></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="categories.php?action=edit&id=<?php echo $category['id']; ?>" class="btn btn-sm">Edit</a>
-                                                <a href="categories.php?action=delete&id=<?php echo $category['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                                                <a href="admin-categories.php?action=edit&id=<?php echo $category['id']; ?>" class="btn btn-edit">Edit</a>
+                                                <a href="admin-categories.php?action=delete&id=<?php echo $category['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -249,5 +250,5 @@ include_once 'includes/admin-header.php';
 
 <?php
 // Include admin footer
-include_once 'includes/admin-footer.php';
+include_once '../includes/admin-footer.php';
 ?>
