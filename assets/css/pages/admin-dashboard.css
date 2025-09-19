@@ -2,24 +2,24 @@
 /* Admin Dashboard Styles - Modern & Professional */
 :root {
     --primary: #4361ee;
-    --primary-dark: #3a56d4;
-    --secondary: #6c757d;
-    --success: #28a745;
-    --danger: #dc3545;
-    --warning: #ffc107;
-    --info: #17a2b8;
-    --light: #f8f9fa;
-    --dark: #343a40;
+    --primary-dark: #2563EB;
+    --secondary: #64748B;
+    --success: #22C55E;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --info: #0EA5E9;
+    --light: #F8FAFC;
+    --dark: #1E293B;
     --white: #ffffff;
-    --gray-100: #f8f9fa;
-    --gray-200: #e9ecef;
-    --gray-300: #dee2e6;
-    --gray-400: #ced4da;
-    --gray-500: #adb5bd;
-    --gray-600: #6c757d;
-    --gray-700: #495057;
-    --gray-800: #343a40;
-    --gray-900: #212529;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-300: #CBD5E1;
+    --gray-400: #94A3B8;
+    --gray-500: #64748B;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1E293B;
+    --gray-900: #0F172A;
     --border-radius: 12px;
     --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s ease;
@@ -103,19 +103,19 @@
 }
 
 .stat-card:nth-child(1) {
-    border-left-color: #4361ee;
+    border-left-color: var(--primary);
 }
 
 .stat-card:nth-child(2) {
-    border-left-color: #28a745;
+    border-left-color: var(--success);
 }
 
 .stat-card:nth-child(3) {
-    border-left-color: #ffc107;
+    border-left-color: var(--warning);
 }
 
 .stat-card:nth-child(4) {
-    border-left-color: #dc3545;
+    border-left-color: var(--danger);
 }
 
 .stat-icon {
@@ -134,17 +134,17 @@
 }
 
 .stat-card:nth-child(2) .stat-icon {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
 }
 
 .stat-card:nth-child(3) .stat-icon {
-    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
     box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
 }
 
 .stat-card:nth-child(4) .stat-icon {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.25);
 }
 
@@ -275,7 +275,7 @@
 }
 
 .btn-success:hover {
-    background: #218838;
+    background: #16a34a;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
 }
@@ -286,7 +286,7 @@
 }
 
 .btn-danger:hover {
-    background: #c82333;
+    background: #dc2626;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.25);
 }
@@ -349,33 +349,33 @@
 }
 
 .status-pending {
-    background-color: rgba(255, 193, 7, 0.15);
-    color: #856404;
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .status-confirmed {
-    background-color: rgba(23, 162, 184, 0.15);
-    color: #0c5460;
-    border: 1px solid rgba(23, 162, 184, 0.3);
+    background-color: rgba(14, 165, 233, 0.15);
+    color: #0369a1;
+    border: 1px solid rgba(14, 165, 233, 0.3);
 }
 
 .status-processing {
-    background-color: rgba(23, 162, 184, 0.15);
-    color: #0c5460;
-    border: 1px solid rgba(23, 162, 184, 0.3);
+    background-color: rgba(14, 165, 233, 0.15);
+    color: #0369a1;
+    border: 1px solid rgba(14, 165, 233, 0.3);
 }
 
 .status-shipped {
-    background-color: rgba(40, 167, 69, 0.15);
-    color: #155724;
-    border: 1px solid rgba(40, 167, 69, 0.3);
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .status-delivered {
-    background-color: rgba(40, 167, 69, 0.15);
-    color: #155724;
-    border: 1px solid rgba(40, 167, 69, 0.3);
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .status-cancelled {

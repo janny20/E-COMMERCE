@@ -1,18 +1,59 @@
 :root {
-    --primary-color: #ff6f00;
-    --secondary-color: #333;
-    --background-light: #f4f7f6;
-    --card-background: #fff;
-    --text-dark: #2c3e50;
-    --text-light: #7f8c8d;
-    --border-color: #e8e8e8;
-    --shadow-color: rgba(0, 0, 0, 0.05);
+    /* New Canva-Inspired Color Palette */
+    --primary-color: #7C3AED; /* Vibrant Purple */
+    --primary-dark: #6D28D9;
+    --secondary-color: #FDBA74; /* Peach */
+    --accent-color: #F472B6; /* Pink */
+
+    --success-color: #22C55E;
+    --danger-color: #EF4444;
+    --warning-color: #F59E0B;
+    --info-color: #3B82F6;
+
+    --success-bg-light: #dcfce7;
+    --danger-bg-light: #fee2e2;
+    --success-text-dark: #166534;
+    --danger-text-dark: #991b1b;
+
+    --background-light: #F8FAFC; /* Very light gray */
+    --bg-light: #F1F5F9; /* e.g., for cards on light background */
+    --bg-white: #FFFFFF;
+    
+    --text-primary: #1E293B; /* Darker Slate */
+    --text-secondary: #475569; /* Slate */
+    --text-light: #94A3B8; /* Lighter Slate */
+    --text-white: #FFFFFF;
+
+    --border-color: #E2E8F0;
+    --border-radius-sm: 4px;
+    --border-radius: 8px;
+    --border-radius-lg: 16px;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+
+    --transition-fast: all 0.2s ease-in-out;
+    --transition-normal: all 0.3s ease-in-out;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: var(--background-light);
-    color: var(--text-dark);
+    background-color: var(--bg-light);
+    color: var(--text-secondary);
     line-height: 1.6;
 }
 
@@ -82,7 +123,7 @@ body {
 }
 
 .btn:hover {
-    background-color: #e06000;
+    background-color: var(--primary-dark);
     transform: translateY(-2px);
 }
 
@@ -119,8 +160,8 @@ body {
 .feature-item {
     background-color: var(--card-background);
     padding: 40px 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px var(--shadow-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
     transition: transform 0.3s ease;
 }
 
@@ -177,10 +218,10 @@ body {
 
 .category-card {
     background-color: var(--card-background);
-    padding: 30px;
-    border-radius: 12px;
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
     text-align: center;
-    box-shadow: 0 4px 15px var(--shadow-color);
+    box-shadow: var(--shadow-md);
     transition: transform 0.3s ease;
     border: 1px solid var(--border-color);
 }
@@ -217,9 +258,9 @@ body {
 
 .product-card {
     background-color: var(--card-background);
-    border-radius: 12px;
+    border-radius: var(--border-radius-lg);
     overflow: hidden;
-    box-shadow: 0 4px 15px var(--shadow-color);
+    box-shadow: var(--shadow-md);
     transition: transform 0.3s ease;
     border: 1px solid var(--border-color);
     position: relative;
@@ -311,7 +352,7 @@ body {
 }
 
 .add-to-cart-btn:hover {
-    background-color: #e06000;
+    background-color: var(--primary-dark);
 }
 
 /* --- Product Overlays and Badges --- */
@@ -363,7 +404,7 @@ body {
 }
 
 .product-card .badge.sale {
-    background-color: #ff6f00;
+    background-color: var(--primary-color);
 }
 
 /* --- Section Footer --- */
@@ -424,14 +465,14 @@ body {
 }
 
 .newsletter-form button:hover {
-    background-color: #e06000;
+    background-color: var(--primary-dark);
 }
 
 /* --- Footer --- */
 footer {
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    padding: 50px 0 20px;
+    background-color: var(--text-primary);
+    color: var(--text-light);
+    padding: var(--spacing-xxl) 0 var(--spacing-lg);
     font-size: 0.9rem;
 }
 
@@ -446,7 +487,7 @@ footer {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 15px;
-    color: #fff;
+    color: var(--text-white);
     position: relative;
 }
 
@@ -470,7 +511,7 @@ footer {
 }
 
 .footer-column ul a {
-    color: #bdc3c7;
+    color: var(--text-light);
     text-decoration: none;
     transition: color 0.3s;
 }
@@ -486,7 +527,7 @@ footer {
 }
 
 .social-links a {
-    color: #fff;
+    color: var(--text-white);
     font-size: 1.2rem;
     transition: color 0.3s;
 }
@@ -497,8 +538,8 @@ footer {
 
 .footer-bottom {
     text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 20px;
+    border-top: 1px solid var(--text-secondary);
+    padding-top: var(--spacing-lg);
 }
 
 /* Animations */

@@ -1,7 +1,7 @@
-/* Admin Sidebar and Topnav Styles (moved from admin-header.css) */
+/* Admin Sidebar and Topnav Styles */
 .admin-sidebar {
 	width: 240px;
-	background: #040000;
+	background: var(--dark, #1E293B);
 	color: #fff;
 	display: flex;
 	flex-direction: column;
@@ -9,15 +9,15 @@
 	position: fixed;
 	top: 0;
 	left: 0;
-	box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+	box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
 	z-index: 100;
 }
+
 .sidebar-header {
-	padding: 32px 0 24px 0;
+	padding: 24px;
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	padding-left: 32px;
 	border-bottom: 1px solid rgba(255,255,255,0.07);
 	background: var(--primary);
 }
@@ -48,10 +48,10 @@
 	transition: background 0.2s;
 }
 .nav-item:hover {
-	background: #34495e;
+	background: var(--gray-700);
 }
 .nav-item.active {
-	background: #34495e;
+	background: var(--gray-700);
 	box-shadow: 0 2px 8px rgba(44,62,80,0.08);
 }
 .nav-link {
@@ -59,14 +59,13 @@
 	align-items: center;
 	gap: 12px;
 	padding: 11px 14px;
-	color: #fff !important;
+	color: #fff;
 	text-decoration: none;
-	font-size: 1.6rem;
-	font-weight: 700;
+	font-size: 1rem;
+	font-weight: 500;
 	margin: 0;
-	letter-spacing: 1px;
-	color: #fff !important;
-	text-shadow: 0 2px 8px rgba(44,97,238,0.15);
+	white-space: nowrap;
+	transition: background 0.2s, color 0.2s;
 }
 .nav-link i {
 	font-size: 1.1rem;
@@ -74,7 +73,6 @@
 }
 .nav-link span {
 	color: #fff;
-	text-shadow: 0 2px 8px rgba(44,97,238,0.15);
 }
 .admin-main {
 	flex: 1;
@@ -87,7 +85,7 @@
 	align-items: center;
 	padding: 18px 32px 18px 260px;
 	background: #fff;
-	border-bottom: 1px solid #e9ecef;
+	border-bottom: 1px solid var(--gray-200);
 	box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 	position: sticky;
 	top: 0;
@@ -102,7 +100,7 @@
 	font-size: 1.2rem;
 	font-weight: 700;
 	margin: 0 0 0 18px;
-	color: #2c3e50;
+	color: var(--gray-800);
 	letter-spacing: 1px;
 }
 .topnav-right {
@@ -113,7 +111,7 @@
 .admin-user {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 12px;
 	background: #f8f9fa;
 	padding: 6px 14px;
 	border-radius: 18px;
@@ -123,252 +121,20 @@
 	width: 32px;
 	height: 32px;
 	border-radius: 50%;
-	background: #3498db;
+	background: var(--primary);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	color: #fff;
 	font-size: 1.5rem;
 }
-.navbar-nav {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	width: 100%;
-	margin-top: 1rem;
-	max-height: 80vh;
-	overflow-y: auto;
-	scrollbar-width: none; /* Hide scrollbar for Firefox */
-}
-.navbar-nav::-webkit-scrollbar {
-	display: none; /* Hide scrollbar for Chrome, Safari */
-}
-.sidebar {
-	background: #ff6600;
-	color: #fff;
-	min-height: 100vh;
-	padding-top: 2rem;
-	font-family: 'Inter', sans-serif;
-	width: 240px;
-	display: flex;
-	flex-direction: column;
-	box-shadow: 2px 0 8px rgba(255, 102, 0, 0.08);
-	overflow-y: auto;
-}
-.nav-link {
-	display: flex;
-	align-items: center;
-	padding: 0.85rem 1.5rem;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 1.08rem;
-	border-radius: 8px;
-	transition: background 0.2s, color 0.2s;
-	text-decoration: none;
-	background: transparent;
-	letter-spacing: 0.01em;
-	white-space: nowrap;
-}
-.nav-link:hover, .nav-link.active {
-	background: #fff;
-	color: #ff6600;
-	box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08);
-}
-/* Dashboard page styles */
-/* Admin sidebar-nav styles for reliable scroll and color */
-.sidebar-nav {
-	max-height: 70vh;
-	overflow-y: auto;
-	background: #ff6600;
-	border-radius: 10px;
-	box-shadow: 0 2px 8px rgba(255,102,0,0.08);
-	padding: 0.5rem 0;
-	margin: 0;
-	scrollbar-width: none; /* Firefox */
-}
-.sidebar-nav::-webkit-scrollbar {
-	width: 0px;
-	background: transparent;
-}
-.sidebar-nav ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-.nav-link {
-	display: flex;
-	align-items: center;
-	padding: 0.85rem 1.5rem;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 1.08rem;
-	border-radius: 8px;
-	transition: background 0.2s, color 0.2s;
-	text-decoration: none;
-	background: transparent;
-	letter-spacing: 0.01em;
-	white-space: nowrap;
-}
-.nav-link:hover, .nav-link.active {
-	background: #fff;
-	color: #ff6600;
-	box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08);
-}
-/* Sidebar Navigation Styling for admin panel */
-.sidebar-nav {
-	max-height: 70vh;
-	overflow-y: auto;
-	background: #ff6600;
-	border-radius: 10px;
-	box-shadow: 0 2px 8px rgba(255,102,0,0.08);
-	padding: 0.5rem 0;
-	scrollbar-width: none; /* Hide scrollbar for Firefox */
-}
-.sidebar-nav::-webkit-scrollbar {
-	display: none; /* Hide scrollbar for Chrome, Safari */
-}
-.nav-link {
-	display: flex;
-	align-items: center;
-	padding: 0.85rem 1.5rem;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 1.08rem;
-	border-radius: 8px;
-	transition: background 0.2s, color 0.2s;
-	text-decoration: none;
-	background: transparent;
-	letter-spacing: 0.01em;
-	white-space: nowrap;
-}
-.nav-link:hover, .nav-link.active {
-	background: #fff;
-	color: #ff6600;
-	box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08);
-}
-/* Sidebar Navigation Styling - Improved for visibility and overflow */
-.sidebar {
-	background: #ff6600;
-	color: #fff;
-	min-height: 100vh;
-	padding-top: 2rem;
-	font-family: 'Inter', sans-serif;
-	width: 240px;
-	display: flex;
-	flex-direction: column;
-	box-shadow: 2px 0 8px rgba(255, 102, 0, 0.08);
-	overflow-y: auto;
-}
-.navbar-nav {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	width: 100%;
-	margin-top: 1rem;
-	max-height: 80vh;
-	overflow-y: auto;
-	scrollbar-width: thin;
-	scrollbar-color: #fff #ff6600;
-}
-.navbar-nav::-webkit-scrollbar {
-	width: 6px;
-	background: #ff6600;
-}
-.navbar-nav::-webkit-scrollbar-thumb {
-	background: #fff;
-	border-radius: 6px;
-}
-.nav-link {
-	display: flex;
-	align-items: center;
-	padding: 0.85rem 1.5rem;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 1.08rem;
-	border-radius: 8px;
-	transition: background 0.2s, color 0.2s;
-	text-decoration: none;
-	background: transparent;
-	letter-spacing: 0.01em;
-	white-space: nowrap;
-}
-.nav-link i {
-	margin-right: 0.85rem;
-	font-size: 1.15rem;
-}
-.nav-link:hover, .nav-link.active {
-	background: #fff;
-	color: #ff6600;
-	box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08);
-}
+
 @media (max-width: 900px) {
-	.sidebar {
-		min-width: 100%;
-		width: 100%;
-		padding-top: 1rem;
-		box-shadow: none;
+	.admin-sidebar {
+		/* Styles to hide sidebar on mobile, or transform to a top/bottom bar */
+		left: -240px;
 	}
-	.navbar-nav {
-		flex-direction: row;
-		gap: 0.25rem;
-		justify-content: space-around;
-		max-height: none;
-		overflow-y: visible;
-	}
-	.nav-link {
-		font-size: 0.98rem;
-		padding: 0.5rem 0.75rem;
-	}
-}
-/* Sidebar Navigation Styling */
-.sidebar {
-	background: #ff6600;
-	color: #fff;
-	min-height: 100vh;
-	padding-top: 2rem;
-	font-family: 'Inter', sans-serif;
-}
-.navbar-nav {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	width: 100%;
-	margin-top: 1rem;
-}
-.nav-link {
-	display: flex;
-	align-items: center;
-	padding: 0.85rem 1.5rem;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 1.05rem;
-	border-radius: 8px;
-	transition: background 0.2s, color 0.2s;
-	text-decoration: none;
-	background: transparent;
-	letter-spacing: 0.01em;
-}
-.nav-link i {
-	margin-right: 0.85rem;
-	font-size: 1.15rem;
-}
-.nav-link:hover, .nav-link.active {
-	background: #ff6600;
-	color: #fff;
-	box-shadow: 0 2px 8px rgba(255, 102, 0, 0.08);
-}
-@media (max-width: 900px) {
-	.sidebar {
-		min-width: 100%;
-		padding-top: 1rem;
-	}
-	.navbar-nav {
-		flex-direction: row;
-		gap: 0.25rem;
-		justify-content: space-around;
-	}
-	.nav-link {
-		font-size: 0.95rem;
-		padding: 0.5rem 0.75rem;
+	.admin-topnav {
+		padding-left: 32px;
 	}
 }

@@ -80,7 +80,7 @@
 .auth-form-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(37,117,252,0.08);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
 }
 
 .auth-form-input.error {
@@ -119,7 +119,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: background var(--transition-fast);
-    box-shadow: 0 1px 4px rgba(37,117,252,0.08);
+    box-shadow: var(--shadow-sm);
 }
 
 .auth-form-submit:hover {

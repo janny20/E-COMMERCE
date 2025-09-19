@@ -1,6 +1,6 @@
 /* Admin Login Page Styles */
 .admin-login {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary, #3B82F6) 0%, var(--primary-dark, #1a5bbd) 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -29,7 +29,7 @@
 }
 
 .login-header {
-    background: #2d72d9;
+    background: transparent;
     color: white;
     padding: 30px 20px;
     text-align: center;
@@ -73,14 +73,14 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #2d72d9;
-    box-shadow: 0 0 0 3px rgba(45, 114, 217, 0.1);
+    border-color: var(--primary, #3B82F6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .btn {
     display: inline-block;
     padding: 14px 20px;
-    background: #2d72d9;
+    background: var(--primary, #3B82F6);
     color: white;
     border: none;
     border-radius: 8px;
@@ -96,7 +96,7 @@
 }
 
 .btn:hover {
-    background: #1a5bbd;
+    background: var(--primary-dark, #2563EB);
     transform: translateY(-2px);
 }
 
