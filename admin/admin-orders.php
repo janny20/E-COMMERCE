@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
 session_start();
 require_once '../includes/config.php';
@@ -76,11 +77,11 @@ $stmt->execute();
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include admin header
-include_once 'includes/admin-header.php';
+include_once '../includes/admin-header.php';
 ?>
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-users-container">
+    <div class="admin-users-header">
         <h1>Orders Management</h1>
         <p>View and manage customer orders</p>
     </div>
@@ -138,7 +139,7 @@ include_once 'includes/admin-header.php';
         </div>
         <div class="card-body">
             <?php if (!empty($orders)): ?>
-                <table class="data-table">
+                <table class="users-table">
                     <thead>
                         <tr>
                             <th>Order #</th>
@@ -163,23 +164,23 @@ include_once 'includes/admin-header.php';
                                 <td>$<?php echo number_format($order['total_amount'], 2); ?></td>
                                 <td><?php echo ucfirst(str_replace('_', ' ', $order['payment_method'])); ?></td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $order['status']; ?>">
+                                    <span class="user-status <?php echo $order['status']; ?>">
                                         <?php echo ucfirst($order['status']); ?>
                                     </span>
                                 </td>
                                 <td><?php echo date('M j, Y', strtotime($order['created_at'])); ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="order-details.php?id=<?php echo $order['id']; ?>" class="btn btn-sm">View Details</a>
+                                        <a href="admin-order-details.php?id=<?php echo $order['id']; ?>" class="btn btn-edit">View Details</a>
                                         <div class="dropdown">
-                                            <button class="btn btn-sm btn-primary dropdown-toggle">Update Status</button>
+                                            <button class="btn btn-edit dropdown-toggle">Update Status</button>
                                             <div class="dropdown-content">
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=pending">Pending</a>
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=confirmed">Confirmed</a>
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=processing">Processing</a>
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=shipped">Shipped</a>
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=delivered">Delivered</a>
-                                                <a href="orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=cancelled">Cancelled</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=pending">Pending</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=confirmed">Confirmed</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=processing">Processing</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=shipped">Shipped</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=delivered">Delivered</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=cancelled">Cancelled</a>
                                             </div>
                                         </div>
                                     </div>
@@ -197,5 +198,5 @@ include_once 'includes/admin-header.php';
 
 <?php
 // Include admin footer
-include_once 'includes/admin-footer.php';
+include_once '../includes/admin-footer.php';
 ?>

@@ -5,7 +5,24 @@ require_once __DIR__ . '/../includes/middleware.php';
 requireVendor();
 
 // Get vendor ID
+
 $vendor_id = $_SESSION['vendor_id'] ?? null;
+// Check vendor approval status
+$vendor_status = null;
+if ($vendor_id) {
+  $stmt = $db->prepare("SELECT status FROM vendors WHERE id = ?");
+  $stmt->execute([$vendor_id]);
+  $vendor_status = $stmt->fetchColumn();
+}
+if ($vendor_status !== 'approved') {
+  require_once __DIR__ . '/../includes/header.php';
+  echo '<div class="vendor-dashboard container" style="margin-top:40px;text-align:center;">';
+  echo '<h2 style="color:#d35400;">Vendor account pending...</h2>';
+  echo '<p>Your account must be approved by the admin before you can access the dashboard.</p>';
+  echo '</div>';
+  require_once __DIR__ . '/../includes/footer.php';
+  exit;
+}
 
 // Get database connection
 $database = new Database();

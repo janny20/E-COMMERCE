@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
 session_start();
 require_once '../includes/config.php';
@@ -59,11 +60,11 @@ $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include admin header
-include_once 'includes/admin-header.php';
+include_once '../includes/admin-header.php';
 ?>
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-users-container">
+    <div class="admin-users-header">
         <h1>Products Management</h1>
         <p>Manage all products in the marketplace</p>
     </div>
@@ -79,7 +80,7 @@ include_once 'includes/admin-header.php';
         </div>
         <div class="card-body">
             <?php if (!empty($products)): ?>
-                <table class="data-table">
+                <table class="users-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -114,17 +115,17 @@ include_once 'includes/admin-header.php';
                                 <td>$<?php echo number_format($product['price'], 2); ?></td>
                                 <td><?php echo $product['quantity']; ?></td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $product['status']; ?>">
+                                    <span class="user-status <?php echo $product['status']; ?>">
                                         <?php echo ucfirst($product['status']); ?>
                                     </span>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="product-edit.php?id=<?php echo $product['id']; ?>" class="btn btn-sm">Edit</a>
-                                        <a href="products.php?action=toggle_status&id=<?php echo $product['id']; ?>" class="btn btn-sm <?php echo $product['status'] == 'active' ? 'btn-warning' : 'btn-success'; ?>">
+                                        <a href="admin-product-edit.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Edit</a>
+                                        <a href="admin-products.php?action=toggle_status&id=<?php echo $product['id']; ?>" class="btn btn-edit">
                                             <?php echo $product['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>
                                         </a>
-                                        <a href="products.php?action=delete&id=<?php echo $product['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                        <a href="admin-products.php?action=delete&id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                                     </div>
                                 </td>
                             </tr>
@@ -140,5 +141,5 @@ include_once 'includes/admin-header.php';
 
 <?php
 // Include admin footer
-include_once 'includes/admin-footer.php';
+include_once '../includes/admin-footer.php';
 ?>
