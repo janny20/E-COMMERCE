@@ -1,0 +1,122 @@
+.footer {
+    background: #222;
+    color: #fff;
+    padding: 40px 0 0 0;
+    font-size: 1rem;
+}
+.footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+.footer-main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: space-between;
+}
+.footer-brand {
+    flex: 1 1 250px;
+    min-width: 220px;
+}
+.footer-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.footer-description {
+    margin: 12px 0 16px 0;
+    color: #bbb;
+    font-size: 0.95rem;
+}
+.footer-social {
+    display: flex;
+    gap: 12px;
+}
+.social-link {
+    color: #fff;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+.social-link:hover {
+    color: #ff8c42;
+}
+.footer-column {
+    flex: 1 1 180px;
+    min-width: 180px;
+}
+.footer-column h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    color: #ff8c42;
+}
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-links li {
+    margin-bottom: 10px;
+}
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.footer-links a:hover {
+    color: #ff8c42;
+}
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+.newsletter-input {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    flex: 1;
+    font-size: 1rem;
+}
+.newsletter-btn {
+    background: #ff8c42;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+.newsletter-btn:hover {
+    background: #ff6b35;
+}
+.footer-bottom {
+    border-top: 1px solid #444;
+    margin-top: 32px;
+    padding: 16px 0;
+    text-align: center;
+    color: #bbb;
+    font-size: 0.95rem;
+}
+@media (max-width: 900px) {
+    .footer-main {
+        flex-direction: column;
+        gap: 24px;
+    }
+    .footer-column, .footer-brand {
+        min-width: 0;
+    }
+}

@@ -1,4 +1,8 @@
 <?php
+// Site name for footer and branding
+if (!defined('SITE_NAME')) {
+    define('SITE_NAME', 'MultiVendor');
+}
 // includes/config.php - CHECK FOR SESSION ISSUES
 // Error reporting
 ini_set('display_errors', 1);

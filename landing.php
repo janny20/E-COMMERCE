@@ -369,10 +369,6 @@ if (session_status() === PHP_SESSION_NONE) {
         </section>
     </main>
 
-    <footer class="landing-footer">
-        <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> ShopSphere. All rights reserved.</p>
-        </div>
-    </footer>
+    <?php require_once __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
