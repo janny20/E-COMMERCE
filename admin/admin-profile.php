@@ -162,5 +162,5 @@ $page_title = "Profile";
     </div>
 </div>
 
-<?php include_once 'includes/admin-footer.php'; ?>
+// ...existing code...
 <?php include_once __DIR__ . '/../includes/admin-footer.php'; ?>
