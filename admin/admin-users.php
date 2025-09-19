@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
 session_start();
 require_once '../includes/config.php';
@@ -75,11 +76,11 @@ $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include admin header
-include_once 'includes/admin-header.php';
+include_once '../includes/admin-header.php';
 ?>
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-users-container">
+    <div class="admin-users-header">
         <h1>Users Management</h1>
         <p>Manage customer accounts</p>
     </div>
@@ -92,13 +93,13 @@ include_once 'includes/admin-header.php';
         <div class="alert alert-success"><?php echo $success; ?></div>
     <?php endif; ?>
 
-    <div class="card">
-        <div class="card-header">
+    <div>
+        <div>
             <h2>All Users</h2>
         </div>
-        <div class="card-body">
+        <div>
             <?php if (!empty($users)): ?>
-                <table class="data-table">
+                <table class="users-table">
                     <thead>
                         <tr>
                             <th>User ID</th>
@@ -114,33 +115,33 @@ include_once 'includes/admin-header.php';
                     <tbody>
                         <?php foreach ($users as $user): ?>
                             <tr>
-                                <td><?php echo $user['id']; ?></td>
-                                <td>
+                                <td data-label="User ID"><?php echo $user['id']; ?></td>
+                                <td data-label="Name">
                                     <?php 
                                     $full_name = trim($user['first_name'] . ' ' . $user['last_name']);
                                     echo !empty($full_name) ? htmlspecialchars($full_name) : htmlspecialchars($user['username']);
                                     ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                <td><?php echo !empty($user['phone']) ? htmlspecialchars($user['phone']) : 'N/A'; ?></td>
-                                <td>
+                                <td data-label="Email"><?php echo htmlspecialchars($user['email']); ?></td>
+                                <td data-label="Phone"><?php echo !empty($user['phone']) ? htmlspecialchars($user['phone']) : 'N/A'; ?></td>
+                                <td data-label="Type">
                                     <span class="badge badge-<?php echo $user['user_type']; ?>">
                                         <?php echo ucfirst($user['user_type']); ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <span class="status-badge status-<?php echo $user['status']; ?>">
-                                        <?php echo ucfirst($user['status']); ?>
+                                <td data-label="Status">
+                                    <span class="user-status <?php echo isset($user['status']) ? $user['status'] : 'unknown'; ?>">
+                                        <?php echo isset($user['status']) ? ucfirst($user['status']) : 'Unknown'; ?>
                                     </span>
                                 </td>
-                                <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
-                                <td>
+                                <td data-label="Joined Date"><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                                <td data-label="Actions">
                                     <div class="action-buttons">
-                                        <a href="user-details.php?id=<?php echo $user['id']; ?>" class="btn btn-sm">View Details</a>
-                                        <a href="users.php?action=toggle_status&id=<?php echo $user['id']; ?>" class="btn btn-sm <?php echo $user['status'] == 'active' ? 'btn-warning' : 'btn-success'; ?>">
-                                            <?php echo $user['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>
+                                        <a href="admin-user-details.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">View Details</a>
+                                        <a href="admin-users.php?action=toggle_status&id=<?php echo $user['id']; ?>" class="btn btn-edit">
+                                            <?php echo (isset($user['status']) && $user['status'] == 'active') ? 'Deactivate' : 'Activate'; ?>
                                         </a>
-                                        <a href="users.php?action=delete&id=<?php echo $user['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                                        <a href="admin-users.php?action=delete&id=<?php echo $user['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                     </div>
                                 </td>
                             </tr>
@@ -156,5 +157,5 @@ include_once 'includes/admin-header.php';
 
 <?php
 // Include admin footer
-include_once 'includes/admin-footer.php';
+include_once '../includes/admin-footer.php';
 ?>

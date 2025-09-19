@@ -19,7 +19,7 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">
-                <h2>Admin Panel</h2>
+                <h2 style="color:#fff !important;">Admin Panel</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>

@@ -33,23 +33,18 @@ require_once 'config.php';
             </div>
             <div class="nav-right">
                 <?php if($isLoggedIn): ?>
-<<<<<<< HEAD
                     <?php if(isset($userType) && strtolower($userType) === 'vendor'): ?>
                         <a href="<?php echo BASE_URL; ?>vendor/profile.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
-                    <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
-=======
-                    <?php if($userType == 'admin'): ?>
+                    <?php elseif(isset($userType) && strtolower($userType) === 'admin'): ?>
                         <a href="<?php echo BASE_URL; ?>admin/admin-dashboard.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
                     <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>pages/home.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
->>>>>>> ebb47525a15ab02a6b62127f98182234ea4ee14f
+                        <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
                     <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon"><i class="fas fa-shopping-cart"></i> Cart (<?php echo $cartCount; ?>)</a>
-                    <?php if($userType == 'vendor'): ?>
+                    <?php if(isset($userType) && strtolower($userType) === 'vendor'): ?>
                         <a href="<?php echo BASE_URL; ?>vendor/dashboard.php" class="nav-icon"><i class="fas fa-store"></i> Vendor Dashboard</a>
-                    <?php elseif($userType == 'admin'): ?>
-                        <a href="<?php echo BASE_URL; ?>pages/home.php" class="nav-icon"><i class="fas fa-cog"></i> Admin Panel</a>
+                    <?php elseif(isset($userType) && strtolower($userType) === 'admin'): ?>
+                        <a href="<?php echo BASE_URL; ?>admin/admin-dashboard.php" class="nav-icon"><i class="fas fa-cog"></i> Admin Panel</a>
                     <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-icon"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 <?php else: ?>

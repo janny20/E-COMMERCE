@@ -5,7 +5,10 @@ require_once __DIR__ . '/../includes/middleware.php';
 requireVendor();
 
 
-$vendor_id = $_SESSION['vendor_id'];
+$vendor_id = $_SESSION['vendor_id'] ?? null;
+if (!$vendor_id) {
+  die('Vendor not logged in.');
+}
 
 // Get database connection
 $database = new Database();
@@ -29,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['item_id']) && !empty
 }
 
 // Fetch order items for this vendor grouped by order
-$stmt = $db->prepare("SELECT o.id as order_id, o.user_id, o.total_amount, o.status, o.created_at,
-          oi.id as item_id, oi.product_id, oi.qty, oi.price, p.title
+$stmt = $db->prepare("SELECT o.id as order_id, o.customer_id, o.total_amount, o.status, o.created_at,
+          oi.id as item_id, oi.product_id, oi.qty, oi.price, p.name
         FROM orders o
         JOIN order_items oi ON oi.order_id = o.id
         LEFT JOIN products p ON p.id = oi.product_id

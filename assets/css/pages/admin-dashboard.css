@@ -1,3 +1,4 @@
+    margin-top: 32px;
 /* Admin Dashboard Styles - Modern & Professional */
 :root {
     --primary: #4361ee;
@@ -27,7 +28,8 @@
 .admin-container {
     padding: 24px;
     max-width: 1600px;
-    margin: 0 auto;
+    margin: 32px auto 0 auto;
+    margin-left: 260px;
 }
 
 .admin-header {
@@ -149,13 +151,13 @@
 .stat-info h3 {
     font-size: 2.2rem;
     font-weight: 700;
-    color: var(--gray-800);
+    color: #222;
     margin-bottom: 6px;
     line-height: 1;
 }
 
 .stat-info p {
-    color: var(--gray-600);
+    color: #333;
     margin: 0;
     font-size: 0.95rem;
     font-weight: 500;
@@ -227,7 +229,7 @@
 .card-header h2 {
     margin: 0;
     font-size: 1.4rem;
-    color: var(--gray-800);
+    color: #222;
     font-weight: 600;
 }
 
@@ -320,7 +322,8 @@
 .data-table th {
     background-color: var(--gray-100);
     font-weight: 600;
-    color: var(--gray-700);
+    color: #222;
+    color: #222;
     position: sticky;
     top: 0;
 }

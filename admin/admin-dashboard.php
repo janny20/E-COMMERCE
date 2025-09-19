@@ -89,144 +89,137 @@ include_once __DIR__ . '/../includes/admin-header.php';
         </div>
     <?php endif; ?>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3><?php echo $stats['total_users']; ?></h3>
-                <p>Total Users</p>
-            </div>
-            <a href="admin-users.php" class="stat-link">View All</a>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-info">
-                <h3><?php echo $stats['total_products']; ?></h3>
-                <p>Total Products</p>
-            </div>
-            <a href="admin-products.php" class="stat-link">View All</a>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-shopping-cart"></i>
-            </div>
-            <div class="stat-info">
-                <h3><?php echo $stats['total_orders']; ?></h3>
-                <p>Total Orders</p>
-            </div>
-            <a href="admin-orders.php" class="stat-link">View All</a>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-store"></i>
-            </div>
-            <div class="stat-info">
-                <h3><?php echo $stats['total_vendors']; ?></h3>
-                <p>Approved Vendors</p>
-            </div>
-            <a href="admin-vendors.php" class="stat-link">View All</a>
-        </div>
-    </div>
-
-    <div class="dashboard-content">
-        <div class="dashboard-column">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Recent Orders</h2>
-                    <a href="admin-orders.php" class="btn btn-outline btn-sm">
-                        <i class="fas fa-list"></i> View All
-                    </a>
+    <section class="dashboard-section">
+        <h2 class="section-title">Quick Stats</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3><?php echo $stats['total_users']; ?></h3>
+                    <p>Total Users</p>
                 </div>
-                <div class="card-body">
-                    <?php if (!empty($recent_orders)): ?>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Order #</th>
-                                    <th>Customer</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recent_orders as $order): ?>
+                <a href="admin-users.php" class="stat-link">View All</a>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-box"></i></div>
+                <div class="stat-info">
+                    <h3><?php echo $stats['total_products']; ?></h3>
+                    <p>Total Products</p>
+                </div>
+                <a href="admin-products.php" class="stat-link">View All</a>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-info">
+                    <h3><?php echo $stats['total_orders']; ?></h3>
+                    <p>Total Orders</p>
+                </div>
+                <a href="admin-orders.php" class="stat-link">View All</a>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-store"></i></div>
+                <div class="stat-info">
+                    <h3><?php echo $stats['total_vendors']; ?></h3>
+                    <p>Approved Vendors</p>
+                </div>
+                <a href="admin-vendors.php" class="stat-link">View All</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-section">
+        <div class="dashboard-columns">
+            <div class="dashboard-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Orders</h2>
+                        <a href="admin-orders.php" class="btn btn-outline btn-sm">
+                            <i class="fas fa-list"></i> View All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($recent_orders)): ?>
+                            <table class="data-table">
+                                <thead>
                                     <tr>
-                                        <td><strong><?php echo $order['order_number']; ?></strong></td>
-                                        <td><?php echo $order['username']; ?></td>
-                                        <td>$<?php echo number_format($order['total_amount'], 2); ?></td>
-                                        <td>
-                                            <span class="status-badge status-<?php echo $order['status']; ?>">
-                                                <?php echo ucfirst($order['status']); ?>
-                                            </span>
-                                        </td>
-                                        <td><?php echo date('M j, Y', strtotime($order['created_at'])); ?></td>
+                                        <th>Order #</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p class="text-center">No recent orders found.</p>
-                    <?php endif; ?>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recent_orders as $order): ?>
+                                        <tr>
+                                            <td><strong><?php echo $order['order_number']; ?></strong></td>
+                                            <td><?php echo $order['username']; ?></td>
+                                            <td>$<?php echo number_format($order['total_amount'], 2); ?></td>
+                                            <td>
+                                                <span class="status-badge status-<?php echo $order['status']; ?>">
+                                                    <?php echo ucfirst($order['status']); ?>
+                                                </span>
+                                            </td>
+                                            <td><?php echo date('M j, Y', strtotime($order['created_at'])); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p class="text-center">No recent orders found.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="dashboard-column">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Pending Vendor Approvals</h2>
-                    <a href="admin-vendors.php" class="btn btn-outline btn-sm">
-                        <i class="fas fa-list"></i> View All
-                    </a>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($pending_vendors)): ?>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Business Name</th>
-                                    <th>Owner</th>
-                                    <th>Email</th>
-                                    <th>Applied On</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($pending_vendors as $vendor): ?>
+            <div class="dashboard-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Pending Vendor Approvals</h2>
+                        <a href="admin-vendors.php" class="btn btn-outline btn-sm">
+                            <i class="fas fa-list"></i> View All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <?php if (!empty($pending_vendors)): ?>
+                            <table class="data-table">
+                                <thead>
                                     <tr>
-                                        <td><strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong></td>
-                                        <td><?php echo htmlspecialchars($vendor['username']); ?></td>
-                                        <td><?php echo htmlspecialchars($vendor['email']); ?></td>
-                                        <td><?php echo date('M j, Y', strtotime($vendor['created_at'])); ?></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="admin-vendors.php?action=approve&id=<?php echo $vendor['id']; ?>" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i> Approve
-                                                </a>
-                                                <a href="admin-vendors.php?action=reject&id=<?php echo $vendor['id']; ?>" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-times"></i> Reject
-                                                </a>
-                                            </div>
-                                        </td>
+                                        <th>Business Name</th>
+                                        <th>Owner</th>
+                                        <th>Email</th>
+                                        <th>Applied On</th>
+                                        <th>Action</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p class="text-center">No pending vendor approvals.</p>
-                    <?php endif; ?>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($pending_vendors as $vendor): ?>
+                                        <tr>
+                                            <td><strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong></td>
+                                            <td><?php echo htmlspecialchars($vendor['username']); ?></td>
+                                            <td><?php echo htmlspecialchars($vendor['email']); ?></td>
+                                            <td><?php echo date('M j, Y', strtotime($vendor['created_at'])); ?></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="admin-vendors.php?action=approve&id=<?php echo $vendor['id']; ?>" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </a>
+                                                    <a href="admin-vendors.php?action=reject&id=<?php echo $vendor['id']; ?>" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p class="text-center">No pending vendor approvals.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 
 <?php

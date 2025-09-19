@@ -86,36 +86,18 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="hero">
     <div class="container">
         <?php
-<<<<<<< HEAD
-        if (isset($_SESSION['welcome_message'])) {
-            // New registration
-            echo '<h1>' . htmlspecialchars($_SESSION['welcome_message']) . '</h1>';
+        if (!empty($_SESSION['welcome_message'])) {
+            echo '<h1>' . e($_SESSION['welcome_message']) . '</h1>';
             unset($_SESSION['welcome_message']);
         } else {
-            // Regular login
-            echo '<h1>Welcome back, ' . htmlspecialchars($username ?? $_SESSION['username'] ?? 'User') . '!</h1>';
+            echo '<h1>Welcome back, ' . e($username ?? $_SESSION['username'] ?? 'User') . '!</h1>';
         }
         ?>
         <p>Ready to continue shopping?</p>
         <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn">Shop Now</a>
         <?php if(isset($userType) ? strtolower($userType) === 'customer' : (isset($_SESSION['user_type']) && strtolower($_SESSION['user_type']) === 'customer')): ?>
             <a href="<?php echo BASE_URL; ?>pages/cart.php" class="btn btn-outline">View Cart</a>
-=======
-        if (!empty($_SESSION['welcome_message'])) {
-            echo '<h1>' . e($_SESSION['welcome_message']) . '</h1>';
-            unset($_SESSION['welcome_message']);
-        } else {
-            echo '<h1>Welcome back, ' . e($_SESSION['username'] ?? 'User') . '!</h1>';
-        }
-        ?>
-        <p>Ready to continue shopping?</p>
-        <a href="products.php" class="btn">Shop Now</a>
-
-        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'customer'): ?>
-            <a href="cart.php" class="btn btn-outline">View Cart</a>
->>>>>>> ebb47525a15ab02a6b62127f98182234ea4ee14f
         <?php endif; ?>
-
         <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin'): ?>
             <!-- Admin Panel button removed as requested -->
         <?php endif; ?>
