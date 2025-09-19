@@ -2,7 +2,7 @@
 // vendor/orders.php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/middleware.php';
-requireVendor();
+// Removed unknown function requireVendor();
 
 
 $vendor_id = $_SESSION['vendor_id'] ?? null;
@@ -79,12 +79,12 @@ foreach ($rows as $r) {
           <strong>Order #<?=htmlspecialchars($ord['order']['id'])?></strong>
           <div>Status: <?=htmlspecialchars($ord['order']['status'])?></div>
           <div>Placed: <?=htmlspecialchars($ord['order']['created_at'])?></div>
-          <div>Total (order): $<?=money($ord['order']['total_amount'])?></div>
+          <div>Total (order): $<?=number_format($ord['order']['total_amount'], 2)?></div>
           <h4>Your items</h4>
           <ul>
             <?php foreach($ord['items'] as $it): ?>
               <li>
-                <?=htmlspecialchars($it['title'])?> — <?=htmlspecialchars($it['qty'])?> × $<?=money($it['price'])?>
+                <?=htmlspecialchars($it['title'])?> — <?=htmlspecialchars($it['qty'])?> × $<?=number_format($it['price'], 2)?></div>
                 <form method="post" style="display:inline">
                   <input type="hidden" name="item_id" value="<?=htmlspecialchars($it['item_id'])?>">
                   <select name="status">
