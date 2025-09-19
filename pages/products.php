@@ -52,11 +52,57 @@ if (!empty($category_filter)) {
 }
 
 // Include header
-require_once '../includes/header.php';
 
+// Set up user session and info for header nav
+require_once '../includes/auth.php';
+$isLoggedIn = false;
+$username = '';
+$userType = '';
+$cartCount = 0;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (isset($_SESSION['user_id'])) {
+    $isLoggedIn = true;
+    $user_id = $_SESSION['user_id'];
+    // Get user info
+    $auth = new Auth();
+    $user = $auth->getUserData($user_id);
+    if ($user) {
+        $username = $user['email'];
+        $userType = $user['user_type'];
+    }
+    // Get cart count
+    if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+        $cartCount = count($_SESSION['cart']);
+    }
+}
+
+require_once '../includes/header.php';
 // Add products-specific CSS
 echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/products.css">';
 ?>
+
+<nav class="main-nav customer-nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
+            <li class="dropdown">
+                <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<a href="' . BASE_URL . 'pages/products.php?category=' . htmlspecialchars($category['slug']) . '">' . htmlspecialchars($category['name']) . '</a>';
+                    }
+                    ?>
+                </div>
+            </li>
+            <li><a href="#">Today's Deals</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/login.php?type=vendor">Become a Vendor</a></li>
+        </ul>
+    </div>
+</nav>
 
 <div class="products-page">
     <div class="container">

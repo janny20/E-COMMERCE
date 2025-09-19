@@ -112,27 +112,17 @@
 
 @media (max-width: 900px) {
 	.admin-users-container {
-<<<<<<< HEAD
-		padding: 16px;
-		margin-left: 0;
-	}
-	.users-table {
-		width: 100%;
-		box-shadow: none;
-		border-radius: 0;
-=======
-		padding: 8px;
-		margin-left: 0;
-		max-width: 100vw;
-		margin-top: 60px;
-	}
+	padding: 16px;
+	margin-left: 0;
+	max-width: 100vw;
+	margin-top: 60px;
+}
 	.users-table {
 		width: 100%;
 		display: block;
 		box-shadow: none;
 		border-radius: 0;
 		overflow-x: auto;
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
 	}
 	.users-table thead {
 		display: none;
@@ -141,21 +131,15 @@
 		display: block;
 	}
 	.users-table tr {
-<<<<<<< HEAD
-		display: flex;
-		flex-direction: column;
-=======
-		display: block;
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
+	display: block;
 		background: #fff;
 		margin-bottom: 16px;
 		box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 		border-radius: 10px;
 		padding: 10px 8px;
-<<<<<<< HEAD
-		gap: 6px;
-=======
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
+	/* gap removed for block layout */
+	/* gap removed for block layout */
+	
 	}
 	.users-table td {
 		display: flex;
@@ -165,11 +149,9 @@
 		font-size: 1rem;
 		align-items: center;
 		position: relative;
-<<<<<<< HEAD
-=======
+		
 		flex-wrap: wrap;
 		word-break: break-word;
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
 	}
 	.users-table td:before {
 		content: attr(data-label);
@@ -178,10 +160,8 @@
 		color: #888;
 		margin-right: 10px;
 		font-size: 0.97rem;
-<<<<<<< HEAD
-=======
+		
 		min-width: 90px;
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
 	}
 	.action-buttons {
 		flex-direction: column;
@@ -193,12 +173,7 @@
 		padding: 5px 10px;
 	}
 
-<<<<<<< HEAD
 /* Add your styles for admin-users.php here */
-<<<<<<< HEAD
-=======
-}
->>>>>>> 19b3975e24d2227f375e13bf09d43559ab912617
-=======
->>>>>>> e36db0d5047e1c81ea9df87633d13a0c5c182818
+/* Add your styles for admin-users.php here */
+	
 }

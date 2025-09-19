@@ -1,10 +1,16 @@
 <?php
 // Include config
 require_once '../includes/config.php';
+require_once '../includes/auth.php';
 
-// Check if user is logged in
-if (!$isLoggedIn) {
-    header('Location: login.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$auth = new Auth();
+$isLoggedIn = $auth->isLoggedIn();
+if (!$isLoggedIn || !isset($_SESSION['user_id'])) {
+    header('Location: ' . BASE_URL . 'pages/login.php');
     exit();
 }
 
@@ -19,6 +25,9 @@ $query = "SELECT c.*, p.name, p.price, p.images, p.quantity as stock_quantity,
           JOIN vendors v ON p.vendor_id = v.id 
           WHERE c.user_id = :user_id";
 
+
+// Get user ID from session
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
@@ -47,8 +56,36 @@ $total = $subtotal + $shipping + $tax;
 // Include header
 require_once '../includes/header.php';
 
+
 // Add cart-specific CSS
 echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
+
+// Customer navigation (second nav)
+?>
+<nav class="main-nav customer-nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
+            <li class="dropdown">
+                <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <?php
+                    $category_query = "SELECT id, name, slug FROM categories WHERE parent_id IS NULL ORDER BY name";
+                    $category_stmt = $db->prepare($category_query);
+                    $category_stmt->execute();
+                    $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($categories as $category) {
+                        echo '<a href="' . BASE_URL . 'pages/products.php?category=' . htmlspecialchars($category['slug']) . '">' . htmlspecialchars($category['name']) . '</a>';
+                    }
+                    ?>
+                </div>
+            </li>
+            <li><a href="#">Today\'s Deals</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/login.php?type=vendor">Become a Vendor</a></li>
+        </ul>
+    </div>
+</nav>
 ?>
 
 <div class="cart-page">
@@ -67,65 +104,36 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
                 <div class="cart-step">
                     <span class="step-number">3</span>
                     <span class="step-text">Order Complete</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="cart-content">
-            <div class="cart-items">
-                <?php if (!empty($cart_items)): ?>
-                    <div class="cart-items-header">
-                        <span>Product</span>
-                        <span>Price</span>
-                        <span>Quantity</span>
-                        <span>Total</span>
-                        <span>Action</span>
-                    </div>
+                <?php
+                require_once '../includes/config.php';
+                require_once '../includes/auth.php';
 
-                    <?php foreach ($cart_items as $item): ?>
-                        <div class="cart-item" data-item-id="<?php echo $item['id']; ?>">
-                            <div class="item-product">
-                                <div class="product-image">
-                                    <img src="../assets/images/products/<?php echo !empty($item['images']) ? explode(',', $item['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
-                                </div>
-                                <div class="product-details">
-                                    <h3 class="product-name">
-                                        <a href="product-detail.php?id=<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['name']); ?></a>
-                                    </h3>
-                                    <div class="product-vendor">
-                                        <span class="vendor-logo">
-                                            <img src="../assets/images/vendors/<?php echo $item['business_logo'] ?: 'default-logo.png'; ?>" alt="<?php echo htmlspecialchars($item['business_name']); ?>">
-                                        </span>
-                                        <span class="vendor-name"><?php echo htmlspecialchars($item['business_name']); ?></span>
-                                    </div>
-                                </div>
-                            </div>
+                // Start session if not started
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+// ...existing code...
 
-                            <div class="item-price">
-                                <span class="current-price">$<?php echo number_format($item['price'], 2); ?></span>
-                            </div>
+                $auth = new Auth();
+                $isLoggedIn = $auth->isLoggedIn();
+                if (!$isLoggedIn || !isset($_SESSION['user_id'])) {
+                    header('Location: ' . BASE_URL . 'pages/login.php');
+                    exit();
+                }
 
-                            <div class="item-quantity">
-                                <div class="quantity-controls">
-                                    <button type="button" class="quantity-btn minus" data-item-id="<?php echo $item['id']; ?>">-</button>
-                                    <input type="number" class="quantity-input" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock_quantity']; ?>" data-item-id="<?php echo $item['id']; ?>" data-price="<?php echo $item['price']; ?>">
-                                    <button type="button" class="quantity-btn plus" data-item-id="<?php echo $item['id']; ?>">+</button>
-                                </div>
-                                <div class="stock-info">
-                                    <?php if ($item['quantity'] > $item['stock_quantity']): ?>
-                                        <span class="stock-error">Only <?php echo $item['stock_quantity']; ?> available</span>
-                                    <?php else: ?>
-                                        <span class="stock-available"><?php echo $item['stock_quantity']; ?> in stock</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                $userId = $_SESSION['user_id'];
 
-                            <div class="item-total">
-                                <span class="total-price">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
-                            </div>
+                // Get cart items for user
+                $database = new Database();
+// ...existing code...
+                    $tax = $subtotal * 0.08;
+                    $total = $subtotal + $shipping + $tax;
+                }
 
-                            <div class="item-actions">
-                                <button class="remove-btn" data-item-id="<?php echo $item['id']; ?>" title="Remove item">
+                // Include header and cart CSS
+                require_once '../includes/header.php';
+                echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
+                ?>
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 <button class="wishlist-btn" data-product-id="<?php echo $item['product_id']; ?>" title="Move to wishlist">
@@ -133,78 +141,54 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
                                 </button>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="empty-cart">
-                        <div class="empty-cart-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <h2>Your cart is empty</h2>
-                        <p>Looks like you haven't added any items to your cart yet.</p>
-                        <a href="products.php" class="btn btn-primary">Continue Shopping</a>
-                    </div>
-                <?php endif; ?>
+// ...existing code...
+                if (empty($cart_items)) {
+                    echo '<div class="empty-cart">';
+                    echo '<div class="empty-cart-icon"><i class="fas fa-shopping-cart"></i></div>';
+                    echo '<h2>Your cart is empty</h2>';
+                    echo '<p>Looks like you haven\'t added any items to your cart yet.</p>';
+                    echo '<a href="products.php" class="btn btn-primary">Continue Shopping</a>';
+                    echo '</div>';
+                }
             </div>
 
-            <?php if (!empty($cart_items)): ?>
-            <div class="cart-summary">
-                <div class="summary-card">
-                    <h3>Order Summary</h3>
-                    
-                    <div class="summary-items">
-                        <div class="summary-item">
-                            <span>Subtotal</span>
-                            <span class="subtotal-amount">$<?php echo number_format($subtotal, 2); ?></span>
-                        </div>
-                        
-                        <div class="summary-item">
-                            <span>Shipping</span>
-                            <span class="shipping-amount">
-                                <?php if ($shipping == 0): ?>
-                                    <span class="free-shipping">FREE</span>
-                                <?php else: ?>
-                                    $<?php echo number_format($shipping, 2); ?>
-                                <?php endif; ?>
-                            </span>
-                        </div>
-                        
-                        <div class="summary-item">
-                            <span>Tax</span>
-                            <span class="tax-amount">$<?php echo number_format($tax, 2); ?></span>
-                        </div>
-                        
-                        <div class="summary-divider"></div>
-                        
-                        <div class="summary-item total">
-                            <span>Total</span>
-                            <span class="total-amount">$<?php echo number_format($total, 2); ?></span>
-                        </div>
-                    </div>
-
-                    <div class="shipping-notice">
-                        <?php if ($subtotal < 50): ?>
-                            <div class="shipping-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <?php echo ($subtotal / 50) * 100; ?>%"></div>
-                                </div>
-                                <p>Add $<?php echo number_format(50 - $subtotal, 2); ?> more for <strong>FREE shipping</strong></p>
-                            </div>
-                        <?php else: ?>
-                            <div class="free-shipping-achieved">
-                                <i class="fas fa-check-circle"></i>
-                                <span>You've qualified for FREE shipping!</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="coupon-section">
-                        <div class="coupon-toggle">
-                            <i class="fas fa-tag"></i>
-                            <span>Apply coupon code</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="coupon-form">
-                            <input type="text" placeholder="Enter coupon code" class="coupon-input">
+<?php foreach ($cart_items as $item) { ?>
+    <div class="cart-item" data-item-id="<?php echo $item['id']; ?>">
+        <div class="item-product">
+            <div class="product-image">
+                <img src="../assets/images/products/<?php echo !empty($item['images']) ? explode(',', $item['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+            </div>
+            <div class="product-details">
+                <h3 class="product-name"><a href="product-detail.php?id=<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['name']); ?></a></h3>
+                <div class="product-vendor">
+                    <span class="vendor-logo"><img src="../assets/images/vendors/<?php echo $item['business_logo'] ?: 'default-logo.png'; ?>" alt="<?php echo htmlspecialchars($item['business_name']); ?>"></span>
+                    <span class="vendor-name"><?php echo htmlspecialchars($item['business_name']); ?></span>
+                </div>
+            </div>
+        </div>
+        <div class="item-price"><span class="current-price">$<?php echo number_format($item['price'], 2); ?></span></div>
+        <div class="item-quantity">
+            <div class="quantity-controls">
+                <button type="button" class="quantity-btn minus" data-item-id="<?php echo $item['id']; ?>">-</button>
+                <input type="number" class="quantity-input" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock_quantity']; ?>" data-item-id="<?php echo $item['id']; ?>" data-price="<?php echo $item['price']; ?>">
+                <button type="button" class="quantity-btn plus" data-item-id="<?php echo $item['id']; ?>">+</button>
+            </div>
+            <div class="stock-info">
+                <?php if ($item['quantity'] > $item['stock_quantity']): ?>
+                    <span class="stock-error">Only <?php echo $item['stock_quantity']; ?> available</span>
+                <?php else: ?>
+                    <span class="stock-available"><?php echo $item['stock_quantity']; ?> in stock</span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="item-total"><span class="total-price">$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span></div>
+        <div class="item-actions">
+            <button class="remove-btn" data-item-id="<?php echo $item['id']; ?>" title="Remove item"><i class="fas fa-trash"></i></button>
+            <button class="wishlist-btn" data-product-id="<?php echo $item['product_id']; ?>" title="Move to wishlist"><i class="fas fa-heart"></i></button>
+        </div>
+    </div>
+<?php } ?>
+// ...existing code...
                             <button class="btn btn-outline coupon-apply">Apply</button>
                         </div>
                     </div>
@@ -261,7 +245,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/cart.css">';
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
+// ...existing code...
         </div>
     </div>
 </div>

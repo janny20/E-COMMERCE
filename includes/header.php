@@ -40,7 +40,7 @@ require_once 'config.php';
                     <?php else: ?>
                         <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-icon"><i class="fas fa-user"></i> <?php echo $username; ?></a>
                     <?php endif; ?>
-                    <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon"><i class="fas fa-shopping-cart"></i> Cart (<?php echo $cartCount; ?>)</a>
+                    <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon cart-link"><i class="fas fa-shopping-cart"></i> Cart (<?php echo $cartCount; ?>)</a>
                     <?php if(isset($userType) && strtolower($userType) === 'vendor'): ?>
                         <a href="<?php echo BASE_URL; ?>vendor/dashboard.php" class="nav-icon"><i class="fas fa-store"></i> Vendor Dashboard</a>
                     <?php elseif(isset($userType) && strtolower($userType) === 'admin'): ?>
@@ -48,7 +48,8 @@ require_once 'config.php';
                     <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-icon"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 <?php else: ?>
-                    <!-- Login/Register links point to root directory files -->
+                    <!-- Cart button for guests links to login -->
+                    <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon cart-link"><i class="fas fa-shopping-cart"></i> Cart (0)</a>
                     <a href="<?php echo BASE_URL; ?>login.php" class="nav-icon"><i class="fas fa-sign-in-alt"></i> Login</a>
                     <a href="<?php echo BASE_URL; ?>register.php" class="nav-icon"><i class="fas fa-user-plus"></i> Register</a>
                 <?php endif; ?>
@@ -61,28 +62,6 @@ require_once 'config.php';
         <div class="container">
             <ul class="nav-menu">
                 <!-- Home link goes to landing page if not logged in, home.php if logged in -->
-                <li><a href="<?php echo $isLoggedIn ? BASE_URL . 'pages/home.php' : BASE_URL . 'landing.php'; ?>">Home</a></li>
-                <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
-                <li class="dropdown">
-                    <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
-                    <div class="dropdown-content">
-                        <?php
-                        $database = new Database();
-                        $db = $database->getConnection();
-                        
-                        $query = "SELECT id, name, slug FROM categories WHERE parent_id IS NULL ORDER BY name";
-                        $stmt = $db->prepare($query);
-                        $stmt->execute();
-                        
-                        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo '<a href="' . BASE_URL . 'pages/products.php?category=' . $row['slug'] . '">' . $row['name'] . '</a>';
-                        }
-                        ?>
-                    </div>
-                </li>
-                <li><a href="#">Today's Deals</a></li>
-                <!-- Become a Vendor link points to root register.php -->
-                <li><a href="<?php echo BASE_URL; ?>register.php?type=vendor">Become a Vendor</a></li>
             </ul>
         </div>
     </nav>

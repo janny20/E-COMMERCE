@@ -79,8 +79,32 @@ try {
 }
 
 // Include header (assumes header uses relative includes)
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
+
+<?php if (isset($userType) && strtolower($userType) === 'customer'): ?>
+<nav class="main-nav customer-nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
+            <li class="dropdown">
+                <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<a href="' . BASE_URL . 'pages/products.php?category=' . e($category['slug']) . '">' . e($category['name']) . '</a>';
+                    }
+                    ?>
+                </div>
+            </li>
+            <li><a href="#">Today's Deals</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/login.php?type=vendor">Become a Vendor</a></li>
+        </ul>
+    </div>
+</nav>
+<?php endif; ?>
 
 <!-- Hero Section -->
 <section class="hero">
@@ -121,6 +145,28 @@ require_once __DIR__ . '/../includes/header.php';
             <?php foreach ($featured_products as $product): ?>
                 <div class="product-card">
                     <?php $img = first_image($product['images'] ?? ''); ?>
+<?php if (isset($userType) && strtolower($userType) === 'customer'): ?>
+<nav class="main-nav customer-nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
+            <li class="dropdown">
+                <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<a href="' . BASE_URL . 'pages/products.php?category=' . e($category['slug']) . '">' . e($category['name']) . '</a>';
+                    }
+                    ?>
+                </div>
+            </li>
+            <li><a href="#">Today's Deals</a></li>
+            <li><a href="<?php echo BASE_URL; ?>register.php?type=vendor">Become a Vendor</a></li>
+        </ul>
+    </div>
+</nav>
+<?php endif; ?>
                     <img src="../assets/images/products/<?php echo e($img); ?>" alt="<?php echo e($product['name'] ?? 'Product'); ?>" class="product-image">
                     <div class="product-info">
                         <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-title"><?php echo e($product['name'] ?? 'Untitled'); ?></a>

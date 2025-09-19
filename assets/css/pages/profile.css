@@ -64,21 +64,24 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 32px;
-    height: 32px;
-    border: 2px solid var(--bg-white);
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--primary-color);
     border-radius: 50%;
-    background: var(--primary-color);
+    background: var(--accent-color);
     color: var(--text-white);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 8px rgba(255,107,107,0.10);
     transition: all var(--transition-fast);
 }
 
 .avatar-upload-btn:hover {
     background: var(--primary-dark);
+    border-color: var(--primary-dark);
     transform: scale(1.1);
 }
 
