@@ -30,14 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
     $user_type = $_POST['user_type'];
     
     // Validate inputs
-    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+    if (empty($username) || empty($email) || empty($password)) {
         $error = 'All fields are required.';
-    } elseif ($password !== $confirm_password) {
-        $error = 'Passwords do not match.';
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -133,7 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="text" id="username" name="username" class="form-input" required 
                                    value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
                                    minlength="3" maxlength="50">
-                            <div class="form-hint">3-50 characters</div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="email">Email Address *</label>
@@ -150,17 +146,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="confirm_password">Confirm Password *</label>
-                            <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
-                        </div>
-                        <div class="form-group">
                             <label class="form-label" for="user_type">Account Type *</label>
-                            <select id="user_type" name="user_type" class="form-select" required onchange="toggleVendorField()">
-                                <option value="customer" <?php echo $user_type == 'customer' ? 'selected' : ''; ?>>Customer</option>
-                                <option value="vendor" <?php echo $user_type == 'vendor' ? 'selected' : ''; ?>>Vendor</option>
-                            </select>
+                            <div style="position:relative;">
+                                <select id="user_type" name="user_type" class="form-select" required onchange="toggleVendorField()" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 32px;">
+                                    <option value="customer" <?php echo $user_type == 'customer' ? 'selected' : ''; ?>>Customer</option>
+                                    <option value="vendor" <?php echo $user_type == 'vendor' ? 'selected' : ''; ?>>Vendor</option>
+                                </select>
+                                <span style="position:absolute;top:50%;right:12px;transform:translateY(-50%);pointer-events:none;color:#888;font-size:1.2rem;">
+                                    <i class="fas fa-chevron-down"></i>
+                                </span>
+                            </div>
                         </div>
-                        <div class="form-group business-name-field <?php echo $user_type == 'vendor' ? 'visible' : ''; ?>" id="business_name_field">
+                        <div class="form-group business-name-field" id="business_name_field" style="display:<?php echo $user_type == 'vendor' ? 'block' : 'none'; ?>;">
                             <label class="form-label" for="business_name">Business Name *</label>
                             <input type="text" id="business_name" name="business_name" class="form-input" 
                                    value="<?php echo isset($_POST['business_name']) ? htmlspecialchars($_POST['business_name']) : ''; ?>"
@@ -192,28 +189,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         const businessField = document.getElementById('business_name_field');
         const businessInput = document.getElementById('business_name');
         if (userType === 'vendor') {
-            businessField.classList.add('visible');
+            businessField.style.display = 'block';
             businessInput.setAttribute('required', 'required');
         } else {
-            businessField.classList.remove('visible');
+            businessField.style.display = 'none';
             businessInput.removeAttribute('required');
             businessInput.value = '';
         }
     }
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirm_password');
-        if (password.value !== confirmPassword.value) {
-            e.preventDefault();
-            alert('Passwords do not match. Please check and try again.');
-            confirmPassword.focus();
-        }
-        if (password.value.length < 6) {
-            e.preventDefault();
-            alert('Password must be at least 6 characters long.');
-            password.focus();
-        }
-    });
+    document.getElementById('user_type').addEventListener('change', toggleVendorField);
     // Show/hide password toggle
     document.getElementById('togglePassword').addEventListener('click', function() {
         const pwd = document.getElementById('password');
@@ -257,13 +241,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .btn, .form-input, .form-select {
         transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
     }
-    .btn:hover {
-        box-shadow: 0 2px 8px rgba(0,123,255,0.12);
-        background: #0056b3;
+    .btn.btn-primary.btn-full {
+        display: block;
+        width: 60%;
+        margin: 0 auto;
+        padding: 10px 0;
+        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+        color: #fff;
+        font-size: 1.08rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(37,117,252,0.10);
+        transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        letter-spacing: 0.5px;
+        cursor: pointer;
     }
-    .form-input:focus, .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 2px rgba(0,123,255,0.10);
+    .btn.btn-primary.btn-full:hover, .btn.btn-primary.btn-full:focus {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
+        transform: translateY(-2px) scale(1.02);
+        outline: none;
+    }
+    .back-arrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2575fc;
+        font-size: 1.08rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: #f7f7fa;
+        border-radius: 8px;
+        padding: 10px 18px;
+        box-shadow: 0 2px 8px rgba(37,117,252,0.08);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .back-arrow:hover, .back-arrow:focus {
+        background: #2575fc;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
+        transform: translateY(-2px) scale(1.02);
+        outline: none;
+    }
+    .auth-form-input {
+        width: 80%;
+        margin: 0 auto;
+        padding: 6px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        font-size: 0.95rem;
+        transition: all var(--transition-fast);
+        display: block;
+    }
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 64px;
+        padding-bottom: 32px;
+        background: var(--bg-light);
+    }
+    .auth-card {
+        margin-top: 0;
+        margin-bottom: 0;
     }
     </style>
 </body>

@@ -1,25 +1,27 @@
 /* ===== AUTHENTICATION PAGES STYLES ===== */
 .auth-container {
     min-height: 100vh;
+    height: auto;
+    overflow: visible;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 0;
+    padding-top: 16px;
+    padding-bottom: 8px;
     background: var(--bg-light);
 }
 
 .auth-card {
-    background: var(--bg-white);
+    max-width: 180px;
+    padding: 8px 6px;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-lg);
-    width: 100%;
-    max-width: 320px;
-    overflow: hidden;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .auth-header {
-    padding: 12px 6px;
+    padding: 6px 4px;
     text-align: center;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: var(--text-white);
@@ -43,13 +45,13 @@
 }
 
 .auth-body {
-    padding: 8px 6px;
+    padding: 6px 4px;
 }
 
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
 .auth-form-group {
@@ -65,11 +67,14 @@
 }
 
 .auth-form-input {
+    width: 85%;
+    margin: 0 auto;
     padding: 6px;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     font-size: 0.95rem;
     transition: all var(--transition-fast);
+    display: block;
 }
 
 .auth-form-input:focus {

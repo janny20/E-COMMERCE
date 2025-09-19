@@ -22,12 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $recaptcha_token = $_POST['g-recaptcha-response'] ?? '';
-    // Verify reCAPTCHA v3
+    // Verify reCAPTCHA v2
     $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
-    $recaptcha_secret = '6LeCBM8rAAAAAKgoK7zTnlTDCxeUdiLME1OPeZ4j';
+    $recaptcha_secret = '6LeZCs8rAAAAAIBTFXd1aeCwLtqYf859rPSqyWeI';
     $recaptcha_response = file_get_contents($recaptcha_url . '?secret=' . $recaptcha_secret . '&response=' . $recaptcha_token);
     $recaptcha = json_decode($recaptcha_response, true);
-    if (empty($recaptcha['success']) || $recaptcha['score'] < 0.5) {
+    if (empty($recaptcha['success'])) {
         $error = 'reCAPTCHA verification failed. Please try again.';
     } elseif (empty($email) || empty($password)) {
         $error = 'Please fill all fields.';
@@ -93,7 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                    <!-- Google reCAPTCHA v2 Checkbox widget -->
+                    <div class="auth-recaptcha" style="margin:12px 0;text-align:center;">
+                        <div class="g-recaptcha" data-sitekey="6LeZCs8rAAAAAFZJNWRINV5zDyNlXMsxEnzJsJdO"></div>
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary btn-full">Login</button>
                     </div>
@@ -138,14 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     });
     </script>
-    <script src="https://www.google.com/recaptcha/api.js?render=6LeCBM8rAAAAAHI7h5xUIvM46nOnAiZumCWLP3S6"></script>
-    <script>
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LeCBM8rAAAAAHI7h5xUIvM46nOnAiZumCWLP3S6', {action: 'login'}).then(function(token) {
-            document.getElementById('g-recaptcha-response').value = token;
-        });
-    });
-    </script>
     <style>
     .animate-fade-in {
         animation: fadeInUp 0.7s cubic-bezier(.23,1,.32,1);
@@ -174,9 +169,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     .btn, .form-input, .form-select {
         transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
     }
-    .btn:hover {
-        box-shadow: 0 2px 8px rgba(0,123,255,0.12);
-        background: #0056b3;
+    .btn.btn-primary.btn-full {
+        display: block;
+        width: 60%;
+        margin: 0 auto;
+        padding: 10px 0;
+        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+        color: #fff;
+        font-size: 1.08rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(37,117,252,0.10);
+        transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+    .btn.btn-primary.btn-full:hover, .btn.btn-primary.btn-full:focus {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
+        transform: translateY(-2px) scale(1.02);
+        outline: none;
+    }
+    .back-arrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #2575fc;
+        font-size: 1.08rem;
+        font-weight: 700;
+        text-decoration: none;
+        background: #f7f7fa;
+        border-radius: 8px;
+        padding: 10px 18px;
+        box-shadow: 0 2px 8px rgba(37,117,252,0.08);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .back-arrow:hover, .back-arrow:focus {
+        background: #2575fc;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
+        transform: translateY(-2px) scale(1.02);
+        outline: none;
     }
     .form-input:focus, .form-select:focus {
         border-color: #007bff;
