@@ -83,31 +83,6 @@ try {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<?php if (isset($userType) && strtolower($userType) === 'customer'): ?>
-<nav class="main-nav customer-nav">
-    <div class="container">
-        <ul class="nav-menu">
-            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
-            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
-            <li class="dropdown">
-                <button type="button" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="category-dropdown">
-                    Categories <i class="fas fa-chevron-down"></i>
-                </button>
-                <ul id="category-dropdown" class="dropdown-content">
-                    <?php
-                    foreach ($categories as $category) {
-                        echo '<li><a href="' . BASE_URL . 'pages/products.php?category=' . e($category['slug']) . '">' . e($category['name']) . '</a></li>';
-                    }
-                    ?>
-                </ul>
-            </li>
-            <li><a href="#">Today's Deals</a></li>
-            <li><a href="<?php echo BASE_URL; ?>pages/login.php?type=vendor">Become a Vendor</a></li>
-        </ul>
-    </div>
-</nav>
-<?php endif; ?>
-
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">

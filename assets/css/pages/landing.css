@@ -88,7 +88,7 @@
 /* Hero Section */
 .hero-section {
     padding: 8rem 0 5rem;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9e0ff 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #e0cdfd 100%);
     overflow: hidden;
 }
 
@@ -797,7 +797,7 @@
 
 @media (max-width: 768px) {
     .landing-header .container {
-        padding: 1rem 1.5rem;
+        padding: 1rem 0.5rem;
     }
 
     .landing-logo {

@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Initialize Cookie Consent
+    initCookieConsent();
 });
 
 // Show notification
@@ -143,4 +146,77 @@ function hideNotification(notification) {
     setTimeout(() => {
         notification.remove();
     }, 300);
+}
+
+// Cookie Consent Banner
+function initCookieConsent() {
+    const banner = document.getElementById('cookie-consent-banner');
+    const acceptBtn = document.getElementById('cookie-accept-btn');
+    const declineBtn = document.getElementById('cookie-decline-btn');
+    const settingsLink = document.getElementById('cookie-settings-link');
+    const settingsModal = document.getElementById('cookie-settings-modal');
+    const settingsCloseBtn = document.getElementById('cookie-settings-close');
+    const saveSettingsBtn = document.getElementById('cookie-save-settings');
+
+    if (!banner) {
+        return;
+    }
+
+    // Check if consent has already been given
+    if (localStorage.getItem('cookie_consent')) {
+        return; // Don't show the banner
+    }
+
+    // Show the banner immediately on page load
+    banner.classList.add('show');
+
+    function handleConsent(consentValue) {
+        localStorage.setItem('cookie_consent', consentValue);
+        banner.classList.remove('show');
+        
+        // Optional: remove the banner from the DOM after it hides
+        setTimeout(() => { banner.remove(); }, 600);
+    }
+
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', () => handleConsent('true'));
+    }
+
+    if (declineBtn) {
+        declineBtn.addEventListener('click', () => handleConsent('false'));
+    }
+
+    // --- Cookie Settings Modal Logic ---
+    if (!settingsModal || !settingsLink || !settingsCloseBtn || !saveSettingsBtn) {
+        return;
+    }
+
+    function openCookieSettings() {
+        settingsModal.classList.add('show');
+    }
+
+    function closeCookieSettings() {
+        settingsModal.classList.remove('show');
+    }
+
+    settingsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        openCookieSettings();
+    });
+
+    settingsCloseBtn.addEventListener('click', closeCookieSettings);
+
+    settingsModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCookieSettings();
+        }
+    });
+
+    saveSettingsBtn.addEventListener('click', function() {
+        // Here you would save the individual cookie preferences from the toggles
+        // For this example, we'll just accept all and close.
+        closeCookieSettings();
+        handleConsent('true'); // Treat saving as accepting all for now
+        showNotification('Your cookie preferences have been saved.', 'success');
+    });
 }

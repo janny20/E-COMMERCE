@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Include config
 require_once '../includes/config.php';
+require_once '../includes/functions.php'; // Include functions for file upload
 
 // Check if user is logged in
 if (!$isLoggedIn || !$userId) {
@@ -56,39 +57,44 @@ $orders_count = $orders_stmt->fetch(PDO::FETCH_ASSOC)['order_count'];
 $success_message = '';
 $error_message = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Handle avatar upload
-    if (isset($_POST['update_avatar'])) {
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
-            $upload_result = uploadFile($_FILES['avatar'], USER_UPLOAD_PATH);
+// Handle AJAX avatar upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_avatar'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
+
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == UPLOAD_ERR_OK) {
+        $upload_result = uploadFile($_FILES['avatar'], USER_UPLOAD_PATH);
+        
+        if ($upload_result['success']) {
+            $avatar_filename = $upload_result['file_name'];
             
-            if ($upload_result['success']) {
-                $avatar_filename = $upload_result['file_name'];
-                
-                // Update database
-                $update_avatar_query = "UPDATE user_profiles SET avatar = :avatar WHERE user_id = :user_id";
-                $update_avatar_stmt = $db->prepare($update_avatar_query);
-                $update_avatar_stmt->bindParam(':avatar', $avatar_filename);
-                $update_avatar_stmt->bindParam(':user_id', $userId);
-                
-                if ($update_avatar_stmt->execute()) {
-                    $success_message = 'Avatar updated successfully!';
-                    $_SESSION['avatar'] = $avatar_filename; // Update session
-                    // Refresh user data to show new avatar immediately
-                    $stmt->execute();
-                    $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-                } else {
-                    $error_message = 'Failed to update avatar in database.';
-                }
+            $update_avatar_query = "UPDATE user_profiles SET avatar = :avatar WHERE user_id = :user_id";
+            $update_avatar_stmt = $db->prepare($update_avatar_query);
+            $update_avatar_stmt->bindParam(':avatar', $avatar_filename);
+            $update_avatar_stmt->bindParam(':user_id', $userId);
+            
+            if ($update_avatar_stmt->execute()) {
+                $_SESSION['avatar'] = $avatar_filename;
+                $response['success'] = true;
+                $response['message'] = 'Avatar updated successfully!';
+                $response['file_name'] = $avatar_filename;
             } else {
-                $error_message = $upload_result['message'];
+                $response['message'] = 'Failed to update avatar in the database.';
             }
         } else {
-            $error_message = 'No file uploaded or an error occurred.';
+            $response['message'] = $upload_result['message'];
         }
+    } else {
+        $response['message'] = 'No file was uploaded or an upload error occurred.';
     }
-    // Handle profile info update
-    elseif (isset($_POST['update_profile'])) {
+    
+    echo json_encode($response);
+    exit();
+}
+
+// Handle standard form submission for profile info
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
+    if (isset($_POST['update_profile'])) {
         $first_name = trim($_POST['first_name'] ?? '');
         $last_name = trim($_POST['last_name'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
@@ -97,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $state = trim($_POST['state'] ?? '');
         $country = trim($_POST['country'] ?? '');
         $zip_code = trim($_POST['zip_code'] ?? '');
-        
+
         try {
             $update_query = "UPDATE user_profiles SET first_name = :first_name, last_name = :last_name, phone = :phone, address = :address, city = :city, state = :state, country = :country, zip_code = :zip_code WHERE user_id = :user_id";
             $update_stmt = $db->prepare($update_query);
@@ -110,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $update_stmt->bindParam(':country', $country);
             $update_stmt->bindParam(':zip_code', $zip_code);
             $update_stmt->bindParam(':user_id', $userId);
-            
+
             if ($update_stmt->execute()) {
                 $success_message = 'Profile updated successfully!';
                 $stmt->execute();
@@ -341,7 +347,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
     <div class="modal-content">
         <div class="modal-header">
             <h3>Change Password</h3>
-            <button class="modal-close" onclick="closePasswordModal()">&times;</button>
+            <button class="modal-close" id="passwordModalClose">&times;</button>
         </div>
         <div class="modal-body">
             <div id="password-modal-messages"></div>
@@ -360,7 +366,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Update Password</button>
-                    <button type="button" class="btn btn-outline" onclick="closePasswordModal()">Cancel</button>
+                    <button type="button" class="btn btn-outline" id="passwordModalCancel">Cancel</button>
                 </div>
             </form>
         </div>
@@ -368,117 +374,172 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
 </div>
 
 <script>
-function openPasswordModal() {
-    document.getElementById('passwordModal').classList.add('show');
-}
-
-function closePasswordModal() {
-    document.getElementById('passwordModal').classList.remove('show');
-}
-
-// Close modal when clicking outside
-document.getElementById('passwordModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closePasswordModal();
-    }
-});
-
-// Avatar auto-upload
-document.getElementById('avatar-upload-input').addEventListener('change', function() {
-    if (this.files.length > 0) {
-        document.getElementById('avatarForm').submit();
-    }
-});
-
-// Handle password change form submission with AJAX
-document.getElementById('passwordChangeForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const form = this;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const messageContainer = document.getElementById('password-modal-messages');
-
-    // Show loading state
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<span class="loading"></span> Updating...';
-    messageContainer.innerHTML = '';
-
-    const formData = new FormData(form);
-    formData.append('change_password_ajax', '1'); // Add flag for AJAX handler
-
-    fetch('profile.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        const alertClass = data.success ? 'alert-success' : 'alert-error';
-        messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
-        
-        if (data.success) {
-            form.reset();
-            setTimeout(() => {
-                closePasswordModal();
-                messageContainer.innerHTML = ''; // Clear message on close
-            }, 2000);
-        }
-    })
-    .catch(error => {
-        messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred. Please try again.</div>`;
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        // Restore button
-        submitButton.disabled = false;
-        submitButton.innerHTML = 'Update Password';
-    });
-});
-
-// Toggle switches
-document.querySelectorAll('.toggle-input').forEach(toggle => {
-    if (toggle.disabled) return;
-
-    toggle.addEventListener('change', function() {
-        const settingId = this.id;
-        const isChecked = this.checked;
-        const preferenceItem = this.closest('.preference-item, .security-item');
-        const statusSpan = preferenceItem ? preferenceItem.querySelector('.preference-status') : null;
-
-        if (statusSpan) {
-            statusSpan.textContent = 'Saving...';
-            statusSpan.style.color = 'var(--text-light)';
-        }
-
-        const formData = new FormData();
-        formData.append('update_preferences_ajax', '1');
-        formData.append('setting', settingId);
-        formData.append('value', isChecked);
-
-        fetch('profile.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (statusSpan) {
-                if (data.success) {
-                    statusSpan.textContent = 'Saved!';
-                    statusSpan.style.color = 'var(--success-color)';
-                } else {
-                    statusSpan.textContent = 'Error';
-                    statusSpan.style.color = 'var(--danger-color)';
-                }
-                setTimeout(() => { statusSpan.textContent = ''; }, 2000);
-            }
-        })
-        .catch(error => {
-            if (statusSpan) { statusSpan.textContent = 'Error'; statusSpan.style.color = 'var(--danger-color)'; }
-            console.error('Error:', error);
-        });
-    });
-});
-
 // Professional form validation and submission handling
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Password Modal ---
+    const passwordModal = document.getElementById('passwordModal');
+    const openModalBtn = document.querySelector('button[onclick="openPasswordModal()"]');
+    const closeModalBtn = document.getElementById('passwordModalClose');
+    const cancelModalBtn = document.getElementById('passwordModalCancel');
+
+    const openPasswordModal = () => passwordModal.classList.add('show');
+    const closePasswordModal = () => passwordModal.classList.remove('show');
+
+    if (openModalBtn) openModalBtn.addEventListener('click', openPasswordModal);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closePasswordModal);
+    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closePasswordModal);
+    if (passwordModal) {
+        passwordModal.addEventListener('click', (e) => {
+            if (e.target === passwordModal) closePasswordModal();
+        });
+    }
+
+    // --- Avatar Auto-Upload ---
+    const avatarInput = document.getElementById('avatar-upload-input');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const avatarContainer = document.querySelector('.profile-avatar');
+                const formData = new FormData(document.getElementById('avatarForm'));
+                
+                avatarContainer.classList.add('uploading');
+
+                fetch('profile.php', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newAvatarUrl = '<?php echo BASE_URL; ?>uploads/users/' + data.file_name;
+                        const cacheBuster = '?t=' + new Date().getTime();
+
+                        // Update profile page avatar
+                        const profileImg = document.querySelector('.avatar-image');
+                        if (profileImg) {
+                            profileImg.src = newAvatarUrl + cacheBuster;
+                        } else {
+                            const placeholder = document.querySelector('.avatar-placeholder');
+                            if (placeholder) {
+                                const newImg = document.createElement('img');
+                                newImg.src = newAvatarUrl;
+                                newImg.alt = 'User Avatar';
+                                newImg.className = 'avatar-image';
+                                placeholder.replaceWith(newImg);
+                            }
+                        }
+
+                        // Update header avatar
+                        const headerAvatar = document.querySelector('.header-avatar');
+                        if (headerAvatar) {
+                            headerAvatar.src = newAvatarUrl + cacheBuster;
+                        } else {
+                            const headerPlaceholder = document.querySelector('.header-avatar-placeholder');
+                            if (headerPlaceholder) {
+                                const newHeaderImg = document.createElement('img');
+                                newHeaderImg.src = newAvatarUrl;
+                                newHeaderImg.alt = 'Profile';
+                                newHeaderImg.className = 'header-avatar';
+                                headerPlaceholder.replaceWith(newHeaderImg);
+                            }
+                        }
+
+                        showNotification('Avatar updated successfully!', 'success');
+                    } else {
+                        showNotification(data.message || 'An error occurred during upload.', 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('A network error occurred. Please try again.', 'error');
+                    console.error('Upload Error:', error);
+                })
+                .finally(() => {
+                    avatarContainer.classList.remove('uploading');
+                });
+            }
+        });
+    }
+
+    // --- Password Change Form ---
+    const passwordForm = document.getElementById('passwordChangeForm');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const messageContainer = document.getElementById('password-modal-messages');
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="loading"></span> Updating...';
+            messageContainer.innerHTML = '';
+
+            const formData = new FormData(form);
+            formData.append('change_password_ajax', '1');
+
+            fetch('profile.php', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                const alertClass = data.success ? 'alert-success' : 'alert-error';
+                messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
+                
+                if (data.success) {
+                    form.reset();
+                    setTimeout(() => {
+                        closePasswordModal();
+                        messageContainer.innerHTML = '';
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred. Please try again.</div>`;
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Update Password';
+            });
+        });
+    }
+
+    // --- Toggle Switches ---
+    document.querySelectorAll('.toggle-input').forEach(toggle => {
+        if (toggle.disabled) return;
+
+        toggle.addEventListener('change', function() {
+            const settingId = this.id;
+            const isChecked = this.checked;
+            const preferenceItem = this.closest('.preference-item, .security-item');
+            const statusSpan = preferenceItem ? preferenceItem.querySelector('.preference-status') : null;
+
+            if (statusSpan) {
+                statusSpan.textContent = 'Saving...';
+                statusSpan.style.color = 'var(--text-light)';
+            }
+
+            const formData = new FormData();
+            formData.append('update_preferences_ajax', '1');
+            formData.append('setting', settingId);
+            formData.append('value', isChecked);
+
+            fetch('profile.php', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if (statusSpan) {
+                    if (data.success) {
+                        statusSpan.textContent = 'Saved!';
+                        statusSpan.style.color = 'var(--success-color)';
+                    } else {
+                        statusSpan.textContent = 'Error';
+                        statusSpan.style.color = 'var(--danger-color)';
+                    }
+                    setTimeout(() => { statusSpan.textContent = ''; }, 2000);
+                }
+            })
+            .catch(error => {
+                if (statusSpan) { statusSpan.textContent = 'Error'; statusSpan.style.color = 'var(--danger-color)'; }
+                console.error('Error:', error);
+            });
+        });
+    });
+
+    // --- Profile Info Form ---
     const profileForm = document.querySelector('.profile-form');
     if (!profileForm) return;
 
@@ -520,12 +581,10 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.innerHTML = '<span class="loading"></span> Saving...';
         }
     });
-
-    // Add confirmation to the reset button for a better user experience
+    
     const resetButton = profileForm.querySelector('button[type="reset"]');
     if (resetButton) {
         resetButton.addEventListener('click', function(e) {
-            // Prevent the default browser reset action to add a confirmation step
             e.preventDefault();
             if (confirm('Are you sure you want to discard your changes? This cannot be undone.')) {
                 profileForm.reset(); // Manually trigger the form reset if confirmed

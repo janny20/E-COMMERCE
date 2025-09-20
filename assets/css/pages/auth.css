@@ -453,22 +453,38 @@
 
 /* Responsive Auth */
 @media (max-width: 768px) {
-    .auth-container {
-        padding: 0;
-    }
+	.auth-container {
+		/* On tablets, allow the card to be at the top instead of centered vertically */
+		align-items: flex-start;
+		padding-top: var(--spacing-xxl);
+	}
+}
 
-    .auth-card {
-        max-width: 100%;
-        margin: 0;
-    }
+@media (max-width: 576px) {
+	.auth-container {
+		padding: 0;
+		background: var(--bg-white); /* Match card background for a seamless full-page look */
+	}
 
-    .auth-header {
-        padding: 8px 2px;
-    }
+	.auth-card {
+		width: 100%;
+		max-width: 100%;
+		min-height: 100vh;
+		margin: 0;
+		border-radius: 0;
+		box-shadow: none;
+		padding: var(--spacing-xl) var(--spacing-lg);
+	}
 
-    .auth-body {
-        padding: 4px 2px;
-    }
+	.auth-header {
+		margin: calc(var(--spacing-xl) * -1) calc(var(--spacing-lg) * -1) var(--spacing-md);
+		border-radius: 0;
+	}
+
+	.auth-footer {
+		margin: var(--spacing-lg) calc(var(--spacing-lg) * -1) calc(var(--spacing-xl) * -1);
+		border-radius: 0;
+	}
 }
 
 /* Form Select Styling */
