@@ -17,7 +17,7 @@ define('BASE_URL', 'http://localhost/multi-vendor-ecommerce/');
 
 // Database configuration
 // Change port if your MySQL is not on 3306 (e.g., 'localhost:3307')
-define('DB_HOST', 'localhost:3306'); // MySQL is running on port 3307
+define('DB_HOST', 'localhost:3307'); // MySQL is running on port 3307
 define('DB_NAME', 'ecommerce_db');
 define('DB_USER', 'root');
 define('DB_PASS', ''); // Set your MySQL password if not empty
