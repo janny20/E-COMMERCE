@@ -1,7 +1,7 @@
 <?php
 // Site name for footer and branding
 if (!defined('SITE_NAME')) {
-    define('SITE_NAME', 'MultiVendor');
+    define('SITE_NAME', 'UniMall');
 }
 // includes/config.php - CHECK FOR SESSION ISSUES
 // Error reporting

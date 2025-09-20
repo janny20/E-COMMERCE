@@ -6,7 +6,7 @@
         <div class="footer-content">
             <div class="footer-main">
                 <div class="footer-brand">
-                    <a href="<?php echo BASE_URL; ?>/pages/index.php" class="footer-logo">
+                    <a href="<?php echo BASE_URL; ?>/pages/index.php" class="footer-logo">UniMall</a>
                         <i class="fas fa-store"></i> <?php echo SITE_NAME; ?>
                     </a>
                     <p class="footer-description">
