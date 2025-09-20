@@ -4,7 +4,7 @@ require_once '../includes/config.php';
 
 // Check if product ID is provided
 if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header('Location: products.php');
+    header('Location: ' . BASE_URL . 'pages/products.php');
     exit();
 }
 
@@ -26,7 +26,7 @@ $stmt->execute();
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
-    header('Location: products.php');
+    header('Location: ' . BASE_URL . 'pages/products.php');
     exit();
 }
 
@@ -53,115 +53,113 @@ $related_products = $related_stmt->fetchAll(PDO::FETCH_ASSOC);
 require_once '../includes/header.php';
 
 // Add product-detail-specific CSS
-echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-detail.css">';
+echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-detail.css?v=2">';
 ?>
 
 <div class="product-detail-page">
     <div class="container">
         <nav class="breadcrumb">
-            <a href="<?php echo BASE_URL; ?>">Home</a>
+            <a href="<?php echo BASE_URL; ?>pages/home.php">Home</a>
             <span>/</span>
             <a href="<?php echo BASE_URL; ?>pages/products.php">Products</a>
             <span>/</span>
-            <a href="<?php echo BASE_URL; ?>pages/products.php?category=<?php echo strtolower($product['category_name']); ?>"><?php echo $product['category_name']; ?></a>
+            <a href="<?php echo BASE_URL; ?>pages/products.php?category=<?php echo urlencode(strtolower($product['category_name'] ?? '')); ?>"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></a>
             <span>/</span>
-            <span><?php echo htmlspecialchars($product['name']); ?></span>
+            <span><?php echo htmlspecialchars($product['name'] ?? 'Product'); ?></span>
         </nav>
 
-        <div class="product-detail">
-            <div class="product-gallery">
-                <div class="product-main-image">
-                    <img src="../assets/images/products/<?php echo $images[0]; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" id="main-image">
-                </div>
-                <div class="product-thumbnails">
-                    <?php foreach ($images as $index => $image): ?>
-                    <div class="thumbnail <?php echo $index === 0 ? 'active' : ''; ?>" data-image="../assets/images/products/<?php echo $image; ?>">
-                        <img src="../assets/images/products/<?php echo $image; ?>" alt="Thumbnail <?php echo $index + 1; ?>">
+        <div class="product-detail-card">
+            <div class="product-detail">
+                <div class="product-gallery">
+                    <div class="product-main-image">
+                        <img src="<?php echo BASE_URL; ?>assets/images/products/<?php echo htmlspecialchars($images[0]); ?>" alt="<?php echo htmlspecialchars($product['name'] ?? 'Product'); ?>" id="main-image">
                     </div>
-                    <?php endforeach; ?>
+                    <div class="product-thumbnails">
+                        <?php foreach ($images as $index => $image): ?>
+                        <div class="thumbnail <?php echo $index === 0 ? 'active' : ''; ?>" data-image="<?php echo BASE_URL; ?>assets/images/products/<?php echo htmlspecialchars($image); ?>">
+                            <img src="<?php echo BASE_URL; ?>assets/images/products/<?php echo htmlspecialchars($image); ?>" alt="Thumbnail <?php echo $index + 1; ?>">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
-            </div>
 
-            <div class="product-info">
-                <div class="product-header">
-                    <h1 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h1>
-                    <div class="product-rating">
-                        <?php
-                        $rating = rand(3, 5);
-                        for ($i = 0; $i < 5; $i++) {
-                            if ($i < $rating) {
-                                echo '<i class="fas fa-star"></i>';
-                            } else {
-                                echo '<i class="far fa-star"></i>';
+                <div class="product-info-main">
+                    <div class="product-header">
+                        <h1 class="product-title"><?php echo htmlspecialchars($product['name'] ?? 'N/A'); ?></h1>
+                        <div class="product-rating">
+                            <?php
+                            $rating = rand(3, 5); // Placeholder
+                            for ($i = 0; $i < 5; $i++) {
+                                echo $i < $rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
                             }
-                        }
-                        ?>
-                        <span>(<?php echo rand(50, 500); ?> reviews)</span>
-                    </div>
-                </div>
-
-                <div class="product-price">
-                    <span class="current-price">$<?php echo number_format($product['price'], 2); ?></span>
-                    <?php if ($product['compare_price']): ?>
-                    <span class="original-price">$<?php echo number_format($product['compare_price'], 2); ?></span>
-                    <span class="discount"><?php echo round(($product['compare_price'] - $product['price']) / $product['compare_price'] * 100); ?>% off</span>
-                    <?php endif; ?>
-                </div>
-
-                <div class="product-description">
-                    <p><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                </div>
-
-                <div class="product-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Category:</span>
-                        <span class="meta-value"><?php echo $product['category_name']; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Vendor:</span>
-                        <span class="meta-value"><?php echo $product['business_name']; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">SKU:</span>
-                        <span class="meta-value"><?php echo $product['sku'] ?: 'N/A'; ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Availability:</span>
-                        <span class="meta-value <?php echo $product['quantity'] > 0 ? 'in-stock' : 'out-of-stock'; ?>">
-                            <?php echo $product['quantity'] > 0 ? 'In Stock (' . $product['quantity'] . ' available)' : 'Out of Stock'; ?>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="product-actions">
-                    <div class="quantity-selector">
-                        <label for="quantity">Quantity:</label>
-                        <div class="quantity-controls">
-                            <button type="button" class="quantity-btn minus">-</button>
-                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['quantity']; ?>">
-                            <button type="button" class="quantity-btn plus">+</button>
+                            ?>
+                            <span>(<?php echo rand(50, 500); ?> reviews)</span>
                         </div>
                     </div>
 
-                    <div class="action-buttons">
-                        <button class="btn btn-primary add-to-cart-btn" <?php echo $product['quantity'] > 0 ? '' : 'disabled'; ?>>
-                            <i class="fas fa-shopping-cart"></i>
-                            Add to Cart
-                        </button>
-                        <button class="btn btn-outline wishlist-btn">
-                            <i class="far fa-heart"></i>
-                            Add to Wishlist
-                        </button>
+                    <div class="product-price">
+                        <span class="current-price">$<?php echo number_format((float)($product['price'] ?? 0), 2); ?></span>
+                        <?php if (!empty($product['compare_price']) && is_numeric($product['compare_price']) && $product['compare_price'] > 0): ?>
+                        <span class="original-price">$<?php echo number_format((float)$product['compare_price'], 2); ?></span>
+                        <span class="discount"><?php echo round(((float)$product['compare_price'] - (float)$product['price']) / (float)$product['compare_price'] * 100); ?>% off</span>
+                        <?php endif; ?>
                     </div>
-                </div>
 
-                <div class="product-share">
-                    <span>Share this product:</span>
-                    <div class="share-buttons">
-                        <a href="#" class="share-btn facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="share-btn twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="share-btn pinterest"><i class="fab fa-pinterest"></i></a>
-                        <a href="#" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
+                    <div class="product-short-description">
+                        <p><?php echo nl2br(htmlspecialchars(substr($product['description'] ?? '', 0, 150))) . '...'; ?></p>
+                    </div>
+
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Category:</span>
+                            <span class="meta-value"><a href="<?php echo BASE_URL; ?>pages/products.php?category=<?php echo urlencode(strtolower($product['category_name'] ?? '')); ?>"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></a></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Vendor:</span>
+                            <span class="meta-value"><a href="#"><?php echo htmlspecialchars($product['business_name'] ?? 'N/A'); ?></a></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">SKU:</span>
+                            <span class="meta-value"><?php echo htmlspecialchars($product['sku'] ?? 'N/A'); ?></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Availability:</span>
+                            <span class="meta-value <?php echo (int)($product['quantity'] ?? 0) > 0 ? 'in-stock' : 'out-of-stock'; ?>">
+                                <?php echo (int)($product['quantity'] ?? 0) > 0 ? 'In Stock (' . (int)$product['quantity'] . ' available)' : 'Out of Stock'; ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity">Quantity:</label>
+                            <div class="quantity-controls">
+                                <button type="button" class="quantity-btn minus" aria-label="Decrease quantity">-</button>
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo (int)($product['quantity'] ?? 1); ?>" aria-label="Quantity">
+                                <button type="button" class="quantity-btn plus" aria-label="Increase quantity">+</button>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary add-to-cart-btn" <?php echo (int)($product['quantity'] ?? 0) > 0 ? '' : 'disabled'; ?>>
+                                <i class="fas fa-shopping-cart"></i>
+                                Add to Cart
+                            </button>
+                            <button class="btn btn-outline wishlist-btn">
+                                <i class="far fa-heart"></i>
+                                Add to Wishlist
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="product-share">
+                        <span>Share:</span>
+                        <div class="share-buttons">
+                            <a href="#" class="share-btn facebook" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="share-btn twitter" aria-label="Share on Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="share-btn pinterest" aria-label="Share on Pinterest"><i class="fab fa-pinterest"></i></a>
+                            <a href="#" class="share-btn whatsapp" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -169,16 +167,16 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
 
         <div class="product-tabs">
             <div class="tabs-header">
-                <button class="tab-btn active" data-tab="description">Description</button>
-                <button class="tab-btn" data-tab="specifications">Specifications</button>
-                <button class="tab-btn" data-tab="reviews">Reviews (<?php echo rand(50, 500); ?>)</button>
-                <button class="tab-btn" data-tab="vendor">Vendor Info</button>
+                <button class="tab-btn active" data-tab="description" type="button">Full Description</button>
+                <button class="tab-btn" data-tab="specifications" type="button">Specifications</button>
+                <button class="tab-btn" data-tab="reviews" type="button">Reviews (<?php echo rand(50, 500); ?>)</button>
+                <button class="tab-btn" data-tab="vendor" type="button">Vendor Info</button>
             </div>
 
             <div class="tabs-content">
                 <div class="tab-pane active" id="description">
                     <div class="tab-content">
-                        <p><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                        <p><?php echo nl2br(htmlspecialchars($product['description'] ?? 'No description available.')); ?></p>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
                     </div>
                 </div>
@@ -294,9 +292,9 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
 
                 <div class="tab-pane" id="vendor">
                     <div class="tab-content">
-                        <div class="vendor-info">
-                            <h3><?php echo $product['business_name']; ?></h3>
-                            <p><?php echo nl2br(htmlspecialchars($product['business_description'])); ?></p>
+                        <div class="vendor-info-tab">
+                            <h3><?php echo htmlspecialchars($product['business_name'] ?? 'N/A'); ?></h3>
+                            <p><?php echo nl2br(htmlspecialchars($product['business_description'] ?? 'No vendor description available.')); ?></p>
                             <div class="vendor-stats">
                                 <div class="stat">
                                     <div class="stat-number">4.9</div>
@@ -311,7 +309,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
                                     <div class="stat-label">Positive Reviews</div>
                                 </div>
                             </div>
-                            <a href="<?php echo BASE_URL; ?>vendor/profile.php?vendor_id=<?php echo $product['vendor_id']; ?>" class="btn btn-outline">View Vendor Profile</a>
+                            <a href="<?php echo BASE_URL; ?>vendor/profile.php?vendor_id=<?php echo (int)($product['vendor_id'] ?? 0); ?>" class="btn btn-outline">View Vendor Profile</a>
                         </div>
                     </div>
                 </div>
@@ -320,44 +318,40 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
 
         <?php if (!empty($related_products)): ?>
         <section class="related-products">
-            <h2>Related Products</h2>
+            <h2 class="section-title">Related Products</h2>
             <div class="products-grid">
                 <?php foreach ($related_products as $related_product): ?>
                 <div class="product-card">
                     <div class="product-image-container">
-                        <img src="../assets/images/products/<?php echo !empty($related_product['images']) ? explode(',', $related_product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($related_product['name']); ?>" class="product-image">
+                        <img src="<?php echo BASE_URL; ?>assets/images/products/<?php echo htmlspecialchars(!empty($related_product['images']) ? explode(',', $related_product['images'])[0] : 'default.jpg'); ?>" alt="<?php echo htmlspecialchars($related_product['name'] ?? 'Product'); ?>" class="product-image">
                         <div class="product-overlay">
-                            <button class="quick-view-btn">Quick View</button>
-                            <button class="wishlist-btn">
+                            <button class="btn btn-outline quick-view-btn">Quick View</button>
+                            <button class="wishlist-icon-btn">
                                 <i class="far fa-heart"></i>
                             </button>
                         </div>
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">
-                            <a href="product-detail.php?id=<?php echo $related_product['id']; ?>"><?php echo htmlspecialchars($related_product['name']); ?></a>
+                            <a href="product-detail.php?id=<?php echo (int)($related_product['id'] ?? 0); ?>"><?php echo htmlspecialchars($related_product['name'] ?? 'N/A'); ?></a>
                         </h3>
                         <div class="product-price">
-                            $<?php echo number_format($related_product['price'], 2); ?>
-                            <?php if ($related_product['compare_price']): ?>
-                                <span class="product-old-price">$<?php echo number_format($related_product['compare_price'], 2); ?></span>
+                            $<?php echo number_format((float)($related_product['price'] ?? 0), 2); ?>
+                            <?php if (!empty($related_product['compare_price']) && is_numeric($related_product['compare_price'])): ?>
+                                <span class="product-old-price">$<?php echo number_format((float)$related_product['compare_price'], 2); ?></span>
                             <?php endif; ?>
                         </div>
-                        <div class="product-vendor">By: <?php echo htmlspecialchars($related_product['business_name']); ?></div>
+                        <div class="product-vendor">By: <?php echo htmlspecialchars($related_product['business_name'] ?? 'N/A'); ?></div>
                         <div class="product-rating">
                             <?php
-                            $rating = rand(3, 5);
+                            $rating = rand(3, 5); // Placeholder
                             for ($i = 0; $i < 5; $i++) {
-                                if ($i < $rating) {
-                                    echo '<i class="fas fa-star"></i>';
-                                } else {
-                                    echo '<i class="far fa-star"></i>';
-                                }
+                                echo $i < $rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
                             }
                             ?>
                             <span>(<?php echo rand(10, 300); ?>)</span>
                         </div>
-                        <button class="add-to-cart-btn">Add to Cart</button>
+                        <button class="btn btn-primary add-to-cart-btn-small">Add to Cart</button>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -398,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
     plusBtn.addEventListener('click', function() {
         let value = parseInt(quantityInput.value);
         const max = parseInt(quantityInput.getAttribute('max'));
-        if (value < max) {
+        if (!max || value < max) {
             quantityInput.value = value + 1;
         }
     });
@@ -408,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabPanes = document.querySelectorAll('.tab-pane');
 
     tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
             const tabId = this.getAttribute('data-tab');
             
             tabBtns.forEach(b => b.classList.remove('active'));

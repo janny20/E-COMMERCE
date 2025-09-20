@@ -51,40 +51,51 @@ $stmt->execute([$vendor_id]);
 $total_earnings = $stmt->fetchColumn();
 ?>
 <?php require_once __DIR__ . '/../includes/header.php'; ?>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/vendor-dashboard.css?v=2">
 
 <div class="vendor-dashboard container">
   <div class="dashboard-header">
-    <h1>Vendor Dashboard</h1>
-    <p>Welcome, <?=htmlspecialchars($_SESSION['username'] ?? 'Vendor')?></p>
+    <h1 class="dashboard-title">Vendor Dashboard</h1>
+    <p class="dashboard-subtitle">Welcome back, <?=htmlspecialchars($_SESSION['username'] ?? 'Vendor')?>!</p>
   </div>
 
-  <div class="dashboard-stats">
+  <div class="stats-grid">
     <div class="stat-card">
-      <h3>Total Products</h3>
-      <p class="stat-number"><?=htmlspecialchars($products_count)?></p>
+        <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+        <div class="stat-info">
+            <span class="stat-number"><?=htmlspecialchars($products_count)?></span>
+            <span class="stat-label">Total Products</span>
+        </div>
     </div>
     <div class="stat-card">
-      <h3>Total Orders</h3>
-      <p class="stat-number"><?=htmlspecialchars($orders_count)?></p>
+        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+        <div class="stat-info">
+            <span class="stat-number"><?=htmlspecialchars($orders_count)?></span>
+            <span class="stat-label">Total Orders</span>
+        </div>
     </div>
     <div class="stat-card">
-      <h3>Pending Orders</h3>
-      <p class="stat-number"><?=htmlspecialchars($pending_count)?></p>
+        <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="stat-info">
+            <span class="stat-number"><?=htmlspecialchars($pending_count)?></span>
+            <span class="stat-label">Pending Orders</span>
+        </div>
     </div>
     <div class="stat-card">
-      <h3>Total Earnings</h3>
-      <p class="stat-number">$<?=money($total_earnings)?></p>
+        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">$<?=money($total_earnings)?></span>
+            <span class="stat-label">Total Earnings</span>
+        </div>
     </div>
   </div>
 
-  <nav class="vendor-nav">
-    <a href="<?php echo BASE_URL; ?>vendor/products.php">Products</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/orders.php">Orders</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/earnings.php">Earnings</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/profile.php">Profile</a> |
-    <a href="<?php echo BASE_URL; ?>pages/logout.php">Logout</a>
-  </nav>
-
+  <div class="quick-actions">
+      <a href="<?php echo BASE_URL; ?>vendor/products.php" class="action-btn"><i class="action-icon fas fa-boxes"></i><span class="action-label">Manage Products</span></a>
+      <a href="<?php echo BASE_URL; ?>vendor/orders.php" class="action-btn"><i class="action-icon fas fa-file-invoice-dollar"></i><span class="action-label">View Orders</span></a>
+      <a href="<?php echo BASE_URL; ?>vendor/earnings.php" class="action-btn"><i class="action-icon fas fa-chart-line"></i><span class="action-label">Earnings Report</span></a>
+      <a href="<?php echo BASE_URL; ?>vendor/profile.php" class="action-btn"><i class="action-icon fas fa-user-cog"></i><span class="action-label">Edit Profile</span></a>
+  </div>
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
