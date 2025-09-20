@@ -301,34 +301,42 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a href="pages/register.php" class="category-card" data-aos="fade-up" data-aos-delay="100">
                         <div class="category-image">
                             <img src="assets/images/phones.jpg" alt="Phones & Tablets">
-                            <div class="category-overlay"></div>
+                            <div class="category-overlay">
+                                <h3>Phones & Tablets</h3>
+                                <p>Latest smartphones and tablets</p>
+                                <span class="shop-now-link">Shop Now <i class="fas fa-arrow-right"></i></span>
+                            </div>
                         </div>
-                        <h3>Phones & Tablets</h3>
-                        <p>Latest smartphones and tablets</p>
                     </a>
                     <a href="pages/register.php" class="category-card" data-aos="fade-up" data-aos-delay="200">
                         <div class="category-image">
                             <img src="assets/images/fashion.jpg" alt="Fashion">
-                            <div class="category-overlay"></div>
+                            <div class="category-overlay">
+                                <h3>Fashion</h3>
+                                <p>Clothing, shoes & accessories</p>
+                                <span class="shop-now-link">Shop Now <i class="fas fa-arrow-right"></i></span>
+                            </div>
                         </div>
-                        <h3>Fashion</h3>
-                        <p>Clothing, shoes & accessories</p>
                     </a>
                     <a href="pages/register.php" class="category-card" data-aos="fade-up" data-aos-delay="300">
                         <div class="category-image">
                             <img src="assets/images/electronics.jpg" alt="Electronics">
-                            <div class="category-overlay"></div>
+                            <div class="category-overlay">
+                                <h3>Electronics</h3>
+                                <p>Gadgets and electronics</p>
+                                <span class="shop-now-link">Shop Now <i class="fas fa-arrow-right"></i></span>
+                            </div>
                         </div>
-                        <h3>Electronics</h3>
-                        <p>Gadgets and electronics</p>
                     </a>
                     <a href="pages/register.php" class="category-card" data-aos="fade-up" data-aos-delay="400">
                         <div class="category-image">
                             <img src="assets/images/home.jpg" alt="Home & Office">
-                            <div class="category-overlay"></div>
+                            <div class="category-overlay">
+                                <h3>Home & Office</h3>
+                                <p>Furniture and supplies</p>
+                                <span class="shop-now-link">Shop Now <i class="fas fa-arrow-right"></i></span>
+                            </div>
                         </div>
-                        <h3>Home & Office</h3>
-                        <p>Furniture and supplies</p>
                     </a>
                 </div>
             </div>
@@ -447,18 +455,62 @@ if (session_status() === PHP_SESSION_NONE) {
                             <a href="pages/register.php" class="vendor-link">Visit Store <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
+                    <div class="vendor-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="vendor-image">
+                            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=400&q=80" alt="GadgetGalaxy">
+                        </div>
+                        <div class="vendor-info">
+                            <h3>GadgetGalaxy</h3>
+                            <div class="vendor-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.9 (415 reviews)</span>
+                            </div>
+                            <p>Your universe of gadgets</p>
+                            <a href="pages/register.php" class="vendor-link">Visit Store <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="vendor-card" data-aos="fade-up" data-aos-delay="500">
+                        <div class="vendor-image">
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80" alt="AudioPhile">
+                        </div>
+                        <div class="vendor-info">
+                            <h3>AudioPhile</h3>
+                            <div class="vendor-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8 (350 reviews)</span>
+                            </div>
+                            <p>Premium sound systems</p>
+                            <a href="pages/register.php" class="vendor-link">Visit Store <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="vendor-card" data-aos="fade-up" data-aos-delay="600">
+                        <div class="vendor-image">
+                            <img src="https://images.unsplash.com/photo-1542496658-606a75416f25?auto=format&fit=crop&w=400&q=80" alt="StyleSavvy">
+                        </div>
+                        <div class="vendor-info">
+                            <h3>StyleSavvy</h3>
+                            <div class="vendor-rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.6 (150 reviews)</span>
+                            </div>
+                            <p>Chic and modern apparel</p>
+                            <a href="pages/register.php" class="vendor-link">Visit Store <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- CTA Section -->
         <section class="cta-section">
-            <div class="container" data-aos="fade-up">
-                <h2>Ready to Start Shopping?</h2>
-                <p>Join thousands of satisfied customers who shop with confidence</p>
-                <div class="cta-actions">
-                    <a href="pages/register.php" class="btn btn-primary btn-lg pulse-animation">Create Free Account</a>
-                    <span class="cta-note">No credit card required</span>
+            <div class="container">
+                <div class="cta-content" data-aos="zoom-in">
+                    <h2>Ready to Start Shopping?</h2>
+                    <p>Join thousands of satisfied customers who shop with confidence.</p>
+                    <div class="cta-actions">
+                        <a href="pages/register.php" class="btn btn-primary btn-lg pulse-animation">Create Free Account</a>
+                        <span class="cta-note">No credit card required</span>
+                    </div>
                 </div>
             </div>
         </section>
