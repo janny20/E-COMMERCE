@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="auth-container">
         <div class="auth-card animate-fade-in">
             <div class="auth-header">
-                <div class="auth-logo">ShopSphere</div>
+                <div class="auth-logo">UniMall</div>
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Join our community and start shopping</p>
             </div>

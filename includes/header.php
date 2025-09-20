@@ -23,7 +23,7 @@ require_once 'config.php';
         <div class="container">
             <div class="nav-left">
                 <!-- Home link goes to landing page if not logged in, home.php if logged in -->
-                <a href="<?php echo $isLoggedIn ? BASE_URL . 'pages/home.php' : BASE_URL . 'landing.php'; ?>" class="logo">E-Shop</a>
+                <a href="<?php echo $isLoggedIn ? BASE_URL . 'pages/home.php' : BASE_URL . 'landing.php'; ?>" class="logo">UniMall</a>
             </div>
             <div class="nav-center">
                 <form class="search-form" action="<?php echo BASE_URL; ?>pages/search.php" method="GET">

@@ -26,7 +26,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Simple Landing Header (Different from main app header) -->
     <header class="landing-header">
         <div class="container">
-            <h1 class="landing-logo" data-aos="fade-down">Unimall</h1>
+            <h1 class="landing-logo" data-aos="fade-down">UniMall</h1>
             <nav class="landing-nav" data-aos="fade-down" data-aos-delay="100">
                 <a href="pages/login.php" class="btn btn-outline">Login</a>
                 <a href="pages/register.php" class="btn btn-primary">Create Account</a>
