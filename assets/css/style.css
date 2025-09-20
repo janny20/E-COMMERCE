@@ -18,7 +18,7 @@
 @import url('components/cards.css');
 @import url('components/navigation.css');
 @import url('components/modals.css');
-@import url('layout/header.css');
+@import url('layout/header.css'); /* Contains new responsive header styles */
 /* Contains new responsive header styles */
 @import url('components/footer.css');
 @import url('layout/grid.css');

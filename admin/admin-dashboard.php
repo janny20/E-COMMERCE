@@ -138,7 +138,7 @@ include_once __DIR__ . '/../includes/admin-header.php';
                         </a>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($recent_orders)): ?>
+                        <?php if (isset($recent_orders) && !empty($recent_orders)): ?>
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -180,7 +180,7 @@ include_once __DIR__ . '/../includes/admin-header.php';
                         </a>
                     </div>
                     <div class="card-body">
-                        <?php if (!empty($pending_vendors)): ?>
+                        <?php if (isset($pending_vendors) && !empty($pending_vendors)): ?>
                             <table class="data-table">
                                 <thead>
                                     <tr>

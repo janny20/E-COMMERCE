@@ -63,45 +63,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body class="admin-login">
     <div class="login-container">
         <div class="login-card">
-            <div class="login-header">
-                <h1>Admin Login</h1>
-                <p>Access the admin dashboard</p>
+            <div class="login-branding">
+                <div class="branding-content">
+                    <div class="login-logo">UniMall Admin</div>
+                    <h2>Platform Management</h2>
+                    <p>Secure access to the UniMall administration panel.</p>
+                </div>
             </div>
-            
-            <?php if (!empty($error)): ?>
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?php echo $error; ?>
+            <div class="login-form-wrapper">
+                <div class="login-header">
+                    <h1>Admin Login</h1>
                 </div>
-            <?php endif; ?>
-            
-            <form method="POST" class="login-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" id="email" name="email" placeholder="admin@example.com" required>
+                
+                <?php if (!empty($error)): ?>
+                    <div class="alert alert-error">
+                        <?php echo $error; ?>
                     </div>
-                </div>
+                <?php endif; ?>
                 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <form method="POST" class="login-form">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" name="email" placeholder="Email Address" required>
+                        </div>
                     </div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-full">Login</button>
-                
-                <div style="text-align: center; margin-top: 20px;">
-                    <p style="color: #666; font-size: 14px;">
-                        Access admin login at: <br>
-                        <a href="http://localhost/multi-vendor-ecommerce/admin/" style="color: #ff6f00; font-weight: 500;">http://localhost/multi-vendor-ecommerce/admin/</a><br>
-                        Default credentials: admin@example.com / password
-                    </p>
-                </div>
-            </form>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+
+                    <div class="test-credentials">
+                        <p><strong>For Testing:</strong></p>
+                        <p>Email: <code>admin@example.com</code></p>
+                        <p>Password: <code>password</code></p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </body>
