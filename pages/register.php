@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body class="register-page">
     <div class="auth-container">
-        <div class="auth-card animate-fade-in" style="max-width:480px;width:100%;margin:0 auto;">
+        <div class="auth-card animate-fade-in">
             <div class="auth-header">
                 <div class="auth-logo">ShopSphere</div>
                 <h1 class="auth-title">Create Account</h1>
@@ -125,56 +125,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php endif; ?>
                 <form method="POST" action="" class="auth-form" id="registrationForm">
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="username">Username *</label>
-                            <input type="text" id="username" name="username" class="form-input" required 
-                                   value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
-                                   minlength="3" maxlength="50">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label" for="username">Username *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="username" name="username" class="auth-form-input" required placeholder="Choose a username"
+                                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
+                                       minlength="3" maxlength="50">
+                            </div>
+                            <div class="form-hint">3-50 characters, letters, numbers, and underscores only.</div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" class="form-input" required 
-                                   value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label" for="email">Email Address *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" class="auth-form-input" required placeholder="e.g., your.email@example.com"
+                                       value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="password">Password *</label>
-                            <div style="position:relative;">
-                                <input type="password" id="password" name="password" class="form-input" required style="padding-right:40px;">
-                                <span id="togglePassword" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);cursor:pointer;color:#888;font-size:1.2rem;">
+                        <div class="auth-form-group">
+                            <label class="auth-form-label" for="password">Password *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" name="password" class="auth-form-input" required placeholder="Create a strong password" minlength="6">
+                                <span id="togglePassword" class="password-toggle-icon">
                                     <i class="fas fa-eye"></i>
                                 </span>
                             </div>
+                            <div class="form-hint">Must be at least 6 characters.</div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="user_type">Account Type *</label>
-                            <div style="position:relative;">
-                                <select id="user_type" name="user_type" class="form-select" required onchange="toggleVendorField()" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 32px;">
-                                    <option value="customer" <?php echo $user_type == 'customer' ? 'selected' : ''; ?>>Customer</option>
-                                    <option value="vendor" <?php echo $user_type == 'vendor' ? 'selected' : ''; ?>>Vendor</option>
-                                </select>
-                                <span style="position:absolute;top:50%;right:12px;transform:translateY(-50%);pointer-events:none;color:#888;font-size:1.2rem;">
-                                    <i class="fas fa-chevron-down"></i>
-                                </span>
+                        <div class="auth-form-group">
+                            <label class="auth-form-label" for="user_type">Account Type *</label>
+                            <select id="user_type" name="user_type" class="form-select" required onchange="toggleVendorField()">
+                                <option value="customer" <?php echo $user_type == 'customer' ? 'selected' : ''; ?>>Customer</option>
+                                <option value="vendor" <?php echo $user_type == 'vendor' ? 'selected' : ''; ?>>Vendor</option>
+                            </select>
+                        </div>
+                        <div class="auth-form-group business-name-field <?php echo $user_type == 'vendor' ? 'visible' : ''; ?>" id="business_name_field">
+                            <label class="auth-form-label" for="business_name">Business Name *</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-store"></i>
+                                <input type="text" id="business_name" name="business_name" class="auth-form-input" placeholder="Your business name"
+                                       value="<?php echo isset($_POST['business_name']) ? htmlspecialchars($_POST['business_name']) : ''; ?>"
+                                       <?php echo $user_type == 'vendor' ? 'required' : ''; ?>>
                             </div>
-                        </div>
-                        <div class="form-group business-name-field" id="business_name_field" style="display:<?php echo $user_type == 'vendor' ? 'block' : 'none'; ?>;">
-                            <label class="form-label" for="business_name">Business Name *</label>
-                            <input type="text" id="business_name" name="business_name" class="form-input" 
-                                   value="<?php echo isset($_POST['business_name']) ? htmlspecialchars($_POST['business_name']) : ''; ?>"
-                                   <?php echo $user_type == 'vendor' ? 'required' : ''; ?>>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-                    </div>
-                    <!-- Back arrow at the bottom of the form, styled as a real arrow -->
-                    <div style="display:flex;justify-content:center;align-items:center;margin-top:24px;">
-                        <a href="../landing.php" class="back-arrow" style="display:inline-flex;align-items:center;gap:8px;color:#222;font-size:1.25rem;text-decoration:none;font-weight:500;">
-                            <i class="fas fa-arrow-left" style="font-size:2rem;"></i>
-                            <span style="font-size:1rem;">Back to Home</span>
-                        </a>
+                        <button type="submit" class="auth-form-submit">Create Account</button>
                     </div>
                 </form>
+                <div class="auth-back-link-container">
+                    <a href="../landing.php" class="back-to-home-link"><i class="fas fa-arrow-left"></i> <span>Back to Home</span></a>
+                </div>
             </div>
             <div class="auth-footer">
                 <p class="auth-footer-text">
@@ -189,15 +192,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         const businessField = document.getElementById('business_name_field');
         const businessInput = document.getElementById('business_name');
         if (userType === 'vendor') {
-            businessField.style.display = 'block';
+            businessField.classList.add('visible');
             businessInput.setAttribute('required', 'required');
         } else {
-            businessField.style.display = 'none';
+            businessField.classList.remove('visible');
             businessInput.removeAttribute('required');
             businessInput.value = '';
         }
-    }
-    document.getElementById('user_type').addEventListener('change', toggleVendorField);
+    });
     // Show/hide password toggle
     document.getElementById('togglePassword').addEventListener('click', function() {
         const pwd = document.getElementById('password');
@@ -213,100 +215,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     });
     </script>
-    <style>
-    .animate-fade-in {
-        animation: fadeInUp 0.7s cubic-bezier(.23,1,.32,1);
-    }
-    @keyframes fadeInUp {
-        0% {
-            opacity: 0;
-            transform: translateY(40px) scale(0.98);
-        }
-        60% {
-            opacity: 1;
-            transform: translateY(-8px) scale(1.02);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-    .auth-card {
-        box-shadow: 0 8px 32px rgba(0,0,0,0.10);
-        transition: box-shadow 0.3s;
-    }
-    .auth-card:hover {
-        box-shadow: 0 16px 48px rgba(0,0,0,0.16);
-    }
-    .btn, .form-input, .form-select {
-        transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
-    }
-    .btn.btn-primary.btn-full {
-        display: block;
-        width: 60%;
-        margin: 0 auto;
-        padding: 10px 0;
-        background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
-        color: #fff;
-        font-size: 1.08rem;
-        font-weight: 700;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(37,117,252,0.10);
-        transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-    }
-    .btn.btn-primary.btn-full:hover, .btn.btn-primary.btn-full:focus {
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
-        transform: translateY(-2px) scale(1.02);
-        outline: none;
-    }
-    .back-arrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: #2575fc;
-        font-size: 1.08rem;
-        font-weight: 700;
-        text-decoration: none;
-        background: #f7f7fa;
-        border-radius: 8px;
-        padding: 10px 18px;
-        box-shadow: 0 2px 8px rgba(37,117,252,0.08);
-        transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-    }
-    .back-arrow:hover, .back-arrow:focus {
-        background: #2575fc;
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(37,117,252,0.18);
-        transform: translateY(-2px) scale(1.02);
-        outline: none;
-    }
-    .auth-form-input {
-        width: 80%;
-        margin: 0 auto;
-        padding: 6px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        font-size: 0.95rem;
-        transition: all var(--transition-fast);
-        display: block;
-    }
-    .auth-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding-top: 64px;
-        padding-bottom: 32px;
-        background: var(--bg-light);
-    }
-    .auth-card {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-    </style>
 </body>
 </html>

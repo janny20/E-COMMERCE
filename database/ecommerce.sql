@@ -9,6 +9,9 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     user_type ENUM('customer', 'vendor', 'admin') DEFAULT 'customer',
+    reset_token VARCHAR(255) DEFAULT NULL,
+    reset_token_expires_at DATETIME DEFAULT NULL,
+    last_reset_request_at DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

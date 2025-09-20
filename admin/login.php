@@ -78,12 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="POST" class="login-form">
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="admin@example.com" required>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full">Login</button>
