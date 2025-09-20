@@ -19,16 +19,15 @@ require_once 'config.php';
 </head>
 <body>
     <!-- Top Navigation -->
-    <nav class="top-nav" style="background-color: #232f3e; color: #fff; padding: 10px 0;">
+    <nav class="top-nav">
         <div class="container">
             <div class="nav-left">
                 <!-- Home link goes to landing page if not logged in, home.php if logged in -->
-                <a href="<?php echo $isLoggedIn ? BASE_URL . 'pages/home.php' : BASE_URL . 'landing.php'; ?>" class="logo" style="color: #fff; text-decoration: none; font-weight: 700; font-size: 1.5rem;">UniMall</a>
+                <a href="<?php echo $isLoggedIn ? BASE_URL . 'pages/home.php' : BASE_URL . 'landing.php'; ?>" class="logo">UniMall</a>
             </div>
             <div class="nav-center">
                 <form class="search-form" action="<?php echo BASE_URL; ?>pages/search.php" method="GET">
                     <input type="text" name="q" placeholder="Search for products..." class="search-input" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>">
-<<<<<<< HEAD
                     <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
                     <button type="button" class="search-close-btn" aria-label="Close search"><i class="fas fa-times"></i></button>
                 </form>
@@ -72,32 +71,6 @@ require_once 'config.php';
                             </div>
                         <?php endif; ?>
                     </a>
-=======
-                    <button type="submit" class="search-btn" style="background-color: var(--primary-color);"><i class="fas fa-search"></i></button>
-                </form>
-            </div>
-            <div class="nav-right">
-                <?php if($isLoggedIn): ?>
-                    <?php if(isset($userType) && strtolower($userType) === 'vendor'): ?>
-                        <a href="<?php echo BASE_URL; ?>vendor/profile.php" class="nav-icon" style="color: #fff;"><i class="fas fa-user"></i> <?php echo $username; ?></a>
-                    <?php elseif(isset($userType) && strtolower($userType) === 'admin'): ?>
-                        <a href="<?php echo BASE_URL; ?>admin/admin-dashboard.php" class="nav-icon" style="color: #fff;"><i class="fas fa-user"></i> <?php echo $username; ?></a>
-                    <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-icon" style="color: #fff;"><i class="fas fa-user"></i> <?php echo $username; ?></a>
-                    <?php endif; ?>
-                    <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon cart-link" style="color: #fff;"><i class="fas fa-shopping-cart"></i> Cart (<?php echo $cartCount; ?>)</a>
-                    <?php if(isset($userType) && strtolower($userType) === 'vendor'): ?>
-                        <a href="<?php echo BASE_URL; ?>vendor/dashboard.php" class="nav-icon" style="color: #fff;"><i class="fas fa-store"></i> Vendor Dashboard</a>
-                    <?php elseif(isset($userType) && strtolower($userType) === 'admin'): ?>
-                        <a href="<?php echo BASE_URL; ?>admin/admin-dashboard.php" class="nav-icon" style="color: #fff;"><i class="fas fa-cog"></i> Admin Panel</a>
-                    <?php endif; ?>
-                    <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-icon" style="color: #fff;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                <?php else: ?>
-                    <!-- Cart button for guests links to login -->
-                    <a href="<?php echo BASE_URL; ?>pages/cart.php" class="nav-icon cart-link" style="color: #fff;"><i class="fas fa-shopping-cart"></i> Cart (0)</a>
-                    <a href="<?php echo BASE_URL; ?>pages/login.php" class="nav-icon" style="color: #fff;"><i class="fas fa-sign-in-alt"></i> Login</a>
-                    <a href="<?php echo BASE_URL; ?>pages/register.php" class="nav-icon" style="color: #fff;"><i class="fas fa-user-plus"></i> Register</a>
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                 <?php endif; ?>
 
                 <div class="mobile-toggles">
@@ -112,7 +85,6 @@ require_once 'config.php';
         </div>
     </nav>
 
-<<<<<<< HEAD
     <!-- Mobile Navigation -->
     <div class="mobile-nav-container" role="dialog" aria-modal="true" aria-labelledby="mobile-nav-title">
         <div class="mobile-nav-header">
@@ -121,12 +93,6 @@ require_once 'config.php';
             <button class="mobile-nav-close" aria-label="Close navigation">
                 <i class="fas fa-times"></i>
             </button>
-=======
-    <!-- Main Navigation -->
-    <nav class="main-nav" style="background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <div class="container">
-            <!-- Customer-specific nav is loaded in page files like home.php -->
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
         </div>
         <ul class="mobile-nav-menu">
             <?php if($isLoggedIn): ?>
@@ -152,13 +118,6 @@ require_once 'config.php';
         </ul>
     </div>
     <div class="nav-overlay"></div>
-
-    <style>
-        .top-nav .nav-icon:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-    </style>
 
     <!-- Main Content -->
     <main class="main-content">

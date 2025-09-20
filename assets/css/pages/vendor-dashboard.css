@@ -1,6 +1,6 @@
 /* assets/css/pages/vendor-dashboard.css */
 .vendor-dashboard {
-    padding: var(--spacing-xl) 0;
+    padding: 2rem 0;
 }
 
 .dashboard-header {
@@ -27,30 +27,16 @@
 
 .stat-card {
     background: white;
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 10px;
     box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
+    text-align: center;
 }
 
 .stat-icon {
     font-size: 2rem;
     color: var(--primary-color);
-    background: var(--bg-light);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-bottom: 1rem;
 }
 
 .stat-number {
@@ -58,7 +44,6 @@
     font-weight: bold;
     color: var(--text-color);
     margin-bottom: 0.5rem;
-    line-height: 1;
 }
 
 .stat-label {
@@ -86,6 +71,55 @@
     color: var(--text-color);
 }
 
+.recent-activity {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+}
+
+.activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--light-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--muted-color);
+}
+
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -96,25 +130,17 @@
 .action-btn {
     background: white;
     padding: 1.5rem;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: 10px;
     text-align: center;
     text-decoration: none;
     color: var(--text-color);
     transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    box-shadow: var(--shadow-sm);
 }
 
 .action-btn:hover {
     border-color: var(--primary-color);
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
-    color: var(--primary-color);
+    transform: translateY(-2px);
 }
 
 .action-icon {

@@ -109,23 +109,24 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <!-- Hero Section -->
-<section class="hero" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); text-align: center; padding: 60px 20px; border-bottom: 1px solid #dee2e6;">
+<section class="hero">
     <div class="container">
         <?php
         if (!empty($_SESSION['welcome_message'])) {
-            echo '<h1 style="font-size: 2.5rem; color: #343a40; margin-bottom: 10px;">' . e($_SESSION['welcome_message']) . '</h1>';
+            echo '<h1>' . e($_SESSION['welcome_message']) . '</h1>';
             unset($_SESSION['welcome_message']);
         } else {
-            echo '<h1 style="font-size: 2.5rem; color: #343a40; margin-bottom: 10px;">Welcome back, ' . e($username ?? $_SESSION['username'] ?? 'User') . '!</h1>';
+            echo '<h1>Welcome back, ' . e($username ?? $_SESSION['username'] ?? 'User') . '!</h1>';
         }
         ?>
-        <p style="font-size: 1.2rem; color: #6c757d; margin-bottom: 30px;">Discover amazing products and great deals just for you.</p>
-        <div class="hero-actions" style="display: flex; justify-content: center; gap: 15px;">
-            <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn btn-primary" style="padding: 12px 25px; font-size: 1.1rem;">Shop Now</a>
-            <?php if(isset($userType) ? strtolower($userType) === 'customer' : (isset($_SESSION['user_type']) && strtolower($_SESSION['user_type']) === 'customer')): ?>
-                <a href="<?php echo BASE_URL; ?>pages/cart.php" class="btn btn-outline" style="padding: 12px 25px; font-size: 1.1rem;">View Cart</a>
-            <?php endif; ?>
-        </div>
+        <p>Ready to continue shopping?</p>
+        <a href="<?php echo BASE_URL; ?>pages/products.php" class="btn">Shop Now</a>
+        <?php if(isset($userType) ? strtolower($userType) === 'customer' : (isset($_SESSION['user_type']) && strtolower($_SESSION['user_type']) === 'customer')): ?>
+            <a href="<?php echo BASE_URL; ?>pages/cart.php" class="btn btn-outline">View Cart</a>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin'): ?>
+            <!-- Admin Panel button removed as requested -->
+        <?php endif; ?>
     </div>
 </section>
 
@@ -157,7 +158,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <p class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></p>
                         <div class="product-price">
                             $<?php echo number_format((float)($product['price'] ?? 0), 2); ?>
-                            <?php if (isset($product['compare_price']) && is_numeric($product['compare_price']) && $product['compare_price'] > 0): ?>
+                            <?php if (!empty($product['compare_price']) && is_numeric($product['compare_price'])): ?>
                                 <span class="product-old-price">$<?php echo number_format((float)$product['compare_price'], 2); ?></span>
                             <?php endif; ?>
                         </div>
@@ -165,12 +166,12 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="product-rating">
                             <?php
                             // If there's a stored rating use it, otherwise show "No ratings yet"
-                            if (isset($product['rating']) && is_numeric($product['rating']) && $product['rating'] > 0) {
+                            if (isset($product['rating']) && is_numeric($product['rating'])) {
                                 $rating = (int)round($product['rating']);
                                 for ($i = 0; $i < 5; $i++) {
                                     echo $i < $rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
                                 }
-                                $reviews = (int)($product['review_count'] ?? 0);
+                                $reviews = isset($product['review_count']) ? (int)$product['review_count'] : 0;
                                 echo ' <span>(' . $reviews . ')</span>';
                             } else {
                                 echo '<span class="no-rating">No ratings yet</span>';
@@ -180,6 +181,10 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
+<<<<<<< HEAD
+=======
+                        </div>
+>>>>>>> parent of c087537 (Merge and push local changes)
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -209,18 +214,18 @@ require_once __DIR__ . '/../includes/header.php';
                         <p class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></p>
                         <div class="product-price">
                             $<?php echo number_format((float)($product['price'] ?? 0), 2); ?>
-                            <?php if (isset($product['compare_price']) && is_numeric($product['compare_price']) && $product['compare_price'] > 0): ?>
+                            <?php if (!empty($product['compare_price']) && is_numeric($product['compare_price'])): ?>
                                 <span class="product-old-price">$<?php echo number_format((float)$product['compare_price'], 2); ?></span>
                             <?php endif; ?>
                         </div>
                         <div class="product-rating">
                             <?php
-                            if (isset($product['rating']) && is_numeric($product['rating']) && $product['rating'] > 0) {
+                            if (isset($product['rating']) && is_numeric($product['rating'])) {
                                 $rating = (int)round($product['rating']);
                                 for ($i = 0; $i < 5; $i++) {
                                     echo $i < $rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
                                 }
-                                $reviews = (int)($product['review_count'] ?? 0);
+                                $reviews = isset($product['review_count']) ? (int)$product['review_count'] : 0;
                                 echo ' <span>(' . $reviews . ')</span>';
                             } else {
                                 echo '<span class="no-rating">No ratings yet</span>';
@@ -230,6 +235,10 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
+<<<<<<< HEAD
+=======
+                        </div>
+>>>>>>> parent of c087537 (Merge and push local changes)
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -258,24 +267,6 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     <?php endif; ?>
 </section>
-
-<style>
-    .modern-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .modern-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
-    .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 40px; color: #333; position: relative; padding-bottom: 15px; }
-    .section-title::after {
-        content: ''; position: absolute; bottom: 0; left: 50%;
-        transform: translateX(-50%); width: 80px; height: 4px;
-        background-color: var(--primary-color); border-radius: 2px;
-    }
-    .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-    .category-card-link { text-decoration: none; }
-    .category-card { position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .category-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
-    .category-image { width: 100%; height: 200px; object-fit: cover; display: block; }
-    .category-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px; }
-    .category-name { color: white; font-size: 1.5rem; font-weight: 600; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-</style>
 
 <?php
 // Include footer
