@@ -1,22 +1,12 @@
 <?php require_once __DIR__ . '/config.php'; ?>
 <!-- Footer -->
-<<<<<<< HEAD
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/components/footer.css?v=2">
-=======
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/components/footer.css">
->>>>>>> parent of c087537 (Merge and push local changes)
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
             <div class="footer-main">
                 <div class="footer-brand">
-<<<<<<< HEAD
                     <a href="<?php echo BASE_URL; ?>landing.php" class="footer-logo"><?php echo SITE_NAME; ?></a>
-=======
-                    <a href="<?php echo BASE_URL; ?>/pages/index.php" class="footer-logo">UniMall</a>
-                        <i class="fas fa-store"></i> <?php echo SITE_NAME; ?>
-                    </a>
->>>>>>> parent of c087537 (Merge and push local changes)
                     <p class="footer-description">
                         Your trusted multi-vendor marketplace. Connecting buyers and sellers with quality products and services.
                     </p>
@@ -69,18 +59,12 @@
             </div>
             
             <div class="footer-bottom">
-<<<<<<< HEAD
                 <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
-=======
-                <p>&copy; 2025 <?php echo SITE_NAME; ?>. All rights reserved.</p>
->>>>>>> parent of c087537 (Merge and push local changes)
             </div>
         </div>
     </div>
 </footer>
+<!-- Back to Top Button -->
+<a href="#" class="back-to-top-btn" title="Back to Top"><i class="fas fa-arrow-up"></i></a>
 <!-- Main JS File -->
-<<<<<<< HEAD
 <script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
-=======
-<script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
->>>>>>> parent of c087537 (Merge and push local changes)

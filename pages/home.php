@@ -181,10 +181,6 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
-<<<<<<< HEAD
-=======
-                        </div>
->>>>>>> parent of c087537 (Merge and push local changes)
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -235,10 +231,6 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
-<<<<<<< HEAD
-=======
-                        </div>
->>>>>>> parent of c087537 (Merge and push local changes)
                     </div>
                 </div>
             <?php endforeach; ?>

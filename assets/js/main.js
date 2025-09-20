@@ -85,6 +85,27 @@ document.addEventListener('DOMContentLoaded', function() {
             topNav.classList.remove('search-active');
         });
     }
+
+    // Back to Top Button
+    const backToTopBtn = document.querySelector('.back-to-top-btn');
+
+    if (backToTopBtn) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 });
 
 // Show notification

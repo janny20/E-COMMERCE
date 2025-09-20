@@ -18,11 +18,13 @@
 @import url('components/cards.css');
 @import url('components/navigation.css');
 @import url('components/modals.css');
-@import url('layout/header.css'); /* Contains new responsive header styles */
+@import url('layout/header.css');
+/* Contains new responsive header styles */
 @import url('layout/footer.css');
 @import url('layout/grid.css');
 @import url('layout/sidebar.css');
-@import url('pages/landing.css'); /* Add this line */
+@import url('pages/landing.css');
+/* Add this line */
 @import url('pages/home.css');
 @import url('pages/products.css');
 @import url('pages/search.css');
@@ -73,7 +75,9 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Notification styles */
@@ -112,6 +116,39 @@ body {
     background-color: #17a2b8;
 }
 
+/* Back to Top Button */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    color: var(--text-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background-color 0.3s;
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background-color: var(--primary-dark);
+}
+
 /* Accessibility helper */
 .visually-hidden {
     position: absolute;
@@ -129,11 +166,14 @@ body {
 .main-nav .dropdown-toggle {
     background: none;
     border: none;
-    color: var(--text-primary); /* Assuming this is the link color */
+    color: var(--text-primary);
+    /* Assuming this is the link color */
     font-family: inherit;
-    font-size: 1rem; /* Match other nav links */
+    font-size: 1rem;
+    /* Match other nav links */
     cursor: pointer;
-    padding: 0.5rem 1rem; /* Match other nav links padding */
+    padding: 0.5rem 1rem;
+    /* Match other nav links padding */
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -155,22 +195,29 @@ body {
         transform: translateY(-100%);
         opacity: 0;
         visibility: hidden;
-        z-index: 998; /* Below header */
-        display: flex; /* Ensure it's flex for children */
+        z-index: 998;
+        /* Below header */
+        display: flex;
+        /* Ensure it's flex for children */
     }
+
     .desktop-nav-links {
         display: none;
     }
+
     .mobile-toggles {
         display: flex;
     }
+
     .mobile-nav-toggle,
     .mobile-search-toggle {
         display: block;
     }
+
     .mobile-nav-close {
         display: block;
     }
+
     .mobile-search-toggle {
         display: block;
     }
