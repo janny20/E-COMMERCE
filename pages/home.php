@@ -144,7 +144,6 @@ require_once __DIR__ . '/../includes/header.php';
     <?php else: ?>
         <div class="products-grid">
             <?php foreach ($featured_products as $product): ?>
-<<<<<<< HEAD
                 <div class="product-card">
                     <div class="product-badge">Featured</div>
                     <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-image-container">
@@ -156,14 +155,6 @@ require_once __DIR__ . '/../includes/header.php';
                             <h3 class="product-title"><?php echo e($product['name'] ?? 'Untitled'); ?></h3>
                         </a>
                         <p class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></p>
-=======
-                <div class="product-card modern-card">
-                    <?php $img = first_image($product['images'] ?? ''); ?>
-                    <img src="../assets/images/products/<?php echo e($img); ?>" alt="<?php echo e($product['name'] ?? 'Product'); ?>" class="product-image">
-                    <div class="product-info">
-                        <a href="product-detail.php?id=<?php echo (int)($product['id'] ?? 0); ?>" class="product-title"><?php echo e($product['name'] ?? 'Untitled'); ?></a>
-
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                         <div class="product-price">
                             $<?php echo number_format((float)($product['price'] ?? 0), 2); ?>
                             <?php if (isset($product['compare_price']) && is_numeric($product['compare_price']) && $product['compare_price'] > 0): ?>
@@ -186,16 +177,9 @@ require_once __DIR__ . '/../includes/header.php';
                             }
                             ?>
                         </div>
-<<<<<<< HEAD
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
-                        </div>
-=======
-
-                        <div class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></div>
-                        <a href="product-detail.php?id=<?php echo (int)($product['id'] ?? 0); ?>" class="btn product-btn">View Details</a>
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -212,7 +196,6 @@ require_once __DIR__ . '/../includes/header.php';
     <?php else: ?>
         <div class="products-grid">
             <?php foreach ($new_products as $product): ?>
-<<<<<<< HEAD
                 <div class="product-card">
                     <div class="product-badge new">New</div>
                     <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-image-container">
@@ -224,14 +207,6 @@ require_once __DIR__ . '/../includes/header.php';
                             <h3 class="product-title"><?php echo e($product['name'] ?? 'Untitled'); ?></h3>
                         </a>
                         <p class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></p>
-=======
-                <div class="product-card modern-card">
-                    <?php $img = first_image($product['images'] ?? ''); ?>
-                    <img src="../assets/images/products/<?php echo e($img); ?>" alt="<?php echo e($product['name'] ?? 'Product'); ?>" class="product-image">
-                    <div class="product-info">
-                        <a href="product-detail.php?id=<?php echo (int)($product['id'] ?? 0); ?>" class="product-title"><?php echo e($product['name'] ?? 'Untitled'); ?></a>
-
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                         <div class="product-price">
                             $<?php echo number_format((float)($product['price'] ?? 0), 2); ?>
                             <?php if (isset($product['compare_price']) && is_numeric($product['compare_price']) && $product['compare_price'] > 0): ?>
@@ -252,16 +227,9 @@ require_once __DIR__ . '/../includes/header.php';
                             }
                             ?>
                         </div>
-<<<<<<< HEAD
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo (int)$product['id']; ?>" class="product-btn add-to-cart">View Details</a>
                             <button class="product-btn wishlist"><i class="far fa-heart"></i></button>
-                        </div>
-=======
-
-                        <div class="product-vendor">Sold by: <?php echo e($product['business_name'] ?? 'Unknown'); ?></div>
-                        <a href="product-detail.php?id=<?php echo (int)($product['id'] ?? 0); ?>" class="btn product-btn">View Details</a>
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -276,7 +244,6 @@ require_once __DIR__ . '/../includes/header.php';
     <?php if (empty($categories)): ?>
         <p>No categories found.</p>
     <?php else: ?>
-<<<<<<< HEAD
         <div class="categories-grid">
             <?php foreach ($categories as $category): ?>
                 <a href="products.php?category=<?php echo urlencode($category['slug']); ?>" class="category-card">
@@ -285,16 +252,6 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="category-card-content">
                         <h3><?php echo e($category['name']); ?></h3>
                         <p>Shop Now</p>
-=======
-        <div class="category-grid">
-            <?php foreach ($categories as $category): ?>
-                <a href="products.php?category=<?php echo urlencode($category['slug'] ?? ''); ?>" class="category-card-link">
-                    <div class="category-card">
-                        <img src="../assets/images/categories/<?php echo e($category['image'] ?? 'default.jpg'); ?>" alt="<?php echo e($category['name'] ?? 'Category'); ?>" class="category-image">
-                        <div class="category-overlay">
-                            <h3 class="category-name"><?php echo e($category['name'] ?? 'Unnamed'); ?></h3>
-                        </div>
->>>>>>> 1f7d65395f4b56b49792a2c435502977a4ad4867
                     </div>
                 </a>
             <?php endforeach; ?>

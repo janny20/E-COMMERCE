@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initNumberCounting();
     
     // Initialize scroll animations
-    initScrollAnimations();
+    initLandingHeaderScroll();
 });
 
 // Carousel functionality
@@ -149,28 +149,19 @@ function initNumberCounting() {
 }
 
 // Scroll animations
-function initScrollAnimations() {
+function initLandingHeaderScroll() {
     // Add shadow to header on scroll
     const header = document.querySelector('.landing-header');
-    
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-            header.style.background = 'rgba(255, 255, 255, 0.98)';
-        } else {
-            header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.1)';
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-        }
-    });
-    
-    // Parallax effect for hero image
-    const heroImage = document.querySelector('.hero-image');
-    
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
-        heroImage.style.transform = `perspective(1000px) rotateY(-10deg) translateY(${rate}px)`;
-    });
+
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    }
 }
 
 // Add to cart animation (for demonstration)
