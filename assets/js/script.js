@@ -46,25 +46,70 @@ function hideTooltip() {
 
 // Dropdown initialization
 function initDropdowns() {
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            const dropdown = this.nextElementSibling;
-            dropdown.classList.toggle('show');
+    const dropdowns = document.querySelectorAll('.dropdown');
+
+    // Function to close all dropdowns
+    const closeAllDropdowns = (exceptThisOne = null) => {
+        const allDropdowns = document.querySelectorAll('.dropdown');
+        allDropdowns.forEach(d => {
+            if (d !== exceptThisOne) {
+                d.querySelector('.dropdown-content')?.classList.remove('show');
+                d.querySelector('.dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            }
         });
-    });
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.matches('.dropdown-toggle')) {
-            const dropdowns = document.querySelectorAll('.dropdown-content');
-            dropdowns.forEach(dropdown => {
-                if (dropdown.classList.contains('show')) {
-                    dropdown.classList.remove('show');
-                }
+    };
+
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const content = dropdown.querySelector('.dropdown-content');
+
+        if (toggle && content) {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent document click listener from closing it immediately
+                const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+                
+                // Close other dropdowns before opening a new one
+                closeAllDropdowns(dropdown);
+
+                toggle.setAttribute('aria-expanded', !isExpanded);
+                content.classList.toggle('show');
             });
+        }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        closeAllDropdowns();
+    });
+
+    // Keyboard navigation for dropdowns
+    document.addEventListener('keydown', (e) => {
+        const openDropdown = document.querySelector('.dropdown-content.show');
+        if (!openDropdown) return;
+
+        const toggle = openDropdown.parentElement.querySelector('.dropdown-toggle');
+        const items = Array.from(openDropdown.querySelectorAll('a'));
+        const activeElement = document.activeElement;
+
+        if (e.key === 'Escape') {
+            openDropdown.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.focus();
+        }
+
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (items.length === 0) return;
+            
+            const currentIndex = items.indexOf(activeElement);
+            let nextIndex;
+
+            if (e.key === 'ArrowDown') {
+                nextIndex = (currentIndex + 1) % items.length;
+            } else { // ArrowUp
+                nextIndex = (currentIndex - 1 + items.length) % items.length;
+            }
+            items[nextIndex].focus();
         }
     });
 }

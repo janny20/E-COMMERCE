@@ -57,44 +57,72 @@ $success_message = '';
 $error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $first_name = trim($_POST['first_name'] ?? '');
-    $last_name = trim($_POST['last_name'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
-    $address = trim($_POST['address'] ?? '');
-    $city = trim($_POST['city'] ?? '');
-    $state = trim($_POST['state'] ?? '');
-    $country = trim($_POST['country'] ?? '');
-    $zip_code = trim($_POST['zip_code'] ?? '');
-    
-    try {
-        // Update user profile
-        $update_query = "UPDATE user_profiles 
-                        SET first_name = :first_name, last_name = :last_name, phone = :phone,
-                            address = :address, city = :city, state = :state, 
-                            country = :country, zip_code = :zip_code
-                        WHERE user_id = :user_id";
-        
-        $update_stmt = $db->prepare($update_query);
-        $update_stmt->bindParam(':first_name', $first_name);
-        $update_stmt->bindParam(':last_name', $last_name);
-        $update_stmt->bindParam(':phone', $phone);
-        $update_stmt->bindParam(':address', $address);
-        $update_stmt->bindParam(':city', $city);
-        $update_stmt->bindParam(':state', $state);
-        $update_stmt->bindParam(':country', $country);
-        $update_stmt->bindParam(':zip_code', $zip_code);
-        $update_stmt->bindParam(':user_id', $userId);
-        
-        if ($update_stmt->execute()) {
-            $success_message = 'Profile updated successfully!';
-            // Refresh user data
-            $stmt->execute();
-            $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Handle avatar upload
+    if (isset($_POST['update_avatar'])) {
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
+            $upload_result = uploadFile($_FILES['avatar'], USER_UPLOAD_PATH);
+            
+            if ($upload_result['success']) {
+                $avatar_filename = $upload_result['file_name'];
+                
+                // Update database
+                $update_avatar_query = "UPDATE user_profiles SET avatar = :avatar WHERE user_id = :user_id";
+                $update_avatar_stmt = $db->prepare($update_avatar_query);
+                $update_avatar_stmt->bindParam(':avatar', $avatar_filename);
+                $update_avatar_stmt->bindParam(':user_id', $userId);
+                
+                if ($update_avatar_stmt->execute()) {
+                    $success_message = 'Avatar updated successfully!';
+                    $_SESSION['avatar'] = $avatar_filename; // Update session
+                    // Refresh user data to show new avatar immediately
+                    $stmt->execute();
+                    $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+                } else {
+                    $error_message = 'Failed to update avatar in database.';
+                }
+            } else {
+                $error_message = $upload_result['message'];
+            }
         } else {
-            $error_message = 'Failed to update profile. Please try again.';
+            $error_message = 'No file uploaded or an error occurred.';
         }
-    } catch (Exception $e) {
-        $error_message = 'Error updating profile: ' . $e->getMessage();
+    }
+    // Handle profile info update
+    elseif (isset($_POST['update_profile'])) {
+        $first_name = trim($_POST['first_name'] ?? '');
+        $last_name = trim($_POST['last_name'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $address = trim($_POST['address'] ?? '');
+        $city = trim($_POST['city'] ?? '');
+        $state = trim($_POST['state'] ?? '');
+        $country = trim($_POST['country'] ?? '');
+        $zip_code = trim($_POST['zip_code'] ?? '');
+        
+        try {
+            $update_query = "UPDATE user_profiles SET first_name = :first_name, last_name = :last_name, phone = :phone, address = :address, city = :city, state = :state, country = :country, zip_code = :zip_code WHERE user_id = :user_id";
+            $update_stmt = $db->prepare($update_query);
+            $update_stmt->bindParam(':first_name', $first_name);
+            $update_stmt->bindParam(':last_name', $last_name);
+            $update_stmt->bindParam(':phone', $phone);
+            $update_stmt->bindParam(':address', $address);
+            $update_stmt->bindParam(':city', $city);
+            $update_stmt->bindParam(':state', $state);
+            $update_stmt->bindParam(':country', $country);
+            $update_stmt->bindParam(':zip_code', $zip_code);
+            $update_stmt->bindParam(':user_id', $userId);
+            
+            if ($update_stmt->execute()) {
+                $success_message = 'Profile updated successfully!';
+                $stmt->execute();
+                $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Update session variable to reflect the name change in the header
+                $_SESSION['username'] = $user_data['first_name'];
+            } else {
+                $error_message = 'Failed to update profile. Please try again.';
+            }
+        } catch (Exception $e) {
+            $error_message = 'Error updating profile: ' . $e->getMessage();
+        }
     }
 }
 
@@ -112,58 +140,46 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
             <p>Manage your account information and preferences</p>
         </div>
 
-                <nav class="profile-nav">
-                    <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-item active">
+        <div class="profile-content">
+            <aside class="profile-sidebar">
                 <div class="profile-card">
-                    <div class="profile-avatar">
-                        <div class="avatar-placeholder">
-                    <a href="<?php echo BASE_URL; ?>pages/orders.php" class="nav-item">
+                    <form id="avatarForm" method="POST" enctype="multipart/form-data" action="">
+                        <div class="profile-avatar">
+                            <label for="avatar-upload-input" class="avatar-upload-label" title="Change profile photo">
+                                <?php if (!empty($user_data['avatar'])): ?>
+                                    <img src="<?php echo BASE_URL . 'uploads/users/' . htmlspecialchars($user_data['avatar']); ?>" alt="User Avatar" class="avatar-image">
+                                <?php else: ?>
+                                    <div class="avatar-placeholder">
+                                        <?php echo strtoupper(substr($user_data['username'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="avatar-upload-btn"><i class="fas fa-camera"></i></div>
+                            </label>
+                            <input type="file" id="avatar-upload-input" name="avatar" accept="image/*" style="display: none;">
+                            <input type="hidden" name="update_avatar" value="1">
                         </div>
-                        <button class="avatar-upload-btn" title="Upload photo">
-                            <i class="fas fa-camera"></i>
-                    <a href="<?php echo BASE_URL; ?>pages/wishlist.php" class="nav-item">
-                    </div>
-                    
+                    </form>
                     <div class="profile-info">
-                    <a href="<?php echo BASE_URL; ?>pages/addresses.php" class="nav-item">
+                        <h2><?php echo htmlspecialchars($user_data['first_name'] . ' ' . $user_data['last_name']); ?></h2>
                         <p class="profile-email"><?php echo htmlspecialchars($user_data['email']); ?></p>
                         <p class="profile-member">Member since <?php echo date('M Y', strtotime($user_data['created_at'])); ?></p>
-                    </div>
-                    <a href="<?php echo BASE_URL; ?>pages/settings.php" class="nav-item">
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <div class="stat-number"><?php echo $orders_count; ?></div>
-                    <a href="<?php echo BASE_URL; ?>pages/logout.php" class="nav-item">
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Reviews</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">0</div>
-                            <div class="stat-label">Wishlist</div>
-                        </div>
                     </div>
                 </div>
                 
                 <nav class="profile-nav">
-                    <a href="profile.php" class="nav-item active">
+                    <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-item active">
                         <i class="fas fa-user"></i>
                         <span>Profile Information</span>
                     </a>
-                    <a href="orders.php" class="nav-item">
+                    <a href="<?php echo BASE_URL; ?>pages/orders.php" class="nav-item">
                         <i class="fas fa-shopping-bag"></i>
-                        <span>My Orders</span>
+                        <span>My Orders (<?php echo $orders_count; ?>)</span>
                     </a>
-                    <a href="wishlist.php" class="nav-item">
+                    <a href="<?php echo BASE_URL; ?>pages/wishlist.php" class="nav-item">
                         <i class="fas fa-heart"></i>
                         <span>Wishlist</span>
                     </a>
-                    <a href="addresses.php" class="nav-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Addresses</span>
-                    </a>
-                    <a href="settings.php" class="nav-item">
+                    <a href="<?php echo BASE_URL; ?>pages/settings.php" class="nav-item">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
@@ -172,25 +188,11 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                         <span>Logout</span>
                     </a>
                 </nav>
-            </div>
+            </aside>
 
             <div class="profile-main">
                 <div class="profile-section">
                     <h2 class="section-title">Personal Information</h2>
-                    
-                    <?php if ($success_message): ?>
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i>
-                        <?php echo $success_message; ?>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php if ($error_message): ?>
-                    <div class="alert alert-error">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <?php echo $error_message; ?>
-                    </div>
-                    <?php endif; ?>
 
                     <form method="POST" class="profile-form">
                         <div class="form-grid">
@@ -248,7 +250,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                         </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="submit" name="update_profile" class="btn btn-primary">Save Changes</button>
                             <button type="reset" class="btn btn-outline">Reset</button>
                         </div>
                     </form>
@@ -262,7 +264,9 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                 <h3>Change Password</h3>
                                 <p>Update your password to keep your account secure</p>
                             </div>
-                            <button class="btn btn-outline" onclick="openPasswordModal()">Change Password</button>
+                            <div class="preference-actions">
+                                <button class="btn btn-outline" onclick="openPasswordModal()">Change Password</button>
+                            </div>
                         </div>
                         
                         <div class="security-item">
@@ -270,18 +274,13 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                 <h3>Two-Factor Authentication</h3>
                                 <p>Add an extra layer of security to your account</p>
                             </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="2fa-toggle" class="toggle-input">
-                                <label for="2fa-toggle" class="toggle-label"></label>
+                            <div class="preference-actions">
+                                <span class="preference-status"></span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="2fa_toggle" class="toggle-input" disabled>
+                                    <label for="2fa_toggle" class="toggle-label"></label>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="security-item">
-                            <div class="security-info">
-                                <h3>Login Activity</h3>
-                                <p>View your recent login history and devices</p>
-                            </div>
-                            <button class="btn btn-outline">View Activity</button>
                         </div>
                     </div>
                 </div>
@@ -294,9 +293,12 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                 <h3>Email Notifications</h3>
                                 <p>Manage what emails you receive from us</p>
                             </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="email-toggle" class="toggle-input" checked>
-                                <label for="email-toggle" class="toggle-label"></label>
+                            <div class="preference-actions">
+                                <span class="preference-status"></span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="email_notifications" class="toggle-input" <?php echo !empty($user_data['email_notifications']) ? 'checked' : ''; ?>>
+                                    <label for="email_notifications" class="toggle-label"></label>
+                                </div>
                             </div>
                         </div>
                         
@@ -305,9 +307,12 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                 <h3>SMS Notifications</h3>
                                 <p>Receive order updates via SMS</p>
                             </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="sms-toggle" class="toggle-input">
-                                <label for="sms-toggle" class="toggle-label"></label>
+                            <div class="preference-actions">
+                                <span class="preference-status"></span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="sms_notifications" class="toggle-input" <?php echo !empty($user_data['sms_notifications']) ? 'checked' : ''; ?>>
+                                    <label for="sms_notifications" class="toggle-label"></label>
+                                </div>
                             </div>
                         </div>
                         
@@ -316,9 +321,12 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                 <h3>Marketing Communications</h3>
                                 <p>Receive offers and promotional emails</p>
                             </div>
-                            <div class="toggle-switch">
-                                <input type="checkbox" id="marketing-toggle" class="toggle-input">
-                                <label for="marketing-toggle" class="toggle-label"></label>
+                            <div class="preference-actions">
+                                <span class="preference-status"></span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="marketing_communications" class="toggle-input" <?php echo !empty($user_data['marketing_communications']) ? 'checked' : ''; ?>>
+                                    <label for="marketing_communications" class="toggle-label"></label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -336,14 +344,15 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
             <button class="modal-close" onclick="closePasswordModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <form class="password-form">
+            <div id="password-modal-messages"></div>
+            <form class="password-form" id="passwordChangeForm">
                 <div class="form-group">
                     <label for="current_password">Current Password</label>
                     <input type="password" id="current_password" name="current_password" required>
                 </div>
                 <div class="form-group">
                     <label for="new_password">New Password</label>
-                    <input type="password" id="new_password" name="new_password" required>
+                    <input type="password" id="new_password" name="new_password" required minlength="6">
                 </div>
                 <div class="form-group">
                     <label for="confirm_password">Confirm New Password</label>
@@ -374,33 +383,167 @@ document.getElementById('passwordModal').addEventListener('click', function(e) {
     }
 });
 
-// Toggle switches
-document.querySelectorAll('.toggle-input').forEach(toggle => {
-    toggle.addEventListener('change', function() {
-        console.log('Toggle changed:', this.id, this.checked);
+// Avatar auto-upload
+document.getElementById('avatar-upload-input').addEventListener('change', function() {
+    if (this.files.length > 0) {
+        document.getElementById('avatarForm').submit();
+    }
+});
+
+// Handle password change form submission with AJAX
+document.getElementById('passwordChangeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const messageContainer = document.getElementById('password-modal-messages');
+
+    // Show loading state
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="loading"></span> Updating...';
+    messageContainer.innerHTML = '';
+
+    const formData = new FormData(form);
+    formData.append('change_password_ajax', '1'); // Add flag for AJAX handler
+
+    fetch('profile.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const alertClass = data.success ? 'alert-success' : 'alert-error';
+        messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
+        
+        if (data.success) {
+            form.reset();
+            setTimeout(() => {
+                closePasswordModal();
+                messageContainer.innerHTML = ''; // Clear message on close
+            }, 2000);
+        }
+    })
+    .catch(error => {
+        messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred. Please try again.</div>`;
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        // Restore button
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Update Password';
     });
 });
 
-// Form validation
-document.querySelector('.profile-form').addEventListener('submit', function(e) {
-    const requiredFields = this.querySelectorAll('[required]');
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            field.style.borderColor = 'var(--danger-color)';
-            isValid = false;
+// Toggle switches
+document.querySelectorAll('.toggle-input').forEach(toggle => {
+    if (toggle.disabled) return;
+
+    toggle.addEventListener('change', function() {
+        const settingId = this.id;
+        const isChecked = this.checked;
+        const preferenceItem = this.closest('.preference-item, .security-item');
+        const statusSpan = preferenceItem ? preferenceItem.querySelector('.preference-status') : null;
+
+        if (statusSpan) {
+            statusSpan.textContent = 'Saving...';
+            statusSpan.style.color = 'var(--text-light)';
+        }
+
+        const formData = new FormData();
+        formData.append('update_preferences_ajax', '1');
+        formData.append('setting', settingId);
+        formData.append('value', isChecked);
+
+        fetch('profile.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (statusSpan) {
+                if (data.success) {
+                    statusSpan.textContent = 'Saved!';
+                    statusSpan.style.color = 'var(--success-color)';
+                } else {
+                    statusSpan.textContent = 'Error';
+                    statusSpan.style.color = 'var(--danger-color)';
+                }
+                setTimeout(() => { statusSpan.textContent = ''; }, 2000);
+            }
+        })
+        .catch(error => {
+            if (statusSpan) { statusSpan.textContent = 'Error'; statusSpan.style.color = 'var(--danger-color)'; }
+            console.error('Error:', error);
+        });
+    });
+});
+
+// Professional form validation and submission handling
+document.addEventListener('DOMContentLoaded', function() {
+    const profileForm = document.querySelector('.profile-form');
+    if (!profileForm) return;
+
+    profileForm.addEventListener('submit', function(e) {
+        const form = this;
+        const submitButton = form.querySelector('button[name="update_profile"]');
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        // Clear previous client-side errors
+        const existingError = form.parentElement.querySelector('.client-side-error');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.style.borderColor = 'var(--danger-color)';
+                isValid = false;
+            } else {
+                field.style.borderColor = ''; // Reset border color
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            
+            // Create and display a professional error message
+            const errorMessageDiv = document.createElement('div');
+            errorMessageDiv.className = 'alert alert-error client-side-error';
+            errorMessageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
+            
+            // Insert the message before the form
+            form.parentElement.insertBefore(errorMessageDiv, form);
+            errorMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-            field.style.borderColor = '';
+            // If form is valid, show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="loading"></span> Saving...';
         }
     });
-    
-    if (!isValid) {
-        e.preventDefault();
-        alert('Please fill in all required fields.');
-    }
+
+    // Add confirmation to the reset button for a better user experience
+    const resetButton = profileForm.querySelector('button[type="reset"]');
+    if (resetButton) {
+        resetButton.addEventListener('click', function(e) {
+            // Prevent the default browser reset action to add a confirmation step
+            e.preventDefault();
+            if (confirm('Are you sure you want to discard your changes? This cannot be undone.')) {
+                profileForm.reset(); // Manually trigger the form reset if confirmed
+            }
+        });
+    });
 });
 </script>
+
+<?php
+// Display notifications for form submissions
+if (!empty($success_message)) {
+    echo "<script>document.addEventListener('DOMContentLoaded', function() { showNotification('" . addslashes($success_message) . "', 'success'); });</script>";
+}
+if (!empty($error_message)) {
+    echo "<script>document.addEventListener('DOMContentLoaded', function() { showNotification('" . addslashes($error_message) . "', 'error'); });</script>";
+}
+?>
 
 <?php
 // Include footer

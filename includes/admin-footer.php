@@ -6,5 +6,6 @@
         <span>&copy; <?php echo date('Y'); ?> ShopSphere Admin Panel. All rights reserved.</span>
     </div>
 </footer>
+<script src="../assets/js/admin.js"></script>
 </body>
 </html>

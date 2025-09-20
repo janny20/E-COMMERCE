@@ -29,6 +29,9 @@ CREATE TABLE user_profiles (
     country VARCHAR(50),
     zip_code VARCHAR(20),
     avatar VARCHAR(255),
+    email_notifications BOOLEAN DEFAULT TRUE,
+    sms_notifications BOOLEAN DEFAULT FALSE,
+    marketing_communications BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

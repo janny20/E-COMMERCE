@@ -16,38 +16,50 @@ function generateSlug($text) {
 }
 
 // Function to handle file uploads
-function uploadFile($file, $target_dir, $allowed_types = ['jpg', 'jpeg', 'png', 'gif']) {
-    $file_name = basename($file["name"]);
-    $target_file = $target_dir . $file_name;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    
+function uploadFile($file, $target_dir, $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp']) {
+    // Check for upload errors first
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        // It's better to return a generic error for security, but for debugging, this is fine.
+        return ["success" => false, "message" => "File upload error code: " . $file['error']];
+    }
+
+    $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+
     // Check if image file is a actual image or fake image
     $check = getimagesize($file["tmp_name"]);
     if($check === false) {
         return ["success" => false, "message" => "File is not an image."];
     }
-    
-    // Check if file already exists
-    if (file_exists($target_file)) {
-        $file_name = time() . '_' . $file_name;
-        $target_file = $target_dir . $file_name;
-    }
-    
+
     // Check file size (5MB limit)
     if ($file["size"] > 5000000) {
-        return ["success" => false, "message" => "Sorry, your file is too large."];
+        return ["success" => false, "message" => "Sorry, your file is too large (max 5MB)."];
     }
-    
+
     // Allow certain file formats
     if(!in_array($imageFileType, $allowed_types)) {
         return ["success" => false, "message" => "Sorry, only " . implode(', ', $allowed_types) . " files are allowed."];
     }
-    
+
+    // Generate a unique filename to prevent overwrites and security issues
+    $file_name = bin2hex(random_bytes(16)) . '.' . $imageFileType;
+    $target_file = rtrim($target_dir, '/') . '/' . $file_name;
+
+    // Check if target directory exists, if not, create it
+    if (!is_dir($target_dir)) {
+        if (!mkdir($target_dir, 0777, true)) {
+            error_log("Failed to create directory: " . $target_dir);
+            return ["success" => false, "message" => "Server error: Failed to create upload directory."];
+        }
+    }
+
     // Try to upload file
     if (move_uploaded_file($file["tmp_name"], $target_file)) {
         return ["success" => true, "file_name" => $file_name];
     } else {
-        return ["success" => false, "message" => "Sorry, there was an error uploading your file."];
+        $error = error_get_last();
+        error_log("move_uploaded_file failed for target '$target_file': " . ($error['message'] ?? 'Unknown error'));
+        return ["success" => false, "message" => "Sorry, there was a server error uploading your file."];
     }
 }
 

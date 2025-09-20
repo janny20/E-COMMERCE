@@ -325,7 +325,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/product-deta
                 <?php foreach ($related_products as $related_product): ?>
                 <div class="product-card">
                     <div class="product-image-container">
-                        <img src="../assets/images/products/<?php echo !empty($related_product['images']) ? explode(',', $related_product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($related_product['name']); ?>" class="product-image">
+                        <img src="../assets/images/products/<?php echo !empty($related_product['images']) ? explode(',', $related_product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($related_product['name']); ?>" class="product-image" loading="lazy" decoding="async">
                         <div class="product-overlay">
                             <button class="quick-view-btn">Quick View</button>
                             <button class="wishlist-btn">

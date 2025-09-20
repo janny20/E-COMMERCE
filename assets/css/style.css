@@ -18,13 +18,14 @@
 @import url('components/cards.css');
 @import url('components/navigation.css');
 @import url('components/modals.css');
-@import url('layout/header.css');
+@import url('layout/header.css'); /* Contains new responsive header styles */
 @import url('layout/footer.css');
 @import url('layout/grid.css');
 @import url('layout/sidebar.css');
 @import url('pages/landing.css'); /* Add this line */
 @import url('pages/home.css');
 @import url('pages/products.css');
+@import url('pages/search.css');
 @import url('pages/logout.css');
 @import url('pages/vendor-dashboard.css');
 @import url('pages/vendor-earnings.css');
@@ -65,9 +66,9 @@ body {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255,153,0,0.3);
+    border: 3px solid rgba(124, 58, 237, 0.2);
     border-radius: 50%;
-    border-top-color: #ff9900;
+    border-top-color: var(--primary-color, #7C3AED);
     animation: spin 1s ease-in-out infinite;
 }
 
@@ -109,4 +110,79 @@ body {
 
 .notification.info {
     background-color: #17a2b8;
+}
+
+/* Accessibility helper */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Accessible Dropdown Button in Main Nav */
+.main-nav .dropdown-toggle {
+    background: none;
+    border: none;
+    color: var(--text-primary); /* Assuming this is the link color */
+    font-family: inherit;
+    font-size: 1rem; /* Match other nav links */
+    cursor: pointer;
+    padding: 0.5rem 1rem; /* Match other nav links padding */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: inherit;
+}
+
+/* ===== RESPONSIVE HEADER ===== */
+@media (max-width: 992px) {
+    .search-form {
+        /* Position for animation */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 0;
+        border: none;
+        box-shadow: var(--shadow-md);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        z-index: 998; /* Below header */
+        display: flex; /* Ensure it's flex for children */
+    }
+    .desktop-nav-links {
+        display: none;
+    }
+    .mobile-toggles {
+        display: flex;
+    }
+    .mobile-nav-toggle,
+    .mobile-search-toggle {
+        display: block;
+    }
+    .mobile-nav-close {
+        display: block;
+    }
+    .mobile-search-toggle {
+        display: block;
+    }
+
+    /* When search is active on mobile */
+    .top-nav.search-active .search-form {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .top-nav.search-active .search-close-btn {
+        display: block;
+    }
 }

@@ -16,6 +16,7 @@
 </head>
 <body class="admin-body">
     <div class="admin-wrapper">
+        <div class="sidebar-overlay"></div>
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header">

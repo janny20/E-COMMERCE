@@ -100,9 +100,6 @@ $total_pages = ceil($total_count / $limit);
 
 // Include header
 require_once '../includes/header.php';
-
-// Add search-specific CSS
-echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">';
 ?>
 
 <div class="search-page">
@@ -125,9 +122,11 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">
 
         <div class="search-content">
             <div class="search-sidebar">
-                <div class="filter-section">
+                <div class="sidebar-header">
                     <h3>Filters</h3>
-                    
+                    <button class="sidebar-close">&times;</button>
+                </div>
+                <div class="filter-section">
                     <div class="filter-group">
                         <h4>Categories</h4>
                         <div class="filter-options">
@@ -182,6 +181,9 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">
 
             <div class="search-main">
                 <div class="search-toolbar">
+                    <button class="filter-toggle-btn btn btn-outline">
+                        <i class="fas fa-filter"></i> Filters
+                    </button>
                     <div class="sort-options">
                         <label for="sort-select">Sort by:</label>
                         <select id="sort-select" onchange="updateSort()">
@@ -210,7 +212,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">
                             <?php foreach ($products as $product): ?>
                                 <div class="product-card">
                                     <div class="product-image-container">
-                                        <img src="../assets/images/products/<?php echo !empty($product['images']) ? explode(',', $product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image">
+                                        <img src="../assets/images/products/<?php echo !empty($product['images']) ? explode(',', $product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image" loading="lazy" decoding="async">
                                         <div class="product-overlay">
                                             <button class="quick-view-btn">Quick View</button>
                                             <button class="wishlist-btn">
@@ -300,6 +302,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/search.css">
         </div>
     </div>
 </div>
+<div class="sidebar-overlay"></div>
 
 <?php
 // Helper function to generate pagination links
@@ -312,6 +315,27 @@ function getPageLink($page_num) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle
+    const filterToggle = document.querySelector('.filter-toggle-btn');
+    const sidebar = document.querySelector('.search-sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const sidebarClose = document.querySelector('.sidebar-close');
+
+    if (filterToggle && sidebar && overlay && sidebarClose) {
+        filterToggle.addEventListener('click', function() {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+        });
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+
+        sidebarClose.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+    }
+
     // View toggle
     const viewOptions = document.querySelectorAll('.view-option');
     const searchResults = document.querySelector('.search-results');

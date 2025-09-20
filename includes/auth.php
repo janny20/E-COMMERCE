@@ -48,7 +48,10 @@ class Auth {
     
     // Login user
     public function login($email, $password) {
-        $query = "SELECT id, username, password, user_type FROM users WHERE email = :email";
+        $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name 
+                  FROM users u
+                  LEFT JOIN user_profiles up ON u.id = up.user_id
+                  WHERE u.email = :email";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $email);
         $stmt->execute();
@@ -57,8 +60,10 @@ class Auth {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if(password_verify($password, $row['password'])) {
                 $_SESSION['user_id'] = $row['id'];
-                $_SESSION['username'] = $row['username'];
+                // Use first name for display if available, otherwise username
+                $_SESSION['username'] = !empty($row['first_name']) ? $row['first_name'] : $row['username'];
                 $_SESSION['user_type'] = $row['user_type'];
+                $_SESSION['avatar'] = $row['avatar']; // Can be null
                 return true;
             }
         }
