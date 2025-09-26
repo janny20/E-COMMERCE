@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* assets/css/pages/vendor-earnings.css */
 .vendor-earnings {
     padding: 2rem 0;
@@ -159,4 +160,36 @@
 .export-btn:hover {
     border-color: var(--primary-color);
     background: var(--light-bg);
+=======
+/*
+* ===================================================================
+* VENDOR EARNINGS PAGE STYLES
+* ===================================================================
+*/
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--border-radius);
+    color: #fff;
+}
+
+.status-pending-clearance {
+    background-color: var(--warning-color);
+    color: var(--text-primary);
+}
+
+.status-cleared {
+    background-color: var(--info-color);
+}
+
+.status-paid-out {
+    background-color: var(--success-color);
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 }

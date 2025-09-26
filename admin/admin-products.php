@@ -14,20 +14,29 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
 $database = new Database();
 $db = $database->getConnection();
 
+<<<<<<< HEAD
 // Generate a CSRF token if one doesn't exist
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 $csrf_token = $_SESSION['csrf_token'];
 
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Set page title
 $page_title = "Products Management";
 
 // Handle product actions (delete, toggle status)
+<<<<<<< HEAD
 if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['token'])) {
     $product_id = $_GET['id'];
     $action = $_GET['action'];
     $token = $_GET['token'];
+=======
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $product_id = $_GET['id'];
+    $action = $_GET['action'];
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     
     if ($action == 'delete') {
         $query = "DELETE FROM products WHERE id = :id";
@@ -129,10 +138,17 @@ include_once '../includes/admin-header.php';
                                 <td>
                                     <div class="action-buttons">
                                         <a href="admin-product-edit.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Edit</a>
+<<<<<<< HEAD
                                         <a href="admin-products.php?action=toggle_status&id=<?php echo $product['id']; ?>&token=<?php echo $csrf_token; ?>" class="btn btn-warning">
                                             <?php echo $product['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>
                                         </a>
                                         <a href="admin-products.php?action=delete&id=<?php echo $product['id']; ?>&token=<?php echo $csrf_token; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+=======
+                                        <a href="admin-products.php?action=toggle_status&id=<?php echo $product['id']; ?>" class="btn btn-edit">
+                                            <?php echo $product['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>
+                                        </a>
+                                        <a href="admin-products.php?action=delete&id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                     </div>
                                 </td>
                             </tr>

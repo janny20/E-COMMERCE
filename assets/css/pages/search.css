@@ -161,6 +161,7 @@
 .view-option:last-child { border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0; }
 .view-option.active { background: var(--primary-color); color: var(--text-white); border-color: var(--primary-color); }
 
+<<<<<<< HEAD
 .search-results.grid-view .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -179,10 +180,58 @@
     flex-shrink: 0;
 }
 .search-results.list-view .product-info {
+=======
+/* List View Specific Styles */
+.products-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.products-grid.list-view .product-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--spacing-xl);
+}
+
+.products-grid.list-view .product-image-container {
+    width: 200px;
+    height: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-color);
+}
+
+.products-grid.list-view .product-info {
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     text-align: left;
     flex-grow: 1;
 }
 
+<<<<<<< HEAD
+=======
+.products-grid.list-view .product-list-description {
+    display: block; /* Show description in list view */
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-md);
+}
+
+.products-grid.list-view .product-actions {
+    flex-direction: row;
+    align-items: center;
+}
+
+.products-grid.list-view .product-btn {
+    flex-grow: 0;
+    width: auto;
+    padding: 10px 20px;
+}
+
+.products-grid.list-view .wishlist-btn {
+    margin-left: var(--spacing-sm);
+}
+
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 .no-results {
     text-align: center;
     padding: var(--spacing-xxl) 0;
@@ -213,6 +262,117 @@
     visibility: visible;
 }
 
+<<<<<<< HEAD
+=======
+/* Quick View Modal */
+.quick-view-modal .modal-content {
+    max-width: 900px;
+    flex-direction: row;
+    padding: 0;
+}
+
+.quick-view-gallery {
+    width: 45%;
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+}
+
+.quick-view-main-image {
+    width: 100%;
+    height: 300px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.quick-view-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.quick-view-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.quick-view-thumb {
+    height: 70px;
+    border: 2px solid transparent;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
+}
+
+.quick-view-thumb.active,
+.quick-view-thumb:hover {
+    border-color: var(--primary-color);
+}
+
+.quick-view-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.quick-view-details {
+    width: 55%;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+}
+
+.quick-view-details h2 {
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.quick-view-vendor {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.quick-view-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.quick-view-description {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.quick-view-actions {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.quick-view-modal .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    z-index: 10;
+    background: var(--bg-light);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 /* Responsive */
 @media (max-width: 992px) {
     .search-content {
@@ -239,6 +399,18 @@
         align-items: center;
         gap: var(--spacing-xs);
     }
+<<<<<<< HEAD
+=======
+
+    .quick-view-modal .modal-content {
+        flex-direction: column;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    .quick-view-gallery, .quick-view-details {
+        width: 100%;
+    }
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 }
 
 @media (max-width: 768px) {

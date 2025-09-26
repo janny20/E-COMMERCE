@@ -2,12 +2,15 @@
 // Include config
 require_once '../includes/config.php';
 
+<<<<<<< HEAD
 // Check if user is logged in
 if (!$isLoggedIn) {
     header('Location: login.php');
     exit();
 }
 
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Get cart items
 $database = new Database();
 $db = $database->getConnection();
@@ -23,6 +26,15 @@ $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
+=======
+// Check if user is logged in, redirect if not
+if (!$isLoggedIn) {
+    header('Location: login.php?redirect=checkout.php');
+    exit();
+}
+
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Redirect if cart is empty
 if (empty($cart_items)) {
     header('Location: cart.php');
@@ -50,6 +62,7 @@ $user_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $user_stmt->execute();
 $user_data = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
 // Process checkout form
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate and process order
@@ -111,6 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Include header
 require_once '../includes/header.php';
 
@@ -138,7 +153,17 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
             </div>
         </div>
 
+<<<<<<< HEAD
         <form method="POST" class="checkout-form">
+=======
+        <?php if (isset($_SESSION['checkout_error'])): ?>
+            <div class="alert alert-error" style="margin-bottom: 1rem;">
+                <?php echo htmlspecialchars($_SESSION['checkout_error']); unset($_SESSION['checkout_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="<?php echo BASE_URL; ?>pages/process_payment.php" class="checkout-form" id="checkout-form">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             <div class="checkout-content">
                 <div class="checkout-main">
                     <div class="checkout-section">
@@ -232,6 +257,31 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 </div>
                                 
                                 <div class="payment-method">
+<<<<<<< HEAD
+=======
+                                    <input type="radio" id="payment_momo" name="payment_method" value="mobile_money">
+                                    <label for="payment_momo">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>Mobile Money (MTN, Telecel)</span>
+                                    </label>
+                                    <div class="payment-details">
+                                        <div class="form-group">
+                                            <label for="momo_number">Phone Number *</label>
+                                            <input type="tel" id="momo_number" name="momo_number" placeholder="024 123 4567">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="momo_network">Network *</label>
+                                            <select id="momo_network" name="momo_network">
+                                                <option value="mtn">MTN Mobile Money</option>
+                                                <option value="telecel">Telecel Cash</option>
+                                            </select>
+                                        </div>
+                                        <p class="form-hint">You will receive a prompt on your phone to approve the payment.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="payment-method">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                     <input type="radio" id="payment_paypal" name="payment_method" value="paypal">
                                     <label for="payment_paypal">
                                         <i class="fab fa-paypal"></i>
@@ -392,7 +442,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const placeOrderBtn = document.querySelector('.btn-place-order');
     
     checkoutForm.addEventListener('submit', function(e) {
+<<<<<<< HEAD
         e.preventDefault();
+=======
+        // The form will be submitted after validation, so we only prevent it if invalid.
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         
         // Basic validation
         let isValid = true;
@@ -401,12 +455,20 @@ document.addEventListener('DOMContentLoaded', function() {
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.style.borderColor = 'var(--danger-color)';
+<<<<<<< HEAD
                 isValid = false;
+=======
+                // Only mark as invalid if the field is visible
+                if (field.offsetParent !== null) {
+                    isValid = false;
+                }
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             } else {
                 field.style.borderColor = '';
             }
         });
         
+<<<<<<< HEAD
         if (isValid) {
             // Show loading state
             placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
@@ -414,6 +476,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Submit form
             this.submit();
+=======
+        if (!isValid) {
+            e.preventDefault(); // Stop form submission
+            alert('Please fill in all required fields.');
+        } else {
+            // If form is valid, show loading state
+            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            placeOrderBtn.disabled = true;
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         }
     });
     

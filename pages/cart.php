@@ -1,11 +1,20 @@
 <?php
+<<<<<<< HEAD
 // Include config
 require_once '../includes/config.php';
 
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+<<<<<<< HEAD
+=======
+// Include config
+require_once '../includes/config.php';
+
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Establish database connection early so it's available for the whole page
 $database = new Database();
 $db = $database->getConnection();

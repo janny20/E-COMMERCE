@@ -1,5 +1,6 @@
 /* Admin Vendors Page CSS */
 
+<<<<<<< HEAD
 /* Container and Header */
 .admin-vendors-container {
     padding: 32px;
@@ -238,3 +239,6 @@
         margin-top: 8px;
     }
 }
+=======
+/* Add your styles for admin-vendors.php here */
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b

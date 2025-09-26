@@ -13,6 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
 $database = new Database();
 $db = $database->getConnection();
 
+<<<<<<< HEAD
 // Generate a CSRF token if one doesn't exist
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -102,17 +103,50 @@ if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['token'])) {
         }
     } else {
         $error = "Invalid security token. Action blocked.";
+=======
+// Set page title
+$page_title = "Vendors Management";
+
+// Handle vendor actions (approve, reject, suspend)
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $vendor_id = $_GET['id'];
+    $action = $_GET['action'];
+    
+    $valid_statuses = ['approved', 'rejected', 'suspended'];
+    
+    if (in_array($action, $valid_statuses)) {
+        $query = "UPDATE vendors SET status = :status WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':status', $action);
+        $stmt->bindParam(':id', $vendor_id);
+        
+        if ($stmt->execute()) {
+            $success = "Vendor status updated successfully.";
+        } else {
+            $error = "Error updating vendor status.";
+        }
+    } else {
+        $error = "Invalid action.";
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     }
 }
 
 // Get filter parameter
+<<<<<<< HEAD
 $status_filter = isset($_GET['status']) ? filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) : '';
+=======
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
 // Build query with filters
 $query = "SELECT v.*, u.username, u.email, u.created_at as joined_date 
           FROM vendors v 
           JOIN users u ON v.user_id = u.id 
+<<<<<<< HEAD
           WHERE 1=1"; // Using 1=1 is a common trick to make appending AND clauses easier
+=======
+          WHERE 1=1";
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 $params = [];
 
 if (!empty($status_filter) && $status_filter != 'all') {
@@ -120,9 +154,12 @@ if (!empty($status_filter) && $status_filter != 'all') {
     $params[':status'] = $status_filter;
 }
 
+<<<<<<< HEAD
 // Exclude vendors whose associated user account has been deleted
 $query .= " AND u.status != 'deleted'";
 
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 $query .= " ORDER BY v.created_at DESC";
 
 $stmt = $db->prepare($query);
@@ -136,6 +173,7 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include_once '../includes/admin-header.php';
 ?>
 
+<<<<<<< HEAD
 <div class="admin-vendors-container">
     <div class="admin-vendors-header">
         <h1>Vendor Management</h1>
@@ -144,6 +182,16 @@ include_once '../includes/admin-header.php';
 
     <?php if (isset($error)): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+=======
+<div class="admin-users-container">
+    <div class="admin-users-header">
+        <h1>Vendors Management</h1>
+        <p>Manage vendor accounts and approvals</p>
+    </div>
+
+    <?php if (isset($error)): ?>
+        <div class="alert alert-error"><?php echo $error; ?></div>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     <?php endif; ?>
 
     <?php if (isset($success)): ?>
@@ -152,11 +200,19 @@ include_once '../includes/admin-header.php';
 
     <div class="card">
         <div class="card-header">
+<<<<<<< HEAD
             <h2>Filters</h2>
         </div>
         <div class="card-body">
             <form method="GET" class="filter-form">
                 <div class="filter-controls">
+=======
+            <h2>Vendor Filters</h2>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="filter-form">
+                <div class="form-row">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                     <div class="form-group">
                         <label for="status">Status</label>
                         <select id="status" name="status">
@@ -168,7 +224,11 @@ include_once '../includes/admin-header.php';
                         </select>
                     </div>
                     
+<<<<<<< HEAD
                     <div class="form-group filter-buttons">
+=======
+                    <div class="form-group">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
                         <a href="admin-vendors.php" class="btn btn-outline">Clear Filters</a>
                     </div>
@@ -183,11 +243,20 @@ include_once '../includes/admin-header.php';
         </div>
         <div class="card-body">
             <?php if (!empty($vendors)): ?>
+<<<<<<< HEAD
                 <table class="vendors-table">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Business Name</th>
+=======
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Business Name</th>
+                            <th>Owner</th>
+                            <th>Email</th>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                             <th>Status</th>
                             <th>Joined Date</th>
                             <th>Actions</th>
@@ -196,6 +265,7 @@ include_once '../includes/admin-header.php';
                     <tbody>
                         <?php foreach ($vendors as $vendor): ?>
                             <tr>
+<<<<<<< HEAD
                                 <td data-label="ID"><?php echo $vendor['id']; ?></td>
                                 <td data-label="Business Name">
                                     <div class="vendor-info">
@@ -226,6 +296,35 @@ include_once '../includes/admin-header.php';
                                         <?php endif; ?>
                                         <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye"></i> Details</a>
                                         <a href="admin-vendors.php?action=delete&id=<?php echo $vendor['id']; ?>&token=<?php echo $csrf_token; ?>" class="btn btn-delete btn-sm" onclick="return confirm('Are you sure you want to delete this vendor? This action is permanent.')"><i class="fas fa-trash"></i> Delete</a>
+=======
+                                <td>
+                                    <strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong>
+                                    <?php if (!empty($vendor['business_logo'])): ?>
+                                        <div class="vendor-logo">
+                                            <img src="../../assets/images/vendors/<?php echo $vendor['business_logo']; ?>" alt="<?php echo htmlspecialchars($vendor['business_name']); ?>" width="50">
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($vendor['username']); ?></td>
+                                <td><?php echo htmlspecialchars($vendor['email']); ?></td>
+                                <td>
+                                    <span class="user-status <?php echo $vendor['status']; ?>">
+                                        <?php echo ucfirst($vendor['status']); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo date('M j, Y', strtotime($vendor['joined_date'])); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-edit">View Details</a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-edit dropdown-toggle">Change Status</button>
+                                            <div class="dropdown-content">
+                                                <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>">Approve</a>
+                                                <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>">Reject</a>
+                                                <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>">Suspend</a>
+                                            </div>
+                                        </div>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                     </div>
                                 </td>
                             </tr>

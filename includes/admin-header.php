@@ -1,5 +1,6 @@
 <?php
 // Admin header file
+<<<<<<< HEAD
 // Start session if not already started to ensure session variables are available
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -12,6 +13,8 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION[
     header('Location: /multi-vendor-ecommerce/admin/login.php');
     exit();
 }
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 ?>
 <!DOCTYPE html>
 <html lang="en">

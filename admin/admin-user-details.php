@@ -19,17 +19,23 @@ if ($user_id <= 0) {
 $database = new Database();
 $db = $database->getConnection();
 
+<<<<<<< HEAD
 // Fetch user info, ensuring 'status' is selected
 $query = "SELECT u.id, u.username, u.email, u.user_type, u.status, u.created_at, 
                  up.first_name, up.last_name, up.phone 
           FROM users u 
           LEFT JOIN user_profiles up ON u.id = up.user_id 
           WHERE u.id = :id";
+=======
+// Fetch user info
+$query = "SELECT u.*, up.first_name, up.last_name, up.phone FROM users u LEFT JOIN user_profiles up ON u.id = up.user_id WHERE u.id = :id";
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 $stmt = $db->prepare($query);
 $stmt->bindParam(':id', $user_id);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
 $page_title = "User Details";
 
 // Include admin header
@@ -75,6 +81,29 @@ include_once '../includes/admin-header.php';
         </div>
     <?php else: ?>
         <div class="alert alert-danger">User not found.</div>
+=======
+// Include admin header
+include_once '../includes/admin-header.php';
+?>
+
+<div class="admin-users-container">
+    <div class="admin-users-header">
+        <h1>User Details</h1>
+        <a href="admin-users.php" class="btn btn-edit">Back to Users</a>
+    </div>
+    <?php if ($user): ?>
+        <div class="card" style="max-width:600px;margin:auto;">
+            <h2><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h2>
+            <p><strong>Username:</strong> <?php echo htmlspecialchars($user['username']); ?></p>
+            <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+            <p><strong>Phone:</strong> <?php echo !empty($user['phone']) ? htmlspecialchars($user['phone']) : 'N/A'; ?></p>
+            <p><strong>User Type:</strong> <?php echo ucfirst($user['user_type']); ?></p>
+            <p><strong>Status:</strong> <span class="user-status <?php echo $user['status']; ?>"><?php echo ucfirst($user['status']); ?></span></p>
+            <p><strong>Joined:</strong> <?php echo date('M j, Y', strtotime($user['created_at'])); ?></p>
+        </div>
+    <?php else: ?>
+        <p>User not found.</p>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     <?php endif; ?>
 </div>
 

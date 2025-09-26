@@ -155,7 +155,10 @@
     border: none;
     font-size: 1rem;
     font-weight: 600;
+<<<<<<< HEAD
     -moz-appearance: textfield;
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 }
 .quantity-input::-webkit-outer-spin-button,
 .quantity-input::-webkit-inner-spin-button {

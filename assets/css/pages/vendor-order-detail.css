@@ -1,0 +1,110 @@
+/*
+* ===================================================================
+* VENDOR ORDER DETAIL PAGE STYLES
+* ===================================================================
+*/
+
+.order-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: var(--spacing-xl);
+    align-items: start;
+}
+
+.order-main-content {
+    grid-column: 1 / 2;
+}
+
+.order-sidebar {
+    grid-column: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.product-info-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.product-cell-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.summary-list {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-md);
+}
+
+.summary-item span:first-child {
+    color: var(--text-secondary);
+}
+
+.summary-item strong,
+.summary-item a {
+    font-weight: 600;
+    text-align: right;
+}
+
+.summary-item.shipping-address {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+}
+
+.summary-item address {
+    font-style: normal;
+    background: var(--bg-light);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    width: 100%;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.data-table tfoot td {
+    font-size: 1.1rem;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Status badge for payment status */
+.status-completed {
+    background-color: var(--success-color);
+}
+
+.tracking-info {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .order-detail-layout {
+        grid-template-columns: 1fr;
+    }
+    .order-sidebar {
+        grid-row: 1; /* Move sidebar to the top on smaller screens */
+    }
+}

@@ -49,8 +49,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(":email", $email);
         $stmt->execute();
         
+<<<<<<< HEAD
         if ($stmt->rowCount() > 0) {
             $error = 'Email already exists. Please use a different email.';
+=======
+        $email_exists = $stmt->rowCount() > 0;
+
+        $query = "SELECT id FROM users WHERE username = :username";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(":username", $username);
+        $stmt->execute();
+        $username_exists = $stmt->rowCount() > 0;
+
+        if ($email_exists) {
+            $error = 'Email already exists. Please use a different email.';
+        } elseif ($username_exists) {
+            $error = 'Username is already taken. Please choose a different one.';
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         } else {
             // Additional data for vendors
             $additional_data = [];
@@ -101,6 +116,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="../assets/css/pages/auth.css">
     <!-- Add FontAwesome CDN for icons if not present -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
+=======
+    <style>
+        #password-strength-meter {
+            margin-top: 8px;
+        }
+        .strength-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0;
+            border-radius: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .strength-text {
+            margin-top: 4px;
+            font-size: 0.8rem;
+            text-align: right;
+            height: 1.2em; /* Reserve space to prevent layout shift */
+            transition: color 0.3s ease;
+        }
+    </style>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 </head>
 <body class="register-page">
     <div class="auth-container">
@@ -152,7 +195,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <i class="fas fa-eye"></i>
                                 </span>
                             </div>
+<<<<<<< HEAD
                             <div class="form-hint">Must be at least 6 characters.</div>
+=======
+                            <div id="password-strength-meter">
+                                <div class="strength-bar-container">
+                                    <div class="strength-bar"></div>
+                                </div>
+                                <div class="strength-text"></div>
+                            </div>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </div>
                         <div class="auth-form-group">
                             <label class="auth-form-label" for="user_type">Account Type *</label>
@@ -199,6 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             businessInput.removeAttribute('required');
             businessInput.value = '';
         }
+<<<<<<< HEAD
     });
     // Show/hide password toggle
     document.getElementById('togglePassword').addEventListener('click', function() {
@@ -212,6 +265,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             pwd.type = 'password';
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
+=======
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show/hide password toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const pwd = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (pwd.type === 'password') {
+                pwd.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                pwd.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // --- Password Strength Meter ---
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.querySelector('#password-strength-meter .strength-bar');
+        const strengthText = document.querySelector('#password-strength-meter .strength-text');
+
+        function checkPasswordStrength(password) {
+            let score = 0;
+            const result = { text: '', width: '0%', color: 'transparent' };
+
+            if (!password) return result;
+
+            // Award points for different criteria
+            if (password.length >= 8) score++;
+            if (password.match(/[a-z]/)) score++;
+            if (password.match(/[A-Z]/)) score++;
+            if (password.match(/[0-9]/)) score++;
+            if (password.match(/[^a-zA-Z0-9\s]/)) score++; // Special characters
+
+            // Determine strength based on score
+            switch (score) {
+                case 0:
+                case 1:
+                case 2:
+                    result.text = 'Weak';
+                    result.width = '25%';
+                    result.color = '#dc3545'; // Danger color
+                    break;
+                case 3:
+                    result.text = 'Medium';
+                    result.width = '50%';
+                    result.color = '#ffc107'; // Warning color
+                    break;
+                case 4:
+                    result.text = 'Strong';
+                    result.width = '75%';
+                    result.color = '#28a745'; // Success color
+                    break;
+                case 5:
+                    result.text = 'Very Strong';
+                    result.width = '100%';
+                    result.color = '#28a745'; // Success color
+                    break;
+            }
+
+            // Override for length if password is not empty
+            if (password.length > 0 && password.length < 8) {
+                result.text = 'Too short';
+                result.width = '10%';
+                result.color = '#dc3545';
+            }
+
+            return result;
+        }
+
+        if (passwordInput && strengthBar && strengthText) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const result = checkPasswordStrength(password);
+
+                strengthBar.style.width = result.width;
+                strengthBar.style.backgroundColor = result.color;
+                strengthText.textContent = result.text;
+                strengthText.style.color = result.color;
+            });
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         }
     });
     </script>
