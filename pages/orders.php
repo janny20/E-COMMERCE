@@ -147,7 +147,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/orders.css">
                             </div>
 
                             <div class="order-actions">
-                                <a href="order-detail.php?id=<?php echo $order['id']; ?>" class="btn btn-outline">View Details</a>
+                                <a href="<?php echo BASE_URL; ?>pages/order-detail.php?id=<?php echo $order['id']; ?>" class="btn btn-outline">View Details</a>
                                 
                                 <?php if ($order['status'] === 'pending' || $order['status'] === 'confirmed'): ?>
                                     <button class="btn btn-outline btn-cancel" data-order-id="<?php echo $order['id']; ?>">Cancel Order</button>
@@ -155,11 +155,10 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/orders.css">
                                 
                                 <?php if ($order['status'] === 'delivered'): ?>
                                     <button class="btn btn-primary btn-reorder" data-order-id="<?php echo $order['id']; ?>">Reorder</button>
-                                    <a href="#" class="btn btn-outline">Return Items</a>
                                 <?php endif; ?>
                                 
                                 <?php if ($order['status'] === 'shipped'): ?>
-                                    <button class="btn btn-primary btn-track" data-order-id="<?php echo $order['id']; ?>">Track Package</button>
+                                    <a href="<?php echo BASE_URL; ?>pages/order-detail.php?id=<?php echo $order['id']; ?>" class="btn btn-primary btn-track">Track Package</a>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -215,16 +214,34 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-cancel').forEach(btn => {
         btn.addEventListener('click', function() {
             const orderId = this.dataset.orderId;
+            const card = this.closest('.order-card');
             if (confirm('Are you sure you want to cancel this order?')) {
-                // Simulate cancel order
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelling...';
                 this.disabled = true;
                 
-                setTimeout(() => {
-                    alert('Order cancellation request submitted.');
+                const formData = new FormData();
+                formData.append('order_id', orderId);
+
+                fetch('../ajax/cancel_order.php', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        if (card) {
+                            card.querySelector('.status-badge').textContent = 'Cancelled';
+                            card.querySelector('.status-badge').className = 'status-badge status-cancelled';
+                            this.remove(); // Remove the cancel button
+                        }
+                    } else {
+                        showNotification(data.message, 'error');
+                        this.innerHTML = 'Cancel Order';
+                        this.disabled = false;
+                    }
+                }).catch(() => {
+                    showNotification('An error occurred.', 'error');
                     this.innerHTML = 'Cancel Order';
                     this.disabled = false;
-                }, 1500);
+                });
             }
         });
     });
@@ -233,21 +250,30 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-reorder').forEach(btn => {
         btn.addEventListener('click', function() {
             const orderId = this.dataset.orderId;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                alert('Items added to cart successfully!');
-                window.location.href = 'cart.php';
-            }, 1500);
-        });
-    });
-    
-    // Track package
-    document.querySelectorAll('.btn-track').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const orderId = this.dataset.orderId;
-            alert('Tracking information would open here for order #' + orderId);
+            if (confirm('Are you sure you want to add all items from this order to your cart?')) {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+                this.disabled = true;
+
+                const formData = new FormData();
+                formData.append('order_id', orderId);
+
+                fetch('../ajax/reorder.php', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => window.location.href = 'cart.php', 1500);
+                    } else {
+                        showNotification(data.message, 'error');
+                        this.innerHTML = 'Reorder';
+                        this.disabled = false;
+                    }
+                }).catch(() => {
+                    showNotification('An error occurred.', 'error');
+                    this.innerHTML = 'Reorder';
+                    this.disabled = false;
+                });
+            }
         });
     });
 });

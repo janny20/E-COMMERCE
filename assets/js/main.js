@@ -1,3 +1,11 @@
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        // Add a short delay to prevent a jarring flash on fast connections
+        setTimeout(() => preloader.classList.add('hidden'), 200);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNavClose = document.querySelector('.mobile-nav-close');
@@ -10,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function openNav() {
         lastFocusedElement = document.activeElement; // Store focus before opening
         mobileNavContainer.classList.add('open');
+        mobileNavToggle.classList.add('is-active');
         navOverlay.classList.add('open');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
 
@@ -25,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeNav() {
         mobileNavContainer.classList.remove('open');
+        mobileNavToggle.classList.remove('is-active');
         navOverlay.classList.remove('open');
         document.body.style.overflow = ''; // Restore background scroll
         document.removeEventListener('keydown', trapFocus);
@@ -86,26 +96,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Back to Top Button
-    const backToTopBtn = document.querySelector('.back-to-top-btn');
+    // Initialize Back to Top Button
+    initBackToTopButton();
 
-    if (backToTopBtn) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        });
+    // Initialize Wishlist functionality
+    initWishlistButtons();
 
-        backToTopBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
+    // Initialize Move to Cart functionality
+    initMoveToCartButtons();
+
+    // Initialize Vendor Order Status functionality
+    initVendorOrderStatus();
 
     // Initialize Cookie Consent
     initCookieConsent();
@@ -146,6 +147,260 @@ function hideNotification(notification) {
     setTimeout(() => {
         notification.remove();
     }, 300);
+}
+
+// Helper function to update wishlist page after an item is removed
+function updateWishlistStatus() {
+    if (!document.body.querySelector('.wishlist-page')) return;
+
+    const wishlistCountEl = document.querySelector('.wishlist-page .products-meta');
+    const productGrid = document.querySelector('.wishlist-page .products-grid');
+    
+    if (wishlistCountEl && productGrid) {
+        const currentCount = productGrid.children.length;
+        wishlistCountEl.textContent = `You have ${currentCount} item(s) in your wishlist.`;
+
+        if (currentCount === 0) {
+            const productsMain = document.querySelector('.wishlist-page .products-main');
+            if (productsMain) {
+                productsMain.innerHTML = `
+                    <div class="products-empty">
+                        <div class="products-empty-icon"><i class="far fa-heart"></i></div>
+                        <h3 class="products-empty-title">Your Wishlist is Empty</h3>
+                        <p class="products-empty-text">Add items you love to your wishlist to save them for later.</p>
+                        <a href="${BASE_URL}pages/products.php" class="btn btn-primary">Discover Products</a>
+                    </div>
+                `;
+            }
+        }
+    }
+}
+
+// Wishlist Buttons
+function initWishlistButtons() {
+    document.body.addEventListener('click', function(e) {
+        const wishlistBtn = e.target.closest('.wishlist-btn, .btn-wishlist');
+        if (!wishlistBtn) return;
+
+        e.preventDefault();
+        
+        const productId = wishlistBtn.dataset.productId;
+        if (!productId) {
+            console.error('Wishlist button is missing data-product-id attribute.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('product_id', productId);
+
+        fetch(`${BASE_URL}ajax/update_wishlist.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.require_login) {
+                // Redirect to login, preserving the current page as the redirect destination
+                window.location.href = `${BASE_URL}pages/login.php?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+                return;
+            }
+
+            if (data.success) {
+                showNotification(data.message, 'success');
+
+                // If an item was removed and we are on the wishlist page, remove the card from the DOM.
+                if (data.action === 'removed' && document.body.querySelector('.wishlist-page')) {
+                    const productCard = wishlistBtn.closest('.product-card');
+                    if (productCard) {
+                        productCard.style.transition = 'opacity 0.3s ease';
+                        productCard.style.opacity = '0';                        
+                        setTimeout(() => { productCard.remove(); updateWishlistStatus(); }, 300);
+                    }
+                } else {
+                    // Original behavior for all other pages
+                    wishlistBtn.classList.toggle('active', data.action === 'added');
+                    const icon = wishlistBtn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('far', data.action === 'removed');
+                        icon.classList.toggle('fas', data.action === 'added');
+                    }
+                    // Update the title attribute
+                    wishlistBtn.title = data.action === 'added' ? 'Remove from wishlist' : 'Add to wishlist';
+                }
+            } else {
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Wishlist Error:', error);
+            showNotification('A network error occurred.', 'error');
+        });
+    });
+}
+
+// Move to Cart Buttons (from Wishlist)
+function initMoveToCartButtons() {
+    document.body.addEventListener('click', function(e) {
+        const moveBtn = e.target.closest('.btn-move-to-cart');
+        if (!moveBtn) return;
+
+        e.preventDefault();
+        
+        const productId = moveBtn.dataset.productId;
+        if (!productId) {
+            console.error('Move to Cart button is missing data-product-id attribute.');
+            return;
+        }
+
+        moveBtn.disabled = true;
+        moveBtn.innerHTML = '<span class="loading"></span> Moving...';
+
+        const formData = new FormData();
+        formData.append('product_id', productId);
+
+        fetch(`${BASE_URL}ajax/move_to_cart.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.require_login) {
+                window.location.href = `${BASE_URL}pages/login.php?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+                return;
+            }
+
+            if (data.success) {
+                showNotification(data.message, 'success');
+
+                document.querySelectorAll('.cart-link').forEach(el => {
+                    el.innerHTML = `<i class="fas fa-shopping-cart"></i> Cart (${data.cartCount})`;
+                });
+
+                const productCard = moveBtn.closest('.product-card');
+                if (productCard) {
+                    productCard.style.transition = 'opacity 0.3s ease';
+                    productCard.style.opacity = '0';
+                    setTimeout(() => { productCard.remove(); updateWishlistStatus(); }, 300);
+                }
+            } else {
+                showNotification(data.message, 'error');
+                moveBtn.disabled = false;
+                moveBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Move to Cart';
+            }
+        })
+        .catch(error => {
+            console.error('Move to Cart Error:', error);
+            showNotification('A network error occurred.', 'error');
+            moveBtn.disabled = false;
+            moveBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Move to Cart';
+        });
+    });
+}
+
+// Vendor Order Status Updates
+function initVendorOrderStatus() {
+    const trackingModal = document.getElementById('trackingModal');
+    if (!trackingModal) return; // Only run on pages with the modal
+
+    const trackingForm = document.getElementById('trackingForm');
+    const closeBtn = document.getElementById('trackingModalClose');
+    const orderItemIdInput = document.getElementById('trackingOrderItemId');
+
+    function openTrackingModal(itemId) {
+        orderItemIdInput.value = itemId;
+        trackingModal.classList.add('show');
+    }
+
+    function closeTrackingModal() {
+        trackingModal.classList.remove('show');
+        trackingForm.reset();
+    }
+
+    closeBtn.addEventListener('click', closeTrackingModal);
+    trackingModal.addEventListener('click', (e) => {
+        if (e.target === trackingModal) closeTrackingModal();
+    });
+
+    document.body.addEventListener('change', function(e) {
+        if (e.target.matches('.item-status-select')) {
+            const select = e.target;
+            const itemId = select.dataset.itemId;
+            const newStatus = select.value;
+            const currentStatus = select.dataset.currentStatus;
+
+            if (newStatus === currentStatus) return;
+
+            if (newStatus === 'shipped') {
+                openTrackingModal(itemId);
+                // Revert selection until tracking is submitted
+                select.value = currentStatus;
+            } else {
+                updateItemStatus(itemId, newStatus);
+            }
+        }
+    });
+
+    trackingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const itemId = orderItemIdInput.value;
+        const carrier = document.getElementById('shipping_carrier').value;
+        const trackingNumber = document.getElementById('tracking_number').value;
+        updateItemStatus(itemId, 'shipped', trackingNumber, carrier);
+        closeTrackingModal();
+    });
+
+    function updateItemStatus(itemId, status, trackingNumber = null, carrier = null) {
+        const formData = new FormData();
+        formData.append('item_id', itemId);
+        formData.append('status', status);
+        if (trackingNumber) formData.append('tracking_number', trackingNumber);
+        if (carrier) formData.append('shipping_carrier', carrier);
+
+        showNotification('Updating status...', 'info');
+
+        fetch(`${BASE_URL}ajax/update_order_item.php`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1500); // Reload to see changes
+            } else {
+                showNotification(data.message || 'Update failed.', 'error');
+            }
+        })
+        .catch(error => showNotification('A network error occurred.', 'error'));
+    }
+}
+
+// Back to Top Button
+function initBackToTopButton() {
+    const backToTopBtn = document.querySelector('.back-to-top-btn');
+
+    if (!backToTopBtn) return;
+
+    // Function to show/hide button based on scroll position
+    const scrollHandler = () => {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    };
+
+    // Function to scroll to top on click
+    const clickHandler = (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    window.addEventListener('scroll', scrollHandler);
+    backToTopBtn.addEventListener('click', clickHandler);
 }
 
 // Cookie Consent Banner

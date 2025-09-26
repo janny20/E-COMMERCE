@@ -1,162 +1,31 @@
-/* assets/css/pages/vendor-earnings.css */
-.vendor-earnings {
-    padding: 2rem 0;
-}
+/*
+* ===================================================================
+* VENDOR EARNINGS PAGE STYLES
+* ===================================================================
+*/
 
-.earnings-header {
-    margin-bottom: 2rem;
-}
-
-.earnings-summary {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
-}
-
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.summary-card {
+.status-badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
     text-align: center;
-    padding: 1.5rem;
-    border-radius: 10px;
-    background: var(--light-bg);
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--border-radius);
+    color: #fff;
 }
 
-.summary-icon {
-    font-size: 2rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.status-pending-clearance {
+    background-color: var(--warning-color);
+    color: var(--text-primary);
 }
 
-.summary-amount {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
+.status-cleared {
+    background-color: var(--info-color);
 }
 
-.summary-label {
-    color: var(--muted-color);
-    font-size: 0.9rem;
-}
-
-.earnings-chart {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
-}
-
-.chart-container {
-    height: 300px;
-    position: relative;
-}
-
-.transactions-list {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-}
-
-.transactions-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.transaction-item {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 1rem;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    align-items: center;
-}
-
-.transaction-item:last-child {
-    border-bottom: none;
-}
-
-.transaction-type {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.type-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--light-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-}
-
-.transaction-amount {
-    font-weight: 500;
-}
-
-.amount-positive {
-    color: var(--success-color);
-}
-
-.amount-negative {
-    color: var(--danger-color);
-}
-
-.transaction-date {
-    color: var(--muted-color);
-    font-size: 0.9rem;
-}
-
-.transaction-status {
-    padding: 0.25rem 0.5rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.status-completed {
-    background: #e8f5e8;
-    color: #2e7d32;
-}
-
-.status-pending {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.export-options {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.export-btn {
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    text-decoration: none;
-    color: var(--text-color);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: white;
-}
-
-.export-btn:hover {
-    border-color: var(--primary-color);
-    background: var(--light-bg);
+.status-paid-out {
+    background-color: var(--success-color);
 }

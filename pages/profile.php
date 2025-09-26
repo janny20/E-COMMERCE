@@ -1,26 +1,227 @@
 <?php
-// Ensure session is started so config.php can read session variables
+// pages/profile.php - Customer Profile Page
+
+// Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include config
 require_once '../includes/config.php';
 require_once '../includes/functions.php'; // Include functions for file upload
 
-// Check if user is logged in
-if (!$isLoggedIn || !$userId) {
-    // Instead of redirecting, show a message if session is missing
-    echo '<div class="container"><div class="alert alert-error">You must be logged in to view your profile. Please register or log in.</div></div>';
-    require_once '../includes/footer.php';
+// --- AJAX HANDLERS ---
+// These are placed at the top to handle POST requests before any HTML is output.
+
+// Handle AJAX avatar upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_avatar'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
+    
+    // Check for login status within the AJAX handler
+    if (!isset($_SESSION['user_id'])) {
+        $response['message'] = 'Authentication error. Please log in again.';
+        echo json_encode($response);
+        exit();
+    }
+    $ajaxUserId = $_SESSION['user_id'];
+
+    // Establish a dedicated DB connection for this action
+    $database = new Database();
+    $db = $database->getConnection();
+
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == UPLOAD_ERR_OK) {
+        $upload_result = uploadFile($_FILES['avatar'], USER_UPLOAD_PATH);
+        
+        if ($upload_result['success']) {
+            $avatar_filename = $upload_result['file_name'];
+            
+            // Check if a profile record exists to decide between INSERT and UPDATE
+            $check_profile_query = "SELECT id, avatar FROM user_profiles WHERE user_id = :user_id";
+            $check_stmt = $db->prepare($check_profile_query);
+            $check_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+            $check_stmt->execute();
+            $existing_profile = $check_stmt->fetch(PDO::FETCH_ASSOC);
+
+            $db->beginTransaction();
+
+            try {
+                // Delete old avatar if it exists
+                if ($existing_profile && !empty($existing_profile['avatar'])) {
+                    $old_avatar_path = USER_UPLOAD_PATH . $existing_profile['avatar'];
+                    if (file_exists($old_avatar_path)) {
+                        unlink($old_avatar_path);
+                    }
+                }
+
+                if ($existing_profile) {
+                    // Profile exists, so UPDATE
+                    $query = "UPDATE user_profiles SET avatar = :avatar WHERE user_id = :user_id";
+                } else {
+                    // Profile does not exist, so INSERT
+                    $query = "INSERT INTO user_profiles (user_id, avatar) VALUES (:user_id, :avatar)";
+                }
+                
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':avatar', $avatar_filename);
+                $stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+                
+                if ($stmt->execute()) {
+                    $db->commit();
+                    $_SESSION['avatar'] = $avatar_filename;
+                    $response['success'] = true;
+                    $response['message'] = 'Avatar updated successfully!';
+                    $response['file_name'] = $avatar_filename;
+                } else {
+                    throw new Exception('Failed to update avatar in the database.');
+                }
+            } catch (Exception $e) {
+                $db->rollBack();
+                // Delete the newly uploaded file if the DB operation failed
+                if (file_exists(USER_UPLOAD_PATH . $avatar_filename)) {
+                    unlink(USER_UPLOAD_PATH . $avatar_filename);
+                }
+                $response['message'] = $e->getMessage();
+                error_log('Avatar Upload Error: ' . $e->getMessage());
+            }
+        } else {
+            $response['message'] = $upload_result['message'];
+        }
+    } else {
+        $error_code = $_FILES['avatar']['error'] ?? UPLOAD_ERR_NO_FILE;
+        $message = 'An unknown upload error occurred.';
+        switch ($error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $message = 'File is too large. Please upload a smaller image.';
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $message = 'The file was only partially uploaded.';
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $message = 'No file was selected for upload.';
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $message = 'Server configuration error: Missing a temporary folder.';
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                $message = 'Server error: Failed to write file to disk.';
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                $message = 'A server extension stopped the file upload.';
+                break;
+        }
+        $response['message'] = $message;
+    }
+    
+    echo json_encode($response);
     exit();
 }
 
-// If the logged-in user is a vendor, redirect to vendor profile
-if (isset($userType) && strtolower($userType) === 'vendor') {
-    header('Location: ' . BASE_URL . 'vendor/profile.php');
+// Handle AJAX password change
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password_ajax'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
+
+    if (!isset($_SESSION['user_id'])) {
+        $response['message'] = 'Authentication error. Please log in again.';
+        echo json_encode($response);
+        exit();
+    }
+    $ajaxUserId = $_SESSION['user_id'];
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $current_password = $_POST['current_password'] ?? '';
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+
+    if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
+        $response['message'] = 'Please fill in all password fields.';
+    } elseif (strlen($new_password) < 6) {
+        $response['message'] = 'New password must be at least 6 characters long.';
+    } elseif ($new_password !== $confirm_password) {
+        $response['message'] = 'New passwords do not match.';
+    } else {
+        // Fetch current user's password from DB
+        $pass_query = "SELECT password FROM users WHERE id = :user_id";
+        $pass_stmt = $db->prepare($pass_query);
+        $pass_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+        $pass_stmt->execute();
+        $user_pass_data = $pass_stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user_pass_data && password_verify($current_password, $user_pass_data['password'])) {
+            // Current password is correct, update to new password
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $update_pass_query = "UPDATE users SET password = :password WHERE id = :user_id";
+            $update_pass_stmt = $db->prepare($update_pass_query);
+            $update_pass_stmt->bindParam(':password', $hashed_password);
+            $update_pass_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+
+            if ($update_pass_stmt->execute()) {
+                $response['success'] = true;
+                $response['message'] = 'Password updated successfully!';
+            } else {
+                $response['message'] = 'Failed to update password. Please try again.';
+            }
+        } else {
+            $response['message'] = 'Incorrect current password.';
+        }
+    }
+    
+    echo json_encode($response);
     exit();
 }
+
+// Handle AJAX preferences update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_preferences_ajax'])) {
+    header('Content-Type: application/json');
+    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
+
+    if (!isset($_SESSION['user_id'])) {
+        $response['message'] = 'Authentication error. Please log in again.';
+        echo json_encode($response);
+        exit();
+    }
+    $ajaxUserId = $_SESSION['user_id'];
+
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $setting = $_POST['setting'] ?? '';
+    $value = ($_POST['value'] ?? 'false') === 'true' ? 1 : 0; // Convert JS boolean string to 1/0
+
+    // Whitelist of allowed settings to prevent arbitrary column updates
+    $allowed_settings = ['email_notifications', 'sms_notifications', 'marketing_communications'];
+
+    if (in_array($setting, $allowed_settings)) {
+        // Use "upsert" logic since user_profiles might not exist
+        $check_profile_query = "SELECT id FROM user_profiles WHERE user_id = :user_id";
+        $check_stmt = $db->prepare($check_profile_query);
+        $check_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+        $check_stmt->execute();
+        $profile_exists = $check_stmt->fetch();
+
+        $query = $profile_exists ? "UPDATE user_profiles SET `$setting` = :value WHERE user_id = :user_id" : "INSERT INTO user_profiles (user_id, `$setting`) VALUES (:user_id, :value)";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':value', $value, PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            $response['success'] = true;
+            $response['message'] = 'Preference updated.';
+        } else {
+            $response['message'] = 'Failed to update preference.';
+        }
+    } else {
+        $response['message'] = 'Invalid preference setting.';
+    }
+
+    echo json_encode($response);
+    exit();
+}
+
+// --- END AJAX HANDLERS ---
 
 // Get user data
 $database = new Database();
@@ -34,103 +235,106 @@ $query = "SELECT u.*, up.*
 $stmt = $db->prepare($query);
 $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
-$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$user_data) {
-    // Include header so the nav loads, then show a helpful message
-    require_once '../includes/header.php';
-    echo '<div class="container" style="margin-top:2rem;">';
-    echo '<div class="alert alert-error">User profile not found. Please contact support.</div>';
-    echo '</div>';
-    require_once '../includes/footer.php';
-    error_log('pages/profile.php: no user data for user_id ' . ($userId ?? 'N/A'));
-    exit();
-}
-
-// Get user orders count
-$orders_query = "SELECT COUNT(*) as order_count FROM orders WHERE customer_id = :user_id";
-$orders_stmt = $db->prepare($orders_query);
-$orders_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-$orders_stmt->execute();
-$orders_count = $orders_stmt->fetch(PDO::FETCH_ASSOC)['order_count'];
 
 // Process profile update
 $success_message = '';
 $error_message = '';
 
-// Handle AJAX avatar upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_avatar'])) {
-    header('Content-Type: application/json');
-    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
+// Handle standard form submission for profile info
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $address = trim($_POST['address'] ?? '');
+    $city = trim($_POST['city'] ?? '');
+    $state = trim($_POST['state'] ?? '');
+    $country = trim($_POST['country'] ?? '');
+    $zip_code = trim($_POST['zip_code'] ?? '');
 
-    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == UPLOAD_ERR_OK) {
-        $upload_result = uploadFile($_FILES['avatar'], USER_UPLOAD_PATH);
-        
-        if ($upload_result['success']) {
-            $avatar_filename = $upload_result['file_name'];
-            
-            $update_avatar_query = "UPDATE user_profiles SET avatar = :avatar WHERE user_id = :user_id";
-            $update_avatar_stmt = $db->prepare($update_avatar_query);
-            $update_avatar_stmt->bindParam(':avatar', $avatar_filename);
-            $update_avatar_stmt->bindParam(':user_id', $userId);
-            
-            if ($update_avatar_stmt->execute()) {
-                $_SESSION['avatar'] = $avatar_filename;
-                $response['success'] = true;
-                $response['message'] = 'Avatar updated successfully!';
-                $response['file_name'] = $avatar_filename;
-            } else {
-                $response['message'] = 'Failed to update avatar in the database.';
-            }
+    try {
+        // Check if a profile record exists to decide between INSERT and UPDATE
+        $check_profile_query = "SELECT id FROM user_profiles WHERE user_id = :user_id";
+        $check_stmt = $db->prepare($check_profile_query);
+        $check_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $check_stmt->execute();
+        $profile_exists = $check_stmt->fetch();
+
+        if ($profile_exists) {
+            $query = "UPDATE user_profiles SET first_name = :first_name, last_name = :last_name, phone = :phone, address = :address, city = :city, state = :state, country = :country, zip_code = :zip_code WHERE user_id = :user_id";
         } else {
-            $response['message'] = $upload_result['message'];
+            $query = "INSERT INTO user_profiles (user_id, first_name, last_name, phone, address, city, state, country, zip_code) VALUES (:user_id, :first_name, :last_name, :phone, :address, :city, :state, :country, :zip_code)";
         }
-    } else {
-        $response['message'] = 'No file was uploaded or an upload error occurred.';
+        
+        $update_stmt = $db->prepare($query);
+        $update_stmt->bindParam(':first_name', $first_name);
+        $update_stmt->bindParam(':last_name', $last_name);
+        $update_stmt->bindParam(':phone', $phone);
+        $update_stmt->bindParam(':address', $address);
+        $update_stmt->bindParam(':city', $city);
+        $update_stmt->bindParam(':state', $state);
+        $update_stmt->bindParam(':country', $country);
+        $update_stmt->bindParam(':zip_code', $zip_code);
+        $update_stmt->bindParam(':user_id', $userId);
+
+        if ($update_stmt->execute()) {
+            $success_message = 'Profile updated successfully!';
+            // Refresh data
+            $stmt->execute();
+            $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Update session variable to reflect the name change in the header
+            $_SESSION['username'] = !empty($user_data['first_name']) ? $user_data['first_name'] : $user_data['username'];
+        } else {
+            $error_message = 'Failed to update profile. Please try again.';
+        }
+    } catch (Exception $e) {
+        $error_message = 'Error updating profile: ' . $e->getMessage();
     }
-    
-    echo json_encode($response);
+}
+
+// --- PAGE LOGIC ---
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header('Location: ' . BASE_URL . 'pages/login.php');
     exit();
 }
 
-// Handle standard form submission for profile info
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-    if (isset($_POST['update_profile'])) {
-        $first_name = trim($_POST['first_name'] ?? '');
-        $last_name = trim($_POST['last_name'] ?? '');
-        $phone = trim($_POST['phone'] ?? '');
-        $address = trim($_POST['address'] ?? '');
-        $city = trim($_POST['city'] ?? '');
-        $state = trim($_POST['state'] ?? '');
-        $country = trim($_POST['country'] ?? '');
-        $zip_code = trim($_POST['zip_code'] ?? '');
-
-        try {
-            $update_query = "UPDATE user_profiles SET first_name = :first_name, last_name = :last_name, phone = :phone, address = :address, city = :city, state = :state, country = :country, zip_code = :zip_code WHERE user_id = :user_id";
-            $update_stmt = $db->prepare($update_query);
-            $update_stmt->bindParam(':first_name', $first_name);
-            $update_stmt->bindParam(':last_name', $last_name);
-            $update_stmt->bindParam(':phone', $phone);
-            $update_stmt->bindParam(':address', $address);
-            $update_stmt->bindParam(':city', $city);
-            $update_stmt->bindParam(':state', $state);
-            $update_stmt->bindParam(':country', $country);
-            $update_stmt->bindParam(':zip_code', $zip_code);
-            $update_stmt->bindParam(':user_id', $userId);
-
-            if ($update_stmt->execute()) {
-                $success_message = 'Profile updated successfully!';
-                $stmt->execute();
-                $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-                // Update session variable to reflect the name change in the header
-                $_SESSION['username'] = $user_data['first_name'];
-            } else {
-                $error_message = 'Failed to update profile. Please try again.';
-            }
-        } catch (Exception $e) {
-            $error_message = 'Error updating profile: ' . $e->getMessage();
-        }
-    }
+// If the logged-in user is a vendor, redirect to vendor profile
+if (isset($_SESSION['user_type']) && strtolower($_SESSION['user_type']) === 'vendor') {
+    header('Location: ' . BASE_URL . 'vendor/profile.php');
+    exit();
 }
+
+$userId = $_SESSION['user_id'];
+
+// Get user data for display
+$stmt->execute(); // Re-execute to get fresh data after potential update
+$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user_data) {
+    // This case is unlikely if the user is logged in, but it's a good safeguard.
+    require_once '../includes/header.php';
+    echo '<div class="container" style="margin-top:2rem;"><div class="alert alert-danger">Could not load user profile. Please try again later or contact support.</div></div>';
+    require_once '../includes/footer.php';
+    error_log('CRITICAL: User profile data not found for logged-in user_id: ' . $userId);
+    exit();
+}
+
+// Get user stats for the profile card
+$orders_stmt = $db->prepare("SELECT COUNT(*) FROM orders WHERE customer_id = :user_id");
+$orders_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$orders_stmt->execute();
+$orders_count = $orders_stmt->fetchColumn();
+
+$reviews_stmt = $db->prepare("SELECT COUNT(*) FROM reviews WHERE user_id = :user_id AND status = 'approved'");
+$reviews_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$reviews_stmt->execute();
+$reviews_count = $reviews_stmt->fetchColumn();
+
+$wishlist_stmt = $db->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = :user_id");
+$wishlist_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+$wishlist_stmt->execute();
+$wishlist_count = $wishlist_stmt->fetchColumn();
 
 // Include header
 require_once '../includes/header.php';
@@ -156,7 +360,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                                     <img src="<?php echo BASE_URL . 'uploads/users/' . htmlspecialchars($user_data['avatar']); ?>" alt="User Avatar" class="avatar-image">
                                 <?php else: ?>
                                     <div class="avatar-placeholder">
-                                        <?php echo strtoupper(substr($user_data['username'], 0, 1)); ?>
+                                        <?php echo strtoupper(substr($user_data['username'] ?? 'U', 0, 1)); ?>
                                     </div>
                                 <?php endif; ?>
                                 <div class="avatar-upload-btn"><i class="fas fa-camera"></i></div>
@@ -166,12 +370,27 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                         </div>
                     </form>
                     <div class="profile-info">
-                        <h2><?php echo htmlspecialchars($user_data['first_name'] . ' ' . $user_data['last_name']); ?></h2>
+                        <h2><?php echo htmlspecialchars(trim($user_data['first_name'] . ' ' . $user_data['last_name'])) ?: htmlspecialchars($user_data['username']); ?></h2>
                         <p class="profile-email"><?php echo htmlspecialchars($user_data['email']); ?></p>
                         <p class="profile-member">Member since <?php echo date('M Y', strtotime($user_data['created_at'])); ?></p>
                     </div>
                 </div>
                 
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-number"><?php echo $orders_count; ?></div>
+                        <div class="stat-label">Orders</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number"><?php echo $reviews_count; ?></div>
+                        <div class="stat-label">Reviews</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number"><?php echo $wishlist_count; ?></div>
+                        <div class="stat-label">Wishlist</div>
+                    </div>
+                </div>
+
                 <nav class="profile-nav">
                     <a href="<?php echo BASE_URL; ?>pages/profile.php" class="nav-item active">
                         <i class="fas fa-user"></i>
@@ -374,223 +593,145 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
 </div>
 
 <script>
-// Professional form validation and submission handling
+// --- Password Modal ---
+// Make functions global so the onclick attribute can find them
+function openPasswordModal() {
+    const modal = document.getElementById('passwordModal');
+    if (modal) modal.classList.add('show');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Password Modal ---
-    const passwordModal = document.getElementById('passwordModal');
-    const openModalBtn = document.querySelector('button[onclick="openPasswordModal()"]');
-    const closeModalBtn = document.getElementById('passwordModalClose');
-    const cancelModalBtn = document.getElementById('passwordModalCancel');
+    /**
+     * Initializes all interactive components on the profile page.
+     */
+    function initProfilePage() {
 
-    const openPasswordModal = () => passwordModal.classList.add('show');
-    const closePasswordModal = () => passwordModal.classList.remove('show');
+        // --- Password Modal ---
+        function initPasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            if (!modal) return;
 
-    if (openModalBtn) openModalBtn.addEventListener('click', openPasswordModal);
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closePasswordModal);
-    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closePasswordModal);
-    if (passwordModal) {
-        passwordModal.addEventListener('click', (e) => {
-            if (e.target === passwordModal) closePasswordModal();
-        });
-    }
+            const form = document.getElementById('passwordChangeForm');
+            const closeBtn = document.getElementById('passwordModalClose');
+            const cancelBtn = document.getElementById('passwordModalCancel');
 
-    // --- Avatar Auto-Upload ---
-    const avatarInput = document.getElementById('avatar-upload-input');
-    if (avatarInput) {
-        avatarInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
+            window.closePasswordModal = () => modal.classList.remove('show');
+
+            closeBtn.addEventListener('click', window.closePasswordModal);
+            cancelBtn.addEventListener('click', window.closePasswordModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) window.closePasswordModal();
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const submitButton = form.querySelector('button[type="submit"]');
+                const messageContainer = document.getElementById('password-modal-messages');
+                const formData = new FormData(form);
+                formData.append('change_password_ajax', '1');
+
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="loading"></span> Updating...';
+                messageContainer.innerHTML = '';
+
+                fetch(window.location.href, { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        const alertClass = data.success ? 'alert-success' : 'alert-error';
+                        messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
+                        if (data.success) {
+                            form.reset();
+                            setTimeout(() => {
+                                window.closePasswordModal();
+                                messageContainer.innerHTML = '';
+                            }, 2000);
+                        }
+                    })
+                    .catch(error => {
+                        messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred.</div>`;
+                        console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = 'Update Password';
+                    });
+            });
+        }
+
+        // --- Avatar Auto-Upload ---
+        function initAvatarUpload() {
+            const avatarInput = document.getElementById('avatar-upload-input');
+            if (!avatarInput) return;
+
+            avatarInput.addEventListener('change', function() {
+                if (!this.files || this.files.length === 0) return;
+
                 const avatarContainer = document.querySelector('.profile-avatar');
                 const formData = new FormData(document.getElementById('avatarForm'));
                 
                 avatarContainer.classList.add('uploading');
 
-                fetch('profile.php', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const newAvatarUrl = '<?php echo BASE_URL; ?>uploads/users/' + data.file_name;
-                        const cacheBuster = '?t=' + new Date().getTime();
-
-                        // Update profile page avatar
-                        const profileImg = document.querySelector('.avatar-image');
-                        if (profileImg) {
-                            profileImg.src = newAvatarUrl + cacheBuster;
-                        } else {
-                            const placeholder = document.querySelector('.avatar-placeholder');
-                            if (placeholder) {
-                                const newImg = document.createElement('img');
-                                newImg.src = newAvatarUrl;
-                                newImg.alt = 'User Avatar';
-                                newImg.className = 'avatar-image';
-                                placeholder.replaceWith(newImg);
-                            }
+                fetch(window.location.href, { method: 'POST', body: formData })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
-
-                        // Update header avatar
-                        const headerAvatar = document.querySelector('.header-avatar');
-                        if (headerAvatar) {
-                            headerAvatar.src = newAvatarUrl + cacheBuster;
+                        const contentType = response.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            return response.json();
                         } else {
-                            const headerPlaceholder = document.querySelector('.header-avatar-placeholder');
-                            if (headerPlaceholder) {
-                                const newHeaderImg = document.createElement('img');
-                                newHeaderImg.src = newAvatarUrl;
-                                newHeaderImg.alt = 'Profile';
-                                newHeaderImg.className = 'header-avatar';
-                                headerPlaceholder.replaceWith(newHeaderImg);
-                            }
+                            return response.text().then(text => { 
+                                throw new Error("Server did not return JSON. Response: " + text);
+                            });
                         }
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            const newAvatarUrl = '<?php echo BASE_URL; ?>uploads/users/' + data.file_name;
+                            const cacheBuster = '?t=' + new Date().getTime();
+                            const finalUrl = newAvatarUrl + cacheBuster;
 
-                        showNotification('Avatar updated successfully!', 'success');
-                    } else {
-                        showNotification(data.message || 'An error occurred during upload.', 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('A network error occurred. Please try again.', 'error');
-                    console.error('Upload Error:', error);
-                })
-                .finally(() => {
-                    avatarContainer.classList.remove('uploading');
-                });
-            }
-        });
-    }
+                            const preloader = new Image();
+                            preloader.onload = () => {
+                                const headerAvatar = document.querySelector('.header-avatar, .header-avatar-placeholder');
+                                if (headerAvatar) {
+                                    const newHeader = preloader.cloneNode();
+                                    newHeader.className = headerAvatar.className.replace('-placeholder', '');
+                                    headerAvatar.replaceWith(newHeader);
+                                }
 
-    // --- Password Change Form ---
-    const passwordForm = document.getElementById('passwordChangeForm');
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = this;
-            const submitButton = form.querySelector('button[type="submit"]');
-            const messageContainer = document.getElementById('password-modal-messages');
-
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span class="loading"></span> Updating...';
-            messageContainer.innerHTML = '';
-
-            const formData = new FormData(form);
-            formData.append('change_password_ajax', '1');
-
-            fetch('profile.php', { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                const alertClass = data.success ? 'alert-success' : 'alert-error';
-                messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
-                
-                if (data.success) {
-                    form.reset();
-                    setTimeout(() => {
-                        closePasswordModal();
-                        messageContainer.innerHTML = '';
-                    }, 2000);
-                }
-            })
-            .catch(error => {
-                messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred. Please try again.</div>`;
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                submitButton.disabled = false;
-                submitButton.innerHTML = 'Update Password';
+                                const profileAvatar = document.querySelector('.avatar-image, .avatar-placeholder');
+                                if (profileAvatar) {
+                                    const newProfile = preloader.cloneNode();
+                                    newProfile.className = profileAvatar.className.replace('-placeholder', '');
+                                    profileAvatar.replaceWith(newProfile);
+                                }
+                                showNotification('Avatar updated successfully!', 'success');
+                            };
+                            preloader.onerror = () => showNotification('Failed to load the new avatar image.', 'error');
+                            preloader.src = finalUrl;
+                        } else {
+                            showNotification(data.message || 'An error occurred during upload.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showNotification('A network error occurred. Please try again.', 'error');
+                        console.error('Upload Error:', error);
+                    })
+                    .finally(() => {
+                        avatarContainer.classList.remove('uploading');
+                    });
             });
-        });
-    }
-
-    // --- Toggle Switches ---
-    document.querySelectorAll('.toggle-input').forEach(toggle => {
-        if (toggle.disabled) return;
-
-        toggle.addEventListener('change', function() {
-            const settingId = this.id;
-            const isChecked = this.checked;
-            const preferenceItem = this.closest('.preference-item, .security-item');
-            const statusSpan = preferenceItem ? preferenceItem.querySelector('.preference-status') : null;
-
-            if (statusSpan) {
-                statusSpan.textContent = 'Saving...';
-                statusSpan.style.color = 'var(--text-light)';
-            }
-
-            const formData = new FormData();
-            formData.append('update_preferences_ajax', '1');
-            formData.append('setting', settingId);
-            formData.append('value', isChecked);
-
-            fetch('profile.php', { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                if (statusSpan) {
-                    if (data.success) {
-                        statusSpan.textContent = 'Saved!';
-                        statusSpan.style.color = 'var(--success-color)';
-                    } else {
-                        statusSpan.textContent = 'Error';
-                        statusSpan.style.color = 'var(--danger-color)';
-                    }
-                    setTimeout(() => { statusSpan.textContent = ''; }, 2000);
-                }
-            })
-            .catch(error => {
-                if (statusSpan) { statusSpan.textContent = 'Error'; statusSpan.style.color = 'var(--danger-color)'; }
-                console.error('Error:', error);
-            });
-        });
-    });
-
-    // --- Profile Info Form ---
-    const profileForm = document.querySelector('.profile-form');
-    if (!profileForm) return;
-
-    profileForm.addEventListener('submit', function(e) {
-        const form = this;
-        const submitButton = form.querySelector('button[name="update_profile"]');
-        const requiredFields = form.querySelectorAll('[required]');
-        let isValid = true;
-
-        // Clear previous client-side errors
-        const existingError = form.parentElement.querySelector('.client-side-error');
-        if (existingError) {
-            existingError.remove();
         }
 
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                field.style.borderColor = 'var(--danger-color)';
-                isValid = false;
-            } else {
-                field.style.borderColor = ''; // Reset border color
-            }
-        });
+        // --- Initialize all components ---
+        initPasswordModal();
+        initAvatarUpload();
+        // Add other initializations here if needed (e.g., for preference toggles)
+    }
 
-        if (!isValid) {
-            e.preventDefault();
-            
-            // Create and display a professional error message
-            const errorMessageDiv = document.createElement('div');
-            errorMessageDiv.className = 'alert alert-error client-side-error';
-            errorMessageDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
-            
-            // Insert the message before the form
-            form.parentElement.insertBefore(errorMessageDiv, form);
-            errorMessageDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            // If form is valid, show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span class="loading"></span> Saving...';
-        }
-    });
-    
-    const resetButton = profileForm.querySelector('button[type="reset"]');
-    if (resetButton) {
-        resetButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to discard your changes? This cannot be undone.')) {
-                profileForm.reset(); // Manually trigger the form reset if confirmed
-            }
-        });
-    });
+    // Run the initializer
+    initProfilePage();
 });
 </script>
 

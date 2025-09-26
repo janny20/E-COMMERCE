@@ -1,5 +1,9 @@
 <?php
 // vendor/dashboard.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/middleware.php';
 requireVendor();
@@ -46,7 +50,7 @@ $stmt->execute([$vendor_id]);
 $pending_count = $stmt->fetchColumn();
 
 // total earnings (sum of amounts in vendor_earnings)
-$stmt = $db->prepare("SELECT COALESCE(SUM(amount),0) FROM vendor_earnings WHERE vendor_id = ?");
+$stmt = $db->prepare("SELECT COALESCE(SUM(net_earning), 0) FROM vendor_earnings WHERE vendor_id = ?");
 $stmt->execute([$vendor_id]);
 $total_earnings = $stmt->fetchColumn();
 ?>

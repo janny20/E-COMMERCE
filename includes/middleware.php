@@ -1,6 +1,8 @@
 <?php
 // includes/middleware.php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function isLoggedIn(): bool {
     return !empty($_SESSION['user_id']);

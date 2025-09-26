@@ -1,0 +1,25 @@
+/*
+* ===================================================================
+* WISHLIST BUTTON STYLES
+* ===================================================================
+*/
+
+.wishlist-btn,
+.btn-wishlist {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.2s ease;
+}
+
+.wishlist-btn:hover,
+.btn-wishlist:hover {
+    color: var(--danger-color);
+}
+
+.wishlist-btn.active i,
+.btn-wishlist.active i {
+    color: var(--danger-color);
+    font-weight: 900; /* This makes 'far' look like 'fas' */
+}

@@ -52,6 +52,13 @@
     border: 1px solid var(--border-color);
     border-radius: 5px;
     min-width: 250px;
+    transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 .filter-select {

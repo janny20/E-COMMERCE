@@ -41,16 +41,16 @@ class Auth {
         } catch(PDOException $e) {
             $this->conn->rollBack();
             error_log("Registration error: " . $e->getMessage());
-            echo "Registration error: " . $e->getMessage(); // Show error for debugging
         }
         return false;
     }
     
     // Login user
     public function login($email, $password) {
-        $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name 
+        $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name, v.business_name
                   FROM users u
                   LEFT JOIN user_profiles up ON u.id = up.user_id
+                  LEFT JOIN vendors v ON u.id = v.user_id
                   WHERE u.email = :email";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":email", $email);
@@ -60,10 +60,16 @@ class Auth {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if(password_verify($password, $row['password'])) {
                 $_SESSION['user_id'] = $row['id'];
-                // Use first name for display if available, otherwise username
-                $_SESSION['username'] = !empty($row['first_name']) ? $row['first_name'] : $row['username'];
                 $_SESSION['user_type'] = $row['user_type'];
                 $_SESSION['avatar'] = $row['avatar']; // Can be null
+
+                // Set display name based on user type
+                if ($row['user_type'] === 'vendor' && !empty($row['business_name'])) {
+                    $_SESSION['username'] = $row['business_name'];
+                } else {
+                    // For customer, admin, or vendor without a business name yet
+                    $_SESSION['username'] = !empty($row['first_name']) ? $row['first_name'] : $row['username'];
+                }
                 return true;
             }
         }

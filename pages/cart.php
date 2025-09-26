@@ -1,10 +1,10 @@
 <?php
-// Include config
-require_once '../includes/config.php';
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Include config
+require_once '../includes/config.php';
 
 // Establish database connection early so it's available for the whole page
 $database = new Database();

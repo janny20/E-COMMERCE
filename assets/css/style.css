@@ -34,6 +34,7 @@
 @import url('pages/vendor-earnings.css');
 @import url('pages/vendor-profile.css');
 @import url('pages/vendor-products.css');
+@import url('pages/vendor-product-form.css');
 /* ... other imports ... */
 
 /* Auth styles are now loaded separately per page */
@@ -51,7 +52,8 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Apply the custom font with sensible fallbacks for system UIs */
+    font-family: 'MTN Brighter Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
@@ -79,6 +81,87 @@ body {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Main Navigation Bar */
+.main-nav {
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    padding: 0 var(--spacing-md);
+    display: none; /* Hidden by default, shown on larger screens */
+}
+
+@media (min-width: 993px) {
+    .main-nav {
+        display: block;
+    }
+}
+
+.main-nav .container {
+    display: flex;
+    justify-content: center;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu li {
+    position: relative;
+}
+
+.nav-menu li a {
+    display: block;
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.2s, background-color 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-menu li a:hover,
+.nav-menu li.active > a {
+    color: var(--primary-color);
+    background-color: var(--bg-light);
+}
+
+.nav-menu li.active > a {
+    border-bottom-color: var(--primary-color);
+}
+
+/* Dropdown */
+.nav-menu .dropdown .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--bg-white);
+    min-width: 220px;
+    box-shadow: var(--shadow-md);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    z-index: 1000;
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0;
+}
+
+.nav-menu .dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    padding: 0.75rem 1.25rem;
+    border-bottom: none !important;
+}
+
+.dropdown-content a.active {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    font-weight: 600;
 }
 
 /* Notification styles */
@@ -466,5 +549,4 @@ body {
         flex-direction: column;
         gap: var(--spacing-md);
     }
-}
 }

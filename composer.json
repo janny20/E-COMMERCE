@@ -1,5 +1,5 @@
 {
-  "name": "multi-vendor-ecommerce",
+  "name": "mvplatform/multi-vendor-ecommerce",
   "description": "A PHP-based multi-vendor ecommerce platform.",
   "require": {}
 }
