@@ -1,0 +1,14 @@
+# .htaccess for URL rewriting and security
+Options -Indexes
+RewriteEngine On
+
+# Set landing.php as the default directory index (FIRST priority)
+DirectoryIndex landing.php index.php
+
+# Redirect root to landing.php
+RewriteRule ^$ landing.php [L]
+
+# Existing URL rewriting rules for non-existent files/directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
