@@ -49,6 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(":email", $email);
         $stmt->execute();
         
+<<<<<<< HEAD
+        if ($stmt->rowCount() > 0) {
+            $error = 'Email already exists. Please use a different email.';
+=======
         $email_exists = $stmt->rowCount() > 0;
 
         $query = "SELECT id FROM users WHERE username = :username";
@@ -61,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = 'Email already exists. Please use a different email.';
         } elseif ($username_exists) {
             $error = 'Username is already taken. Please choose a different one.';
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         } else {
             // Additional data for vendors
             $additional_data = [];
@@ -111,6 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="../assets/css/pages/auth.css">
     <!-- Add FontAwesome CDN for icons if not present -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
+=======
     <style>
         #password-strength-meter {
             margin-top: 8px;
@@ -136,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             transition: color 0.3s ease;
         }
     </style>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 </head>
 <body class="register-page">
     <div class="auth-container">
@@ -187,12 +195,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <i class="fas fa-eye"></i>
                                 </span>
                             </div>
+<<<<<<< HEAD
+                            <div class="form-hint">Must be at least 6 characters.</div>
+=======
                             <div id="password-strength-meter">
                                 <div class="strength-bar-container">
                                     <div class="strength-bar"></div>
                                 </div>
                                 <div class="strength-text"></div>
                             </div>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </div>
                         <div class="auth-form-group">
                             <label class="auth-form-label" for="user_type">Account Type *</label>
@@ -239,6 +251,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             businessInput.removeAttribute('required');
             businessInput.value = '';
         }
+<<<<<<< HEAD
+    });
+    // Show/hide password toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const pwd = document.getElementById('password');
+        const icon = this.querySelector('i');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            pwd.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+=======
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -321,6 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 strengthText.textContent = result.text;
                 strengthText.style.color = result.color;
             });
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         }
     });
     </script>

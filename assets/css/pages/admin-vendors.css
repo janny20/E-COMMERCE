@@ -1,3 +1,244 @@
 /* Admin Vendors Page CSS */
 
+<<<<<<< HEAD
+/* Container and Header */
+.admin-vendors-container {
+    padding: 32px;
+    margin-left: 260px;
+    max-width: 1400px;
+}
+
+.admin-vendors-header {
+    margin-bottom: 32px;
+}
+
+.admin-vendors-header h1 {
+    font-size: 2.2rem;
+    color: #222;
+    font-weight: 700;
+}
+
+.admin-vendors-header p {
+    color: #555;
+    font-size: 1.1rem;
+}
+
+/* Card Layout */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* Filter Form */
+.filter-form .filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.filter-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.filter-form select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    min-width: 200px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Vendors Table */
+.card-body .vendors-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.vendors-table th, .vendors-table td {
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.vendors-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: #444;
+}
+
+.vendors-table tr:hover {
+    background: #f4f6fb;
+}
+
+.vendor-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vendor-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+}
+
+.text-muted {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.status-approved { background: rgba(40,167,69,0.15); color: #218838; }
+.status-badge.status-pending { background: rgba(255,193,7,0.15); color: #b08800; }
+.status-badge.status-rejected { background: rgba(220,53,69,0.15); color: #c82333; }
+.status-badge.status-suspended { background: rgba(108,117,125,0.15); color: #5a6268; }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Action Buttons from components/buttons.css but scoped for this page */
+.action-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.action-buttons .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+}
+
+.action-buttons .btn-success { background: var(--success, #28a745); color: #fff; }
+.action-buttons .btn-success:hover { background: #218838; }
+
+.action-buttons .btn-info { background: var(--info, #17a2b8); color: #fff; }
+.action-buttons .btn-info:hover { background: #138496; }
+
+.action-buttons .btn-warning { background: var(--warning, #ffc107); color: #212529; }
+.action-buttons .btn-warning:hover { background: #e0a800; }
+
+.action-buttons .btn-delete { background: var(--danger, #dc3545); color: #fff; }
+.action-buttons .btn-delete:hover { background: #c82333; }
+
+.action-buttons .btn i {
+    margin-right: 4px;
+}
+/* Responsive Table */
+@media (max-width: 900px) {
+    .admin-vendors-container {
+        padding: 16px;
+        margin-left: 0;
+        margin-top: 60px;
+    }
+
+    .vendors-table {
+        display: block;
+        width: 100%;
+    }
+
+    .vendors-table thead { display: none; }
+    .vendors-table tbody, .vendors-table tr, .vendors-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .vendors-table tr {
+        background: #fff;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border-radius: 10px;
+        padding: 10px;
+        border-bottom: none;
+    }
+
+    .vendors-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align items to the top for better readability */
+        padding: 12px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: right; /* Align content to the right */
+    }
+
+    .vendors-table td:last-child { border-bottom: none; }
+
+    .vendors-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+        margin-right: 10px;
+        min-width: 110px; /* Give labels a bit more space */
+        text-align: left; /* Align labels to the left */
+    }
+
+    .action-buttons {
+        flex-direction: column; /* Stack buttons vertically */
+        width: 100%;
+        align-items: stretch; /* Make buttons full-width */
+        margin-top: 8px;
+    }
+}
+=======
 /* Add your styles for admin-vendors.php here */
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b

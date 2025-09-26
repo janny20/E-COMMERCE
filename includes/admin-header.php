@@ -1,5 +1,20 @@
 <?php
 // Admin header file
+<<<<<<< HEAD
+// Start session if not already started to ensure session variables are available
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Robust check to ensure admin is logged in on every admin page load
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    // Use an absolute path to prevent "Not Found" errors. Assumes BASE_URL is defined in config.
+    // The config file should be included before this header.
+    header('Location: /multi-vendor-ecommerce/admin/login.php');
+    exit();
+}
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 ?>
 <!DOCTYPE html>
 <html lang="en">

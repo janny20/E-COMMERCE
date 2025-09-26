@@ -1,0 +1,110 @@
+/* --- Professional Admin Details Page --- */
+.admin-details-container {
+    padding: 32px;
+    margin-left: 260px;
+    max-width: 900px;
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.details-header h1 {
+    font-size: 2.2rem;
+    color: #222;
+    font-weight: 700;
+}
+
+.details-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    overflow: hidden;
+}
+
+.details-card .card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.details-card .card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.details-card .card-body {
+    padding: 24px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.detail-item {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary, #ff9900);
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    color: #212529;
+    word-break: break-word;
+}
+
+/* Re-using status badge styles */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.status-badge.status-active { background: rgba(40,167,69,0.15); color: #218838; }
+.status-badge.status-inactive { background: rgba(220,53,69,0.15); color: #c82333; }
+.status-badge.status-unknown { background: rgba(108,117,125,0.15); color: #5a6268; }
+
+/* Re-using user type badge styles */
+.badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.badge-customer { background: rgba(0, 123, 255, 0.1); color: #004085; }
+.badge-vendor { background: rgba(255, 193, 7, 0.15); color: #b08800; }
+.badge-admin { background: rgba(40, 167, 69, 0.15); color: #218838; }
+
+@media (max-width: 900px) {
+    .admin-details-container {
+        margin-left: 0;
+        padding: 16px;
+        margin-top: 60px;
+    }
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}

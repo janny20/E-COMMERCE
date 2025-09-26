@@ -1,14 +1,20 @@
 <?php
+<<<<<<< HEAD
+// Include config
+=======
 // Start session first
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 // Then include config
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 require_once '../includes/config.php';
 
 // Get category filter
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 $search_query = isset($_GET['q']) ? $_GET['q'] : '';
+<<<<<<< HEAD
+=======
 $sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $min_price = isset($_GET['min_price']) && is_numeric($_GET['min_price']) ? (float)$_GET['min_price'] : null;
 $max_price = isset($_GET['max_price']) && is_numeric($_GET['max_price']) ? (float)$_GET['max_price'] : null;
@@ -18,11 +24,16 @@ $offset = ($page - 1) * $limit;
 
 // Get wishlist IDs for the current user to show correct heart icon status
 $wishlist_ids = [];
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
 // Get products with filters
 $database = new Database();
 $db = $database->getConnection();
 
+<<<<<<< HEAD
+// Build query based on filters
+$query = "SELECT p.*, v.business_name, c.name as category_name 
+=======
 // Get current category details for the header
 $current_category = null;
 if (!empty($category_filter)) {
@@ -33,6 +44,7 @@ if (!empty($category_filter)) {
 
 // Build query based on filters
 $query = "SELECT SQL_CALC_FOUND_ROWS p.*, v.business_name, c.name as category_name
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
           FROM products p 
           JOIN vendors v ON p.vendor_id = v.id 
           JOIN categories c ON p.category_id = c.id 
@@ -50,6 +62,9 @@ if (!empty($search_query)) {
     $params[':search'] = "%$search_query%";
 }
 
+<<<<<<< HEAD
+$query .= " ORDER BY p.created_at DESC";
+=======
 if ($min_price !== null) {
     $query .= " AND p.price >= :min_price";
     $params[':min_price'] = $min_price;
@@ -77,11 +92,17 @@ switch ($sort_by) {
 }
 
 $query .= " LIMIT :limit OFFSET :offset";
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
 $stmt = $db->prepare($query);
 foreach ($params as $key => $value) {
     $stmt->bindValue($key, $value);
 }
+<<<<<<< HEAD
+$stmt->execute();
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+=======
 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
@@ -95,6 +116,7 @@ if ($isLoggedIn) {
     $wishlist_ids = getWishlistProductIds($db, $userId);
 }
 
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Get all categories for filter
 $category_query = "SELECT id, name, slug FROM categories WHERE parent_id IS NULL ORDER BY name";
 $category_stmt = $db->prepare($category_query);
@@ -102,14 +124,77 @@ $category_stmt->execute();
 $categories = $category_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $page_title = "Products";
+<<<<<<< HEAD
+if (!empty($category_filter)) {
+    $page_title = ucfirst($category_filter) . " Products";
+=======
 if ($current_category) {
     $page_title = $current_category['name'];
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 } elseif (!empty($search_query)) {
     $page_title = "Search Results for: " . htmlspecialchars($search_query);
 }
 
 // Include header
 
+<<<<<<< HEAD
+// Set up user session and info for header nav
+require_once '../includes/auth.php';
+$isLoggedIn = false;
+$username = '';
+$userType = '';
+$cartCount = 0;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (isset($_SESSION['user_id'])) {
+    $isLoggedIn = true;
+    $user_id = $_SESSION['user_id'];
+    // Get user info
+    $auth = new Auth();
+    $user = $auth->getUserData($user_id);
+    if ($user) {
+        $username = $user['email'];
+        $userType = $user['user_type'];
+    }
+    // Get cart count
+    if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+        $cartCount = count($_SESSION['cart']);
+    }
+}
+
+require_once '../includes/header.php';
+// Add products-specific CSS
+echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/products.css">';
+?>
+
+<nav class="main-nav customer-nav">
+    <div class="container">
+        <ul class="nav-menu">
+            <li><a href="<?php echo BASE_URL; ?>pages/home.php">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/products.php">All Products</a></li>
+            <li class="dropdown">
+                <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<a href="' . BASE_URL . 'pages/products.php?category=' . htmlspecialchars($category['slug']) . '">' . htmlspecialchars($category['name']) . '</a>';
+                    }
+                    ?>
+                </div>
+            </li>
+            <li><a href="#">Today's Deals</a></li>
+            <li><a href="<?php echo BASE_URL; ?>pages/login.php?type=vendor">Become a Vendor</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="products-page">
+    <div class="container">
+        <div class="products-header">
+            <h1 class="products-title"><?php echo $page_title; ?></h1>
+            <p class="products-meta">Showing <?php echo count($products); ?> products</p>
+=======
 require_once '../includes/header.php';
 // Add products-specific CSS
 echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/products.css">';
@@ -129,6 +214,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
                     Showing <?php echo count($products); ?> of <?php echo $total_count; ?> product<?php echo ($total_count != 1) ? 's' : ''; ?>
                 </p>
             </div>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         </div>
 
         <div class="products-toolbar">
@@ -138,11 +224,19 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
             
             <div class="products-sort">
                 <label>Sort by:</label>
+<<<<<<< HEAD
+                <select class="form-select">
+                    <option value="newest">Newest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+=======
                 <select id="sort-select" class="form-select">
                     <option value="newest" <?php echo $sort_by === 'newest' ? 'selected' : ''; ?>>Newest First</option>
                     <option value="price-low" <?php echo $sort_by === 'price-low' ? 'selected' : ''; ?>>Price: Low to High</option>
                     <option value="price-high" <?php echo $sort_by === 'price-high' ? 'selected' : ''; ?>>Price: High to Low</option>
                     <option value="rating" <?php echo $sort_by === 'rating' ? 'selected' : ''; ?>>Highest Rated</option>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 </select>
             </div>
 
@@ -164,11 +258,16 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
                 </div>
 
                 <div class="filter-section">
+<<<<<<< HEAD
+                    <h4 class="filter-section-title">Categories</h4>
+                    <div class="filter-options">
+=======
                     <h4 class="filter-section-title">
                         <span>Categories</span>
                         <button class="filter-toggle-btn"><i class="fas fa-chevron-down"></i></button>
                     </h4>
                     <div class="filter-options" style="max-height: 500px;">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         <div class="filter-option">
                             <input type="radio" id="category-all" name="category" value="" checked>
                             <label for="category-all">All Categories</label>
@@ -183,6 +282,14 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
                 </div>
 
                 <div class="filter-section">
+<<<<<<< HEAD
+                    <h4 class="filter-section-title">Price Range</h4>
+                    <div class="filter-price">
+                        <input type="range" class="price-range" min="0" max="1000" step="10">
+                        <div class="price-values">
+                            <span>$0</span>
+                            <span>$1000</span>
+=======
                     <h4 class="filter-section-title">
                         <span>Price Range</span>
                         <button class="filter-toggle-btn"><i class="fas fa-chevron-down"></i></button>
@@ -192,19 +299,79 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
                             <input type="number" id="min_price" name="min_price" placeholder="Min" value="<?php echo $min_price !== null ? htmlspecialchars($min_price) : ''; ?>" min="0">
                             <span>-</span>
                             <input type="number" id="max_price" name="max_price" placeholder="Max" value="<?php echo $max_price !== null ? htmlspecialchars($max_price) : ''; ?>" min="0">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </div>
                     </div>
                 </div>
 
                 <div class="filter-actions">
+<<<<<<< HEAD
+                    <button class="btn btn-primary">Apply Filters</button>
+                    <button class="btn btn-outline">Reset</button>
+=======
                     <button class="btn btn-primary" id="apply-filters-btn">Apply Filters</button>
                     <button class="btn btn-outline" id="reset-filters-btn">Reset</button>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 </div>
             </div>
 
             <div class="products-main">
                 <?php if (!empty($products)): ?>
                     <div class="products-grid-view" id="products-view">
+<<<<<<< HEAD
+                        <?php foreach ($products as $product): ?>
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <img src="../assets/images/products/<?php echo !empty($product['images']) ? explode(',', $product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image">
+                                    <div class="product-overlay">
+                                        <button class="quick-view-btn">Quick View</button>
+                                        <button class="wishlist-btn">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                    <?php if ($product['is_featured']): ?>
+                                        <div class="product-badge">Featured</div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">
+                                        <a href="product-detail.php?id=<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['name']); ?></a>
+                                    </h3>
+                                    <div class="product-price">
+                                        $<?php echo number_format($product['price'], 2); ?>
+                                        <?php if ($product['compare_price']): ?>
+                                            <span class="product-old-price">$<?php echo number_format($product['compare_price'], 2); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="product-vendor">By: <?php echo htmlspecialchars($product['business_name']); ?></div>
+                                    <div class="product-category">Category: <?php echo htmlspecialchars($product['category_name']); ?></div>
+                                    <div class="product-rating">
+                                        <?php
+                                        $rating = rand(3, 5);
+                                        for ($i = 0; $i < 5; $i++) {
+                                            if ($i < $rating) {
+                                                echo '<i class="fas fa-star"></i>';
+                                            } else {
+                                                echo '<i class="far fa-star"></i>';
+                                            }
+                                        }
+                                        ?>
+                                        <span>(<?php echo rand(10, 300); ?>)</span>
+                                    </div>
+                                    <button class="add-to-cart-btn">Add to Cart</button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="pagination">
+                        <a href="#" class="pagination-item disabled">&laquo;</a>
+                        <a href="#" class="pagination-item active">1</a>
+                        <a href="#" class="pagination-item">2</a>
+                        <a href="#" class="pagination-item">3</a>
+                        <a href="#" class="pagination-item">&raquo;</a>
+                    </div>
+=======
                         <div class="products-grid">
                             <?php foreach ($products as $product) {
                                 include '../includes/product-card.php';
@@ -231,6 +398,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 <?php else: ?>
                     <div class="products-empty">
                         <div class="products-empty-icon">
@@ -248,6 +416,8 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/home.css">';
 
 <div class="sidebar-overlay"></div>
 
+<<<<<<< HEAD
+=======
 <?php
 // Helper function to generate pagination links for this page
 function getPageLink($page_num) {
@@ -257,6 +427,7 @@ function getPageLink($page_num) {
 }
 ?>
 
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Toggle sidebar
@@ -280,6 +451,11 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.classList.remove('open');
     });
 
+<<<<<<< HEAD
+    // View toggle
+    const viewOptions = document.querySelectorAll('.view-option');
+    const productsView = document.getElementById('products-view');
+=======
     // Filter accordion
     document.querySelectorAll('.filter-section-title').forEach(title => {
         title.addEventListener('click', function() {
@@ -290,13 +466,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // View toggle
     const viewOptions = document.querySelectorAll('.view-option');
     const productsGrid = document.querySelector('.products-grid');
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
     viewOptions.forEach(option => {
         option.addEventListener('click', function() {
             viewOptions.forEach(opt => opt.classList.remove('active'));
             this.classList.add('active');
+<<<<<<< HEAD
+            
+            if (this.dataset.view === 'grid') {
+                productsView.classList.remove('list-view');
+                productsView.classList.add('grid-view');
+            } else {
+                productsView.classList.remove('grid-view');
+                productsView.classList.add('list-view');
+=======
             if (productsGrid) {
                 productsGrid.className = 'products-grid ' + this.dataset.view + '-view';
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             }
         });
     });
@@ -304,6 +491,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Category filter
     const categoryRadios = document.querySelectorAll('input[name="category"]');
     categoryRadios.forEach(radio => {
+<<<<<<< HEAD
+        radio.addEventListener('change', function() {
+            if (this.value) {
+                window.location.href = `products.php?category=${this.value}`;
+            } else {
+                window.location.href = 'products.php';
+            }
+        });
+    });
+=======
         radio.addEventListener('change', applyProductFilters);
     });
 
@@ -341,6 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
         params.delete('page'); // Reset to first page when filters change
         window.location.href = `products.php?${params.toString()}`;
     }
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 });
 </script>
 

@@ -1,9 +1,12 @@
 <?php
 // vendor/settings.php
+<<<<<<< HEAD
+=======
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/middleware.php';
 requireVendor();

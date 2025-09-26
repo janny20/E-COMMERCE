@@ -26,7 +26,10 @@
     border-top-right-radius: 18px;
     border-bottom-right-radius: 18px;
 }
+<<<<<<< HEAD
+=======
 }
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 .navbar-nav::-webkit-scrollbar {
     width: 6px;
     background: #e67e22;

@@ -2,6 +2,15 @@
 // Include config
 require_once '../includes/config.php';
 
+<<<<<<< HEAD
+// Check if user is logged in
+if (!$isLoggedIn) {
+    header('Location: login.php');
+    exit();
+}
+
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Get cart items
 $database = new Database();
 $db = $database->getConnection();
@@ -17,12 +26,15 @@ $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $stmt->execute();
 $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
+=======
 // Check if user is logged in, redirect if not
 if (!$isLoggedIn) {
     header('Location: login.php?redirect=checkout.php');
     exit();
 }
 
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Redirect if cart is empty
 if (empty($cart_items)) {
     header('Location: cart.php');
@@ -50,6 +62,70 @@ $user_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $user_stmt->execute();
 $user_data = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
+<<<<<<< HEAD
+// Process checkout form
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Validate and process order
+    $payment_method = $_POST['payment_method'] ?? '';
+    $shipping_address = $_POST['shipping_address'] ?? '';
+    
+    if (!empty($payment_method) && !empty($shipping_address)) {
+        // Create order
+        $order_number = 'ORD' . strtoupper(uniqid());
+        
+        $order_query = "INSERT INTO orders 
+                       (order_number, customer_id, total_amount, tax_amount, shipping_amount, 
+                        shipping_address, payment_method, payment_status) 
+                       VALUES 
+                       (:order_number, :customer_id, :total_amount, :tax_amount, :shipping_amount,
+                        :shipping_address, :payment_method, 'pending')";
+        
+        $order_stmt = $db->prepare($order_query);
+        $order_stmt->bindParam(':order_number', $order_number);
+        $order_stmt->bindParam(':customer_id', $userId);
+        $order_stmt->bindParam(':total_amount', $total);
+        $order_stmt->bindParam(':tax_amount', $tax);
+        $order_stmt->bindParam(':shipping_amount', $shipping);
+        $order_stmt->bindParam(':shipping_address', $shipping_address);
+        $order_stmt->bindParam(':payment_method', $payment_method);
+        
+        if ($order_stmt->execute()) {
+            $order_id = $db->lastInsertId();
+            
+            // Create order items
+            foreach ($cart_items as $item) {
+                $item_total = $item['price'] * $item['quantity'];
+                
+                $order_item_query = "INSERT INTO order_items 
+                                   (order_id, product_id, vendor_id, quantity, price, total) 
+                                   VALUES 
+                                   (:order_id, :product_id, :vendor_id, :quantity, :price, :total)";
+                
+                $order_item_stmt = $db->prepare($order_item_query);
+                $order_item_stmt->bindParam(':order_id', $order_id);
+                $order_item_stmt->bindParam(':product_id', $item['product_id']);
+                $order_item_stmt->bindParam(':vendor_id', $item['vendor_id']);
+                $order_item_stmt->bindParam(':quantity', $item['quantity']);
+                $order_item_stmt->bindParam(':price', $item['price']);
+                $order_item_stmt->bindParam(':total', $item_total);
+                $order_item_stmt->execute();
+            }
+            
+            // Clear cart
+            $clear_cart_query = "DELETE FROM cart WHERE user_id = :user_id";
+            $clear_cart_stmt = $db->prepare($clear_cart_query);
+            $clear_cart_stmt->bindParam(':user_id', $userId);
+            $clear_cart_stmt->execute();
+            
+            // Redirect to success page
+            header('Location: order-success.php?order_id=' . $order_id);
+            exit();
+        }
+    }
+}
+
+=======
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Include header
 require_once '../includes/header.php';
 
@@ -77,6 +153,9 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
             </div>
         </div>
 
+<<<<<<< HEAD
+        <form method="POST" class="checkout-form">
+=======
         <?php if (isset($_SESSION['checkout_error'])): ?>
             <div class="alert alert-error" style="margin-bottom: 1rem;">
                 <?php echo htmlspecialchars($_SESSION['checkout_error']); unset($_SESSION['checkout_error']); ?>
@@ -84,6 +163,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
         <?php endif; ?>
 
         <form method="POST" action="<?php echo BASE_URL; ?>pages/process_payment.php" class="checkout-form" id="checkout-form">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             <div class="checkout-content">
                 <div class="checkout-main">
                     <div class="checkout-section">
@@ -177,6 +257,8 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 </div>
                                 
                                 <div class="payment-method">
+<<<<<<< HEAD
+=======
                                     <input type="radio" id="payment_momo" name="payment_method" value="mobile_money">
                                     <label for="payment_momo">
                                         <i class="fas fa-mobile-alt"></i>
@@ -199,6 +281,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 </div>
                                 
                                 <div class="payment-method">
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                     <input type="radio" id="payment_paypal" name="payment_method" value="paypal">
                                     <label for="payment_paypal">
                                         <i class="fab fa-paypal"></i>
@@ -359,7 +442,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const placeOrderBtn = document.querySelector('.btn-place-order');
     
     checkoutForm.addEventListener('submit', function(e) {
+<<<<<<< HEAD
+        e.preventDefault();
+=======
         // The form will be submitted after validation, so we only prevent it if invalid.
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         
         // Basic validation
         let isValid = true;
@@ -368,15 +455,28 @@ document.addEventListener('DOMContentLoaded', function() {
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.style.borderColor = 'var(--danger-color)';
+<<<<<<< HEAD
+                isValid = false;
+=======
                 // Only mark as invalid if the field is visible
                 if (field.offsetParent !== null) {
                     isValid = false;
                 }
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             } else {
                 field.style.borderColor = '';
             }
         });
         
+<<<<<<< HEAD
+        if (isValid) {
+            // Show loading state
+            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            placeOrderBtn.disabled = true;
+            
+            // Submit form
+            this.submit();
+=======
         if (!isValid) {
             e.preventDefault(); // Stop form submission
             alert('Please fill in all required fields.');
@@ -384,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // If form is valid, show loading state
             placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             placeOrderBtn.disabled = true;
+>>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         }
     });
     
