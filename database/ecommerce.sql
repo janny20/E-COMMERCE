@@ -9,10 +9,6 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     user_type ENUM('customer', 'vendor', 'admin') DEFAULT 'customer',
-<<<<<<< HEAD
-    status ENUM('active', 'inactive', 'pending', 'deleted') DEFAULT 'active',
-=======
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     reset_token VARCHAR(255) DEFAULT NULL,
     reset_token_expires_at DATETIME DEFAULT NULL,
     last_reset_request_at DATETIME DEFAULT NULL,
@@ -49,11 +45,7 @@ CREATE TABLE vendors (
     business_address TEXT,
     business_phone VARCHAR(20),
     business_email VARCHAR(100),
-<<<<<<< HEAD
-    status ENUM('pending', 'approved', 'rejected', 'suspended') DEFAULT 'pending',
-=======
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -143,27 +135,6 @@ CREATE TABLE order_items (
     FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE SET NULL
 );
 
-<<<<<<< HEAD
--- Vendor Earnings table
-CREATE TABLE vendor_earnings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_id INT NOT NULL,
-    order_id INT NOT NULL,
-    order_item_id INT NOT NULL,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    commission_rate DECIMAL(5, 2) NOT NULL,
-    commission_amount DECIMAL(10, 2) NOT NULL,
-    net_earnings DECIMAL(10, 2) NOT NULL,
-    status ENUM('pending', 'paid', 'cancelled') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (vendor_id) REFERENCES vendors(id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (order_item_id) REFERENCES order_items(id) ON DELETE CASCADE
-);
-
-=======
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 -- Cart table
 CREATE TABLE cart (
     id INT AUTO_INCREMENT PRIMARY KEY,

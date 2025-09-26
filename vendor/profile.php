@@ -14,8 +14,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'vendor') {
 // Include config
 require_once '../includes/config.php';
 
-<<<<<<< HEAD
-=======
 // Handle AJAX logo upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_logo'])) {
     header('Content-Type: application/json');
@@ -168,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password_ajax'
     exit();
 }
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Get vendor data
 $database = new Database();
 $db = $database->getConnection();
@@ -194,25 +191,18 @@ if (!$vendor || !isset($vendor['id'])) {
 }
 
 // Process form submission
-<<<<<<< HEAD
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-=======
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vendor_profile'])) {
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     $business_name = trim($_POST['business_name']);
     $business_description = trim($_POST['business_description']);
     $business_address = trim($_POST['business_address']);
     $business_phone = trim($_POST['business_phone']);
     $support_email = trim($_POST['support_email']);
-<<<<<<< HEAD
-=======
     
     // New store settings
     $store_status = trim($_POST['store_status']);
     $processing_time = trim($_POST['processing_time']);
     $shipping_policy = trim($_POST['shipping_policy']);
     $return_policy = trim($_POST['return_policy']);
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
     $update_query = "UPDATE vendors SET 
                     business_name = :business_name,
@@ -220,13 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vendor_profile'
                     business_address = :business_address,
                     business_phone = :business_phone,
                     support_email = :support_email,
-<<<<<<< HEAD
-=======
                     store_status = :store_status,
                     processing_time = :processing_time,
                     shipping_policy = :shipping_policy,
                     return_policy = :return_policy,
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                     updated_at = NOW()
                     WHERE user_id = :user_id";
 
@@ -236,13 +223,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vendor_profile'
     $stmt->bindParam(':business_address', $business_address);
     $stmt->bindParam(':business_phone', $business_phone);
     $stmt->bindParam(':support_email', $support_email);
-<<<<<<< HEAD
-=======
     $stmt->bindParam(':store_status', $store_status);
     $stmt->bindParam(':processing_time', $processing_time);
     $stmt->bindParam(':shipping_policy', $shipping_policy);
     $stmt->bindParam(':return_policy', $return_policy);
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     $stmt->bindParam(':user_id', $_SESSION['user_id']);
 
     if ($stmt->execute()) {
@@ -252,12 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vendor_profile'
         $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
         $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
-<<<<<<< HEAD
-=======
 
         // Update session username to reflect the change immediately
         $_SESSION['username'] = $business_name;
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     } else {
         $error = "Failed to update profile. Please try again.";
     }
@@ -267,8 +248,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_vendor_profile'
 require_once '../includes/header.php';
 ?>
 
-<<<<<<< HEAD
-=======
 <!-- Add profile-specific CSS for consistency -->
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/profile.css">
 <style>
@@ -326,7 +305,6 @@ require_once '../includes/header.php';
     .banner-preview.uploading::before { content: ''; position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; margin-top: -20px; margin-left: -20px; border: 4px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; z-index: 11; }
 </style>
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 <div class="vendor-profile">
     <div class="container">
         <div class="profile-header">
@@ -347,15 +325,6 @@ require_once '../includes/header.php';
         <?php endif; ?>
 
         <div class="profile-card">
-<<<<<<< HEAD
-            <div class="profile-avatar">
-                <img src="<?php echo BASE_URL; ?>assets/images/vendors/<?php echo $vendor['business_logo'] ?: 'default-logo.png'; ?>" alt="<?php echo htmlspecialchars($vendor['business_name']); ?>" class="avatar-image">
-                <label for="logo-upload" class="avatar-upload">
-                    <i class="fas fa-camera"></i>
-                    <input type="file" id="logo-upload" accept="image/*" style="display: none;">
-                </label>
-            </div>
-=======
             <form id="logoForm" method="POST" enctype="multipart/form-data">
                 <div class="profile-avatar">
                     <label for="logo-upload" class="avatar-upload-label" title="Change business logo">
@@ -366,7 +335,6 @@ require_once '../includes/header.php';
                     <input type="hidden" name="update_logo" value="1">
                 </div>
             </form>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             
             <div class="profile-info">
                 <h2 class="profile-name"><?php echo htmlspecialchars($vendor['business_name']); ?></h2>
@@ -407,8 +375,6 @@ require_once '../includes/header.php';
             </div>
         </div>
 
-<<<<<<< HEAD
-=======
         <div class="banner-upload-section">
             <h3>Store Banner</h3>
             <p>This image will appear at the top of your public store page. Recommended size: 1200x400 pixels.</p>
@@ -424,7 +390,6 @@ require_once '../includes/header.php';
             </form>
         </div>
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         <form method="POST" class="profile-form">
             <div class="form-section">
                 <h3 class="section-title">Business Information</h3>
@@ -457,8 +422,6 @@ require_once '../includes/header.php';
             </div>
 
             <div class="form-section">
-<<<<<<< HEAD
-=======
                 <h3 class="section-title">Security</h3>
                 <div class="security-settings">
                     <div class="security-item">
@@ -474,111 +437,57 @@ require_once '../includes/header.php';
             </div>
 
             <div class="form-section">
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 <h3 class="section-title">Store Settings</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Store Status</label>
-<<<<<<< HEAD
-                        <select class="form-control">
-                            <option value="open" selected>Open</option>
-                            <option value="closed">Closed</option>
-                            <option value="vacation">On Vacation</option>
-=======
                         <select name="store_status" class="form-control">
                             <option value="open" <?php echo ($vendor['store_status'] ?? 'open') == 'open' ? 'selected' : ''; ?>>Open</option>
                             <option value="closed" <?php echo ($vendor['store_status'] ?? '') == 'closed' ? 'selected' : ''; ?>>Closed</option>
                             <option value="vacation" <?php echo ($vendor['store_status'] ?? '') == 'vacation' ? 'selected' : ''; ?>>On Vacation</option>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Order Processing Time</label>
-<<<<<<< HEAD
-                        <select class="form-control">
-                            <option value="1">1 Business Day</option>
-                            <option value="2">2 Business Days</option>
-                            <option value="3">3 Business Days</option>
-                            <option value="5">5 Business Days</option>
-=======
                         <select name="processing_time" class="form-control">
                             <option value="1" <?php echo ($vendor['processing_time'] ?? '') == '1' ? 'selected' : ''; ?>>1 Business Day</option>
                             <option value="2" <?php echo ($vendor['processing_time'] ?? '') == '2' ? 'selected' : ''; ?>>2 Business Days</option>
                             <option value="3" <?php echo ($vendor['processing_time'] ?? '') == '3' ? 'selected' : ''; ?>>3 Business Days</option>
                             <option value="5" <?php echo ($vendor['processing_time'] ?? '') == '5' ? 'selected' : ''; ?>>5 Business Days</option>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Shipping Policy</label>
-<<<<<<< HEAD
-                        <select class="form-control">
-                            <option value="free">Free Shipping</option>
-                            <option value="flat">Flat Rate</option>
-                            <option value="calculated">Calculated</option>
-=======
                         <select name="shipping_policy" class="form-control">
                             <option value="free" <?php echo ($vendor['shipping_policy'] ?? '') == 'free' ? 'selected' : ''; ?>>Free Shipping</option>
                             <option value="flat" <?php echo ($vendor['shipping_policy'] ?? '') == 'flat' ? 'selected' : ''; ?>>Flat Rate</option>
                             <option value="calculated" <?php echo ($vendor['shipping_policy'] ?? '') == 'calculated' ? 'selected' : ''; ?>>Calculated</option>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Return Policy</label>
-<<<<<<< HEAD
-                        <select class="form-control">
-                            <option value="30">30 Days Return</option>
-                            <option value="14">14 Days Return</option>
-                            <option value="7">7 Days Return</option>
-                            <option value="none">No Returns</option>
-=======
                         <select name="return_policy" class="form-control">
                             <option value="30" <?php echo ($vendor['return_policy'] ?? '') == '30' ? 'selected' : ''; ?>>30 Days Return</option>
                             <option value="14" <?php echo ($vendor['return_policy'] ?? '') == '14' ? 'selected' : ''; ?>>14 Days Return</option>
                             <option value="7" <?php echo ($vendor['return_policy'] ?? '') == '7' ? 'selected' : ''; ?>>7 Days Return</option>
                             <option value="none" <?php echo ($vendor['return_policy'] ?? '') == 'none' ? 'selected' : ''; ?>>No Returns</option>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </select>
                     </div>
                 </div>
             </div>
 
             <div class="form-actions">
-<<<<<<< HEAD
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-=======
                 <input type="hidden" name="update_vendor_profile" value="1">
                 <button type="submit" class="btn btn-primary">Save All Changes</button>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 <button type="reset" class="btn btn-outline">Reset</button>
             </div>
         </form>
     </div>
 </div>
 
-<<<<<<< HEAD
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Logo upload functionality
-    const logoUpload = document.getElementById('logo-upload');
-    const avatarImage = document.querySelector('.avatar-image');
-    
-    logoUpload.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                avatarImage.src = e.target.result;
-                // Here you would typically upload the image to the server
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-=======
 <!-- Password Modal -->
 <div class="modal" id="passwordModal">
     <div class="modal-content">
@@ -749,7 +658,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 });
 </script>
 

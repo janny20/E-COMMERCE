@@ -1,0 +1,2 @@
+<?php
+// Vendor registration page

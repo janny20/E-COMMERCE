@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 window.addEventListener('load', function() {
     const preloader = document.getElementById('preloader');
     if (preloader) {
@@ -8,7 +6,6 @@ window.addEventListener('load', function() {
     }
 });
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 document.addEventListener('DOMContentLoaded', function() {
     const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
     const mobileNavClose = document.querySelector('.mobile-nav-close');
@@ -21,10 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function openNav() {
         lastFocusedElement = document.activeElement; // Store focus before opening
         mobileNavContainer.classList.add('open');
-<<<<<<< HEAD
-=======
         mobileNavToggle.classList.add('is-active');
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         navOverlay.classList.add('open');
         document.body.style.overflow = 'hidden'; // Prevent background scroll
 
@@ -40,10 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeNav() {
         mobileNavContainer.classList.remove('open');
-<<<<<<< HEAD
-=======
         mobileNavToggle.classList.remove('is-active');
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         navOverlay.classList.remove('open');
         document.body.style.overflow = ''; // Restore background scroll
         document.removeEventListener('keydown', trapFocus);
@@ -105,28 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-<<<<<<< HEAD
-    // Back to Top Button
-    const backToTopBtn = document.querySelector('.back-to-top-btn');
-
-    if (backToTopBtn) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        });
-
-        backToTopBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-=======
     // Initialize Back to Top Button
     initBackToTopButton();
 
@@ -138,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Vendor Order Status functionality
     initVendorOrderStatus();
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
     // Initialize Cookie Consent
     initCookieConsent();
@@ -181,8 +149,6 @@ function hideNotification(notification) {
     }, 300);
 }
 
-<<<<<<< HEAD
-=======
 // Helper function to update wishlist page after an item is removed
 function updateWishlistStatus() {
     if (!document.body.querySelector('.wishlist-page')) return;
@@ -437,7 +403,6 @@ function initBackToTopButton() {
     backToTopBtn.addEventListener('click', clickHandler);
 }
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 // Cookie Consent Banner
 function initCookieConsent() {
     const banner = document.getElementById('cookie-consent-banner');

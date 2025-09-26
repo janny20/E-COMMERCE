@@ -41,21 +41,13 @@ class Auth {
         } catch(PDOException $e) {
             $this->conn->rollBack();
             error_log("Registration error: " . $e->getMessage());
-<<<<<<< HEAD
-            echo "Registration error: " . $e->getMessage(); // Show error for debugging
-=======
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         }
         return false;
     }
     
     // Login user
     public function login($email, $password) {
-<<<<<<< HEAD
-        $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name, v.id as vendor_id
-=======
         $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name, v.business_name
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                   FROM users u
                   LEFT JOIN user_profiles up ON u.id = up.user_id
                   LEFT JOIN vendors v ON u.id = v.user_id
@@ -67,18 +59,6 @@ class Auth {
         if($stmt->rowCount() == 1) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if(password_verify($password, $row['password'])) {
-<<<<<<< HEAD
-                // Clear old session to be safe
-                session_unset();
-
-                $_SESSION['user_id'] = $row['id'];
-                // Use first name for display if available, otherwise username
-                $_SESSION['username'] = !empty($row['first_name']) ? $row['first_name'] : $row['username'];
-                $_SESSION['user_type'] = $row['user_type'];
-                $_SESSION['avatar'] = $row['avatar']; // Can be null
-                if ($row['user_type'] === 'vendor' && !empty($row['vendor_id'])) {
-                    $_SESSION['vendor_id'] = $row['vendor_id'];
-=======
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['user_type'] = $row['user_type'];
                 $_SESSION['avatar'] = $row['avatar']; // Can be null
@@ -89,7 +69,6 @@ class Auth {
                 } else {
                     // For customer, admin, or vendor without a business name yet
                     $_SESSION['username'] = !empty($row['first_name']) ? $row['first_name'] : $row['username'];
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                 }
                 return true;
             }

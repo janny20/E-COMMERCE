@@ -1,12 +1,8 @@
 <?php
 // includes/middleware.php
-<<<<<<< HEAD
-session_start();
-=======
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 
 function isLoggedIn(): bool {
     return !empty($_SESSION['user_id']);
@@ -18,14 +14,8 @@ function isVendor(): bool {
 
 function requireVendor() {
     if (!isVendor()) {
-<<<<<<< HEAD
-        // If the user is not a vendor, redirect them to the main home page.
-        // This is a safe fallback for any non-vendor user.
-        header('Location: ' . BASE_URL . 'pages/home.php');
-=======
         // redirect to vendor login or main login
         header('Location: /vendor/register.php?redirected=1');
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         exit;
     }
 }

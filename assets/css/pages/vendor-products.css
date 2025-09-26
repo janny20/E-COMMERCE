@@ -52,8 +52,6 @@
     border: 1px solid var(--border-color);
     border-radius: 5px;
     min-width: 250px;
-<<<<<<< HEAD
-=======
     transition: all var(--transition-fast);
 }
 
@@ -61,7 +59,6 @@
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 }
 
 .filter-select {

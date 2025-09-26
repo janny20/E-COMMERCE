@@ -17,39 +17,6 @@ function generateSlug($text) {
 
 // Function to handle file uploads
 function uploadFile($file, $target_dir, $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp']) {
-<<<<<<< HEAD
-    // Check for upload errors first
-    if ($file['error'] !== UPLOAD_ERR_OK) {
-        // It's better to return a generic error for security, but for debugging, this is fine.
-        return ["success" => false, "message" => "File upload error code: " . $file['error']];
-    }
-
-    $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
-
-    // Check if image file is a actual image or fake image
-    $check = getimagesize($file["tmp_name"]);
-    if($check === false) {
-        return ["success" => false, "message" => "File is not an image."];
-    }
-
-    // Check file size (5MB limit)
-    if ($file["size"] > 5000000) {
-        return ["success" => false, "message" => "Sorry, your file is too large (max 5MB)."];
-    }
-
-    // Allow certain file formats
-    if(!in_array($imageFileType, $allowed_types)) {
-        return ["success" => false, "message" => "Sorry, only " . implode(', ', $allowed_types) . " files are allowed."];
-    }
-
-    // Generate a unique filename to prevent overwrites and security issues
-    $file_name = bin2hex(random_bytes(16)) . '.' . $imageFileType;
-    $target_file = rtrim($target_dir, '/') . '/' . $file_name;
-
-    // Check if target directory exists, if not, create it
-    if (!is_dir($target_dir)) {
-        if (!mkdir($target_dir, 0777, true)) {
-=======
     if ($file['error'] !== UPLOAD_ERR_OK) {
         error_log("File upload error code: " . $file['error']);
         return ["success" => false, "message" => "An unexpected error occurred during upload."];
@@ -81,20 +48,10 @@ function uploadFile($file, $target_dir, $allowed_types = ['jpg', 'jpeg', 'png', 
     // Check if target directory exists and is writable
     if (!is_dir($target_dir)) {
         if (!mkdir($target_dir, 0755, true)) {
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
             error_log("Failed to create directory: " . $target_dir);
             return ["success" => false, "message" => "Server error: Failed to create upload directory."];
         }
     }
-<<<<<<< HEAD
-
-    // Try to upload file
-    if (move_uploaded_file($file["tmp_name"], $target_file)) {
-        return ["success" => true, "file_name" => $file_name];
-    } else {
-        $error = error_get_last();
-        error_log("move_uploaded_file failed for target '$target_file': " . ($error['message'] ?? 'Unknown error'));
-=======
     if (!is_writable($target_dir)) {
         error_log("Upload directory is not writable: " . $target_dir);
         return ["success" => false, "message" => "Server configuration error: Upload directory is not writable."];
@@ -105,7 +62,6 @@ function uploadFile($file, $target_dir, $allowed_types = ['jpg', 'jpeg', 'png', 
         return ["success" => true, "file_name" => $file_name];
     } else {
         error_log("move_uploaded_file failed for target '$target_file'.");
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         return ["success" => false, "message" => "Sorry, there was a server error uploading your file."];
     }
 }
@@ -172,8 +128,6 @@ function getCartTotal($user_id) {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     return $result['total'] ?? 0;
 }
-<<<<<<< HEAD
-=======
 
 // Function to get total number of items in cart
 function getCartTotalItems($db, $user_id) {
@@ -230,5 +184,4 @@ function getTrackingUrl($carrier, $tracking_number) {
             return "https://www.google.com/search?q={$encoded_tracking}";
     }
 }
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 ?>

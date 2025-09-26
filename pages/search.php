@@ -8,10 +8,7 @@ $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 $sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'relevance';
 $min_price = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
 $max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 10000;
-<<<<<<< HEAD
-=======
 $min_rating = isset($_GET['rating']) ? intval($_GET['rating']) : 0;
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit = 12;
 $offset = ($page - 1) * $limit;
@@ -21,11 +18,7 @@ $database = new Database();
 $db = $database->getConnection();
 
 // Build query
-<<<<<<< HEAD
-$query = "SELECT SQL_CALC_FOUND_ROWS p.*, v.business_name, c.name as category_name 
-=======
 $query = "SELECT SQL_CALC_FOUND_ROWS p.*, v.business_name, c.name as category_name
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
           FROM products p 
           JOIN vendors v ON p.vendor_id = v.id 
           JOIN categories c ON p.category_id = c.id 
@@ -54,14 +47,11 @@ if ($max_price < 10000) {
     $params[':max_price'] = $max_price;
 }
 
-<<<<<<< HEAD
-=======
 if ($min_rating > 0) {
     $where_conditions[] = "p.rating >= :min_rating";
     $params[':min_rating'] = $min_rating;
 }
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 if (!empty($where_conditions)) {
     $query .= " AND " . implode(" AND ", $where_conditions);
 }
@@ -78,28 +68,18 @@ switch ($sort_by) {
         $query .= " ORDER BY p.created_at DESC";
         break;
     case 'rating':
-<<<<<<< HEAD
-        $query .= " ORDER BY p.rating DESC";
-        break;
-    default:
-=======
         $query .= " ORDER BY p.rating DESC, p.review_count DESC";
         break;
     default: // relevance
         if (!empty($search_query)) {
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         $query .= " ORDER BY 
                   (CASE 
                    WHEN p.name LIKE :search_exact THEN 1
                    WHEN p.description LIKE :search_exact THEN 2
                    ELSE 3
                    END)";
-<<<<<<< HEAD
-        $params[':search_exact'] = "$search_query%";
-=======
             $params[':search_exact'] = "$search_query%";
         }
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
         break;
 }
 
@@ -130,11 +110,8 @@ $total_pages = ceil($total_count / $limit);
 require_once '../includes/header.php';
 ?>
 
-<<<<<<< HEAD
-=======
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/home.css"> <!-- For product card styles -->
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 <div class="search-page">
     <div class="container">
         <div class="search-header">
@@ -164,20 +141,12 @@ require_once '../includes/header.php';
                         <h4>Categories</h4>
                         <div class="filter-options">
                             <div class="filter-option">
-<<<<<<< HEAD
-                                <input type="radio" id="category-all" name="category" value="" <?php echo empty($category_filter) ? 'checked' : ''; ?> onchange="updateFilters()">
-=======
                                 <input type="radio" id="category-all" name="category" value="" <?php echo empty($category_filter) ? 'checked' : ''; ?>>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                 <label for="category-all">All Categories</label>
                             </div>
                             <?php foreach ($categories as $category): ?>
                             <div class="filter-option">
-<<<<<<< HEAD
-                                <input type="radio" id="category-<?php echo $category['id']; ?>" name="category" value="<?php echo $category['slug']; ?>" <?php echo $category_filter === $category['slug'] ? 'checked' : ''; ?> onchange="updateFilters()">
-=======
                                 <input type="radio" id="category-<?php echo $category['id']; ?>" name="category" value="<?php echo $category['slug']; ?>" <?php echo $category_filter === $category['slug'] ? 'checked' : ''; ?>>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                 <label for="category-<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['name']); ?></label>
                             </div>
                             <?php endforeach; ?>
@@ -192,24 +161,12 @@ require_once '../includes/header.php';
                                 <span>-</span>
                                 <input type="number" id="max_price" name="max_price" placeholder="Max" value="<?php echo $max_price != 10000 ? $max_price : ''; ?>" min="0" max="10000">
                             </div>
-<<<<<<< HEAD
-                            <button class="btn btn-sm" onclick="updateFilters()">Apply</button>
-=======
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </div>
                     </div>
 
                     <div class="filter-group">
                         <h4>Rating</h4>
                         <div class="filter-options">
-<<<<<<< HEAD
-                            <?php for ($i = 4; $i >= 1; $i--): ?>
-                            <div class="filter-option">
-                                <input type="checkbox" id="rating-<?php echo $i; ?>" name="rating" value="<?php echo $i; ?>">
-                                <label for="rating-<?php echo $i; ?>">
-                                    <?php for ($j = 0; $j < 5; $j++): ?>
-                                    <i class="fas fa-star<?php echo $j < $i ? '' : '-o'; ?>"></i>
-=======
                             <div class="filter-option">
                                 <input type="radio" id="rating-any" name="rating" value="0" <?php echo $min_rating == 0 ? 'checked' : ''; ?>>
                                 <label for="rating-any">Any Rating</label>
@@ -220,7 +177,6 @@ require_once '../includes/header.php';
                                 <label for="rating-<?php echo $i; ?>">
                                     <?php for ($j = 0; $j < 5; $j++): ?>
                                     <i class="fas fa-star" style="color: <?php echo $j < $i ? '#ffc107' : '#e0e0e0'; ?>"></i>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                                     <?php endfor; ?>
                                     <span>& Up</span>
                                 </label>
@@ -230,11 +186,7 @@ require_once '../includes/header.php';
                     </div>
 
                     <div class="filter-actions">
-<<<<<<< HEAD
-                        <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
-=======
                         <button class="btn btn-primary" onclick="applyFilters()">Apply</button>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         <button class="btn btn-outline" onclick="resetFilters()">Reset</button>
                     </div>
                 </div>
@@ -247,11 +199,7 @@ require_once '../includes/header.php';
                     </button>
                     <div class="sort-options">
                         <label for="sort-select">Sort by:</label>
-<<<<<<< HEAD
-                        <select id="sort-select" onchange="updateSort()">
-=======
                         <select id="sort-select" onchange="applyFilters()">
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                             <option value="relevance" <?php echo $sort_by === 'relevance' ? 'selected' : ''; ?>>Relevance</option>
                             <option value="price_low" <?php echo $sort_by === 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
                             <option value="price_high" <?php echo $sort_by === 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
@@ -272,53 +220,6 @@ require_once '../includes/header.php';
                 </div>
 
                 <?php if (!empty($products)): ?>
-<<<<<<< HEAD
-                    <div class="search-results grid-view">
-                        <div class="products-grid">
-                            <?php foreach ($products as $product): ?>
-                                <div class="product-card">
-                                    <div class="product-image-container">
-                                        <img src="../assets/images/products/<?php echo !empty($product['images']) ? explode(',', $product['images'])[0] : 'default.jpg'; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image" loading="lazy" decoding="async">
-                                        <div class="product-overlay">
-                                            <button class="quick-view-btn">Quick View</button>
-                                            <button class="wishlist-btn">
-                                                <i class="far fa-heart"></i>
-                                            </button>
-                                        </div>
-                                        <?php if ($product['is_featured']): ?>
-                                            <div class="product-badge">Featured</div>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="product-info">
-                                        <h3 class="product-title">
-                                            <a href="product-detail.php?id=<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['name']); ?></a>
-                                        </h3>
-                                        <div class="product-price">
-                                            $<?php echo number_format($product['price'], 2); ?>
-                                            <?php if ($product['compare_price']): ?>
-                                                <span class="product-old-price">$<?php echo number_format($product['compare_price'], 2); ?></span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="product-vendor">By: <?php echo htmlspecialchars($product['business_name']); ?></div>
-                                        <div class="product-category"><?php echo htmlspecialchars($product['category_name']); ?></div>
-                                        <div class="product-rating">
-                                            <?php
-                                            $rating = rand(3, 5);
-                                            for ($i = 0; $i < 5; $i++) {
-                                                if ($i < $rating) {
-                                                    echo '<i class="fas fa-star"></i>';
-                                                } else {
-                                                    echo '<i class="far fa-star"></i>';
-                                                }
-                                            }
-                                            ?>
-                                            <span>(<?php echo rand(10, 300); ?>)</span>
-                                        </div>
-                                        <button class="add-to-cart-btn">Add to Cart</button>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-=======
                     <div class="products-grid-view" id="products-view">
                         <div class="products-grid grid-view">
                             <?php foreach ($products as $product) {
@@ -326,28 +227,12 @@ require_once '../includes/header.php';
                                 $is_in_wishlist = isset($wishlist_ids) && in_array($product['id'], $wishlist_ids);
                                 include '../includes/product-card.php';
                             } ?>
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                         </div>
 
                         <?php if ($total_pages > 1): ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
                                 <a href="<?php echo getPageLink($page - 1); ?>" class="pagination-item">&laquo; Previous</a>
-<<<<<<< HEAD
-                            <?php else: ?>
-                                <span class="pagination-item disabled">&laquo; Previous</span>
-                            <?php endif; ?>
-
-                            <?php for ($i = 1; $i <= min($total_pages, 5); $i++): ?>
-                                <a href="<?php echo getPageLink($i); ?>" class="pagination-item <?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                            <?php endfor; ?>
-
-                            <?php if ($total_pages > 5): ?>
-                                <span class="pagination-item">...</span>
-                                <a href="<?php echo getPageLink($total_pages); ?>" class="pagination-item"><?php echo $total_pages; ?></a>
-                            <?php endif; ?>
-
-=======
                             <?php endif; ?>
 
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
@@ -358,7 +243,6 @@ require_once '../includes/header.php';
                                 <?php endif; ?>
                             <?php endfor; ?>
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
                             <?php if ($page < $total_pages): ?>
                                 <a href="<?php echo getPageLink($page + 1); ?>" class="pagination-item">Next &raquo;</a>
                             <?php else: ?>
@@ -392,8 +276,6 @@ require_once '../includes/header.php';
 </div>
 <div class="sidebar-overlay"></div>
 
-<<<<<<< HEAD
-=======
 <!-- Quick View Modal -->
 <div class="modal quick-view-modal" id="quickViewModal">
     <div class="modal-content">
@@ -426,7 +308,6 @@ require_once '../includes/header.php';
     </div>
 </div>
 
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
 <?php
 // Helper function to generate pagination links
 function getPageLink($page_num) {
@@ -461,69 +342,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // View toggle
     const viewOptions = document.querySelectorAll('.view-option');
-<<<<<<< HEAD
-    const searchResults = document.querySelector('.search-results');
-=======
     const productsGrid = document.querySelector('.products-grid');
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
     
     viewOptions.forEach(option => {
         option.addEventListener('click', function() {
             viewOptions.forEach(opt => opt.classList.remove('active'));
             this.classList.add('active');
-<<<<<<< HEAD
-            
-            if (this.dataset.view === 'grid') {
-                searchResults.classList.remove('list-view');
-                searchResults.classList.add('grid-view');
-            } else {
-                searchResults.classList.remove('grid-view');
-                searchResults.classList.add('list-view');
-            }
-        });
-    });
-});
-
-function updateFilters() {
-    // This function would collect all filter values and update the URL
-    const category = document.querySelector('input[name="category"]:checked').value;
-    const minPrice = document.getElementById('min_price').value;
-    const maxPrice = document.getElementById('max_price').value;
-    
-    let url = `search.php?q=<?php echo urlencode($search_query); ?>`;
-    
-    if (category) url += `&category=${category}`;
-    if (minPrice) url += `&min_price=${minPrice}`;
-    if (maxPrice) url += `&max_price=${maxPrice}`;
-    
-    window.location.href = url;
-}
-
-function updateSort() {
-    const sortBy = document.getElementById('sort-select').value;
-    let url = `search.php?q=<?php echo urlencode($search_query); ?>&sort=${sortBy}`;
-    
-    <?php if (!empty($category_filter)): ?>
-    url += `&category=<?php echo $category_filter; ?>`;
-    <?php endif; ?>
-    
-    <?php if ($min_price > 0): ?>
-    url += `&min_price=<?php echo $min_price; ?>`;
-    <?php endif; ?>
-    
-    <?php if ($max_price < 10000): ?>
-    url += `&max_price=<?php echo $max_price; ?>`;
-    <?php endif; ?>
-    
-    window.location.href = url;
-}
-
-function resetFilters() {
-    window.location.href = `search.php?q=<?php echo urlencode($search_query); ?>`;
-}
-
-function applyFilters() {
-=======
             if (productsGrid) {
                 productsGrid.className = 'products-grid ' + this.dataset.view + '-view';
             }
@@ -645,4 +469,3 @@ function resetFilters() {
         window.location.href = 'search.php';
     }
 }
->>>>>>> fb15e7a04685f9c6a2c15a53b4d13a3a8944dd6b
