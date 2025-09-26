@@ -5,9 +5,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// robust pathing
+require_once __DIR__ . '/../includes/config.php';
+
 // Redirect to landing page if not logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../landing.php');
+    header('Location: ' . BASE_URL . 'landing.php');
     exit();
 }
 
@@ -21,9 +24,6 @@ if (isset($_SESSION['user_type'])) {
         exit();
     }
 }
-
-// robust pathing
-require_once __DIR__ . '/../includes/config.php';
 
 // helper for escaping
 function e($str) {
