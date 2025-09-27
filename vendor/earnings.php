@@ -17,14 +17,18 @@ $db = $database->getConnection();
 
 // Fetch summary stats
 $stats_sql = "SELECT 
-                COALESCE(SUM(net_earning), 0) as total_earnings,
-                COALESCE(SUM(CASE WHEN status = 'pending_clearance' THEN net_earning ELSE 0 END), 0) as pending_clearance,
-                COALESCE(SUM(CASE WHEN status = 'paid_out' THEN net_earning ELSE 0 END), 0) as total_paid_out
+                COALESCE(SUM(net_earning), 0) as total_earnings
               FROM vendor_earnings
               WHERE vendor_id = :vendor_id";
+// For now, pending and paid out are placeholders until a payout status system is built.
+$stats = ['pending_clearance' => 0, 'total_paid_out' => 0];
 $stats_stmt = $db->prepare($stats_sql);
 $stats_stmt->execute(['vendor_id' => $vendor_id]);
-$stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+$db_stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($db_stats) {
+    $stats = array_merge($stats, $db_stats);
+}
 
 // Fetch detailed earnings records
 $earnings_sql = "SELECT 
@@ -102,7 +106,9 @@ require_once __DIR__ . '/../includes/header.php';
                             <td>$<?php echo money($earning['item_total_amount']); ?></td>
                             <td>-$<?php echo money($earning['commission_amount']); ?> (<?php echo $earning['commission_rate'] * 100; ?>%)</td>
                             <td><strong>$<?php echo money($earning['net_earning']); ?></strong></td>
-                            <td><span class="status-badge status-<?php echo str_replace('_', '-', $earning['status']); ?>"><?php echo ucwords(str_replace('_', ' ', $earning['status'])); ?></span></td>
+                            <td>
+                                <span class="status-badge status-cleared">Cleared</span>
+                            </td>
                         </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
