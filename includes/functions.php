@@ -107,6 +107,11 @@ function getVendorName($vendor_id) {
     return 'Unknown Vendor';
 }
 
+// helper to pretty print money
+function money($amount) {
+    return number_format((float)$amount, 2);
+}
+
 // Function to generate order number
 function generateOrderNumber() {
     return 'ORD' . strtoupper(uniqid());

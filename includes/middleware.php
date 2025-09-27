@@ -20,11 +20,6 @@ function requireVendor() {
     }
 }
 
-// helper to pretty print money
-function money($amount) {
-    return number_format((float)$amount, 2);
-}
-
 // slug helper
 function slugify($text) {
     $text = preg_replace('~[^\pL\d]+~u', '-', $text);

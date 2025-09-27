@@ -49,8 +49,12 @@ $home_link = BASE_URL . 'landing.php';
 if ($isLoggedIn) {
     switch ($userType) {
         case 'admin': $home_link = BASE_URL . 'admin/admin-dashboard.php'; break;
-        case 'vendor': $home_link = BASE_URL . 'vendor/dashboard.php'; break;
-        default: $home_link = BASE_URL . 'pages/home.php'; break;
+        // For vendors and customers, the logo should link to the main homepage.
+        // Vendors can access their dashboard via the navigation links.
+        case 'vendor':
+        case 'customer':
+        default: 
+            $home_link = BASE_URL . 'pages/home.php'; break;
     }
 }
 
@@ -213,6 +217,30 @@ if ($isLoggedIn) {
                 </li>
                 <li><a href="#">Today's Deals</a></li>
                 <li><a href="<?php echo BASE_URL; ?>pages/register.php?type=vendor" class="vendor-link">Become a Vendor</a></li>
+            </ul>
+        </div>
+    </nav>
+    <?php endif; ?>
+
+    <?php if ($isVendorPage): ?>
+    <nav class="vendor-nav">
+        <div class="container">
+            <ul class="nav-menu">
+                <li class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'vendor/dashboard.php') !== false) ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>vendor/dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                </li>
+                <li class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'vendor/products.php') !== false || strpos($_SERVER['REQUEST_URI'], 'vendor/product-form.php') !== false) ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>vendor/products.php"><i class="fas fa-box-open"></i> Products</a>
+                </li>
+                <li class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'vendor/orders.php') !== false) ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>vendor/orders.php"><i class="fas fa-receipt"></i> Orders</a>
+                </li>
+                <li class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'vendor/earnings.php') !== false) ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>vendor/earnings.php"><i class="fas fa-dollar-sign"></i> Earnings</a>
+                </li>
+                <li class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'vendor/profile.php') !== false) ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>vendor/profile.php"><i class="fas fa-user-cog"></i> Store Profile</a>
+                </li>
             </ul>
         </div>
     </nav>

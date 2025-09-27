@@ -14,17 +14,6 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// If a vendor or admin lands here, redirect them to their respective dashboards
-if (isset($_SESSION['user_type'])) {
-    if ($_SESSION['user_type'] === 'vendor') {
-        header('Location: ' . BASE_URL . 'vendor/dashboard.php');
-        exit();
-    } elseif ($_SESSION['user_type'] === 'admin') {
-        header('Location: ' . BASE_URL . 'admin/admin-dashboard.php');
-        exit();
-    }
-}
-
 // helper for escaping
 function e($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');

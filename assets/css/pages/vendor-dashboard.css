@@ -1,13 +1,14 @@
 /* assets/css/pages/vendor-dashboard.css */
 .vendor-dashboard {
     padding: 2rem 0;
+    background-color: var(--bg-light);
 }
 
 .dashboard-header {
     margin-bottom: 2rem;
 }
 
-.dashboard-title {
+.dashboard-header h1 {
     font-size: 2rem;
     color: var(--text-color);
     margin-bottom: 0.5rem;
@@ -120,6 +121,16 @@
     color: var(--muted-color);
 }
 
+.chart-card {
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    padding: 1.5rem;
+}
+
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -151,4 +162,82 @@
 
 .action-label {
     font-weight: 500;
+}
+
+.quick-actions-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin-top: 2rem;
+}
+
+.quick-actions-container h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-columns {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.content-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.content-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.content-card-header h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.content-card .table-responsive {
+    overflow-x: auto;
+}
+
+.content-card .data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-light);
+}
+
+@media (max-width: 992px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        height: 250px;
+        padding: 1rem;
+    }
 }
