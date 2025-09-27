@@ -1,13 +1,5 @@
-<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-categories.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -27,6 +19,11 @@ $page_title = "Categories Management";
 
 // Handle form submission for adding/editing categories
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // CSRF check
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        die('Invalid CSRF token');
+    }
+
     $name = trim($_POST['name']);
     $description = trim($_POST['description']);
     $parent_id = !empty($_POST['parent_id']) ? $_POST['parent_id'] : NULL;
@@ -73,7 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Handle category deletion
-if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']) && isset($_GET['token'])) {
+    // CSRF check
+    if (!hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+        die('Invalid CSRF token');
+    }
+
     $category_id = $_GET['id'];
     
     // Check if category has products
@@ -111,9 +113,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
 }
 
 // Get all categories
-$query = "SELECT c1.*, c2.name as parent_name 
+$query = "SELECT c1.*, c2.name as parent_name, COUNT(p.id) as product_count
           FROM categories c1 
           LEFT JOIN categories c2 ON c1.parent_id = c2.id 
+          LEFT JOIN products p ON p.category_id = c1.id
+          GROUP BY c1.id
           ORDER BY c1.parent_id, c1.name";
 $stmt = $db->prepare($query);
 $stmt->execute();
@@ -140,6 +144,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['id'])) {
 include_once '../includes/admin-header.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <div class="admin-users-container">
     <div class="admin-users-header">
         <h1>Categories Management</h1>
@@ -163,6 +168,7 @@ include_once '../includes/admin-header.php';
                 <div class="card-body">
                     <form method="POST">
                         <?php if ($editing_category): ?>
+                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                             <input type="hidden" name="category_id" value="<?php echo $editing_category['id']; ?>">
                         <?php endif; ?>
                         
@@ -192,6 +198,7 @@ include_once '../includes/admin-header.php';
                         </div>
                         
                         <button type="submit" class="btn btn-primary">
+                            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                             <?php echo $editing_category ? 'Update Category' : 'Add Category'; ?>
                         </button>
                         
@@ -220,14 +227,7 @@ include_once '../includes/admin-header.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($categories as $category): 
-                                    // Count products in this category
-                                    $query = "SELECT COUNT(*) as product_count FROM products WHERE category_id = :category_id";
-                                    $stmt = $db->prepare($query);
-                                    $stmt->bindParam(':category_id', $category['id']);
-                                    $stmt->execute();
-                                    $product_count = $stmt->fetch(PDO::FETCH_ASSOC)['product_count'];
-                                ?>
+                                <?php foreach ($categories as $category): ?>
                                     <tr>
                                         <td>
                                             <strong><?php echo htmlspecialchars($category['name']); ?></strong>
@@ -236,11 +236,11 @@ include_once '../includes/admin-header.php';
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo $category['parent_name'] ? htmlspecialchars($category['parent_name']) : '—'; ?></td>
-                                        <td><?php echo $product_count; ?></td>
+                                        <td><?php echo $category['product_count']; ?></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="admin-categories.php?action=edit&id=<?php echo $category['id']; ?>" class="btn btn-edit">Edit</a>
-                                                <a href="admin-categories.php?action=delete&id=<?php echo $category['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
+                                                <a href="admin-categories.php?action=delete&id=<?php echo $category['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
                                             </div>
                                         </td>
                                     </tr>

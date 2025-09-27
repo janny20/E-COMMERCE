@@ -1,13 +1,5 @@
-<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-orders.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -26,7 +18,12 @@ $db = $database->getConnection();
 $page_title = "Orders Management";
 
 // Handle order status update
-if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['status'])) {
+if (isset($_GET['action']) && $_GET['id']) {
+    // CSRF check for actions
+    if (isset($_GET['token']) && !hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+        die('Invalid CSRF token');
+    }
+
     $order_id = $_GET['id'];
     $status = $_GET['status'];
     
@@ -88,6 +85,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include_once '../includes/admin-header.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <div class="admin-users-container">
     <div class="admin-users-header">
         <h1>Orders Management</h1>
@@ -183,12 +181,12 @@ include_once '../includes/admin-header.php';
                                         <div class="dropdown">
                                             <button class="btn btn-edit dropdown-toggle">Update Status</button>
                                             <div class="dropdown-content">
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=pending">Pending</a>
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=confirmed">Confirmed</a>
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=processing">Processing</a>
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=shipped">Shipped</a>
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=delivered">Delivered</a>
-                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=cancelled">Cancelled</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=pending&token=<?php echo $_SESSION['csrf_token']; ?>">Pending</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=confirmed&token=<?php echo $_SESSION['csrf_token']; ?>">Confirmed</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=processing&token=<?php echo $_SESSION['csrf_token']; ?>">Processing</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=shipped&token=<?php echo $_SESSION['csrf_token']; ?>">Shipped</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=delivered&token=<?php echo $_SESSION['csrf_token']; ?>">Delivered</a>
+                                                <a href="admin-orders.php?action=update_status&id=<?php echo $order['id']; ?>&status=cancelled&token=<?php echo $_SESSION['csrf_token']; ?>">Cancelled</a>
                                             </div>
                                         </div>
                                     </div>

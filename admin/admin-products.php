@@ -1,13 +1,5 @@
-<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-products.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -26,7 +18,12 @@ $db = $database->getConnection();
 $page_title = "Products Management";
 
 // Handle product actions (delete, toggle status)
-if (isset($_GET['action']) && isset($_GET['id'])) {
+if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['token'])) {
+    // CSRF check
+    if (!hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+        die('Invalid CSRF token');
+    }
+
     $product_id = $_GET['id'];
     $action = $_GET['action'];
     
@@ -71,6 +68,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include_once '../includes/admin-header.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <div class="admin-users-container">
     <div class="admin-users-header">
         <h1>Products Management</h1>
@@ -129,11 +127,11 @@ include_once '../includes/admin-header.php';
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="admin-product-edit.php?id=<?php echo $product['id']; ?>" class="btn btn-edit">Edit</a>
-                                        <a href="admin-products.php?action=toggle_status&id=<?php echo $product['id']; ?>" class="btn btn-edit">
+                                        <a href="admin-product-edit.php?id=<?php echo $product['id']; ?>" class="btn btn-edit btn-sm">Edit</a>
+                                        <a href="admin-products.php?action=toggle_status&id=<?php echo $product['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-warning btn-sm">
                                             <?php echo $product['status'] == 'active' ? 'Deactivate' : 'Activate'; ?>
                                         </a>
-                                        <a href="admin-products.php?action=delete&id=<?php echo $product['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                        <a href="admin-products.php?action=delete&id=<?php echo $product['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                                     </div>
                                 </td>
                             </tr>

@@ -1,12 +1,5 @@
 <?php
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-vendors.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -25,7 +18,12 @@ $db = $database->getConnection();
 $page_title = "Vendors Management";
 
 // Handle vendor actions (approve, reject, suspend)
-if (isset($_GET['action']) && isset($_GET['id'])) {
+if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['token'])) {
+    // CSRF check
+    if (!hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+        die('Invalid CSRF token');
+    }
+
     $vendor_id = $_GET['id'];
     $action = $_GET['action'];
     $valid_statuses = ['approved', 'rejected', 'suspended'];
@@ -42,7 +40,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
         // Redirect back to the referring page (dashboard or vendors list)
         $redirect_url = 'admin-vendors.php';
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'admin-dashboard.php') !== false) {
+        if (isset($_SERVER['HTTP_REFERER']) && (strpos($_SERVER['HTTP_REFERER'], 'admin-dashboard.php') !== false || strpos($_SERVER['HTTP_REFERER'], 'landing.php') !== false)) {
             $redirect_url = 'admin-dashboard.php';
         }
         header('Location: ' . $redirect_url);
@@ -159,9 +157,9 @@ include_once '../includes/admin-header.php';
                                     <td>
                                         <div class="action-buttons">
                                             <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-edit">View Details</a>
-                                            <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>" class="btn btn-success">Approve</a>
-                                            <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>" class="btn btn-danger">Reject</a>
-                                            <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>" class="btn btn-warning">Suspend</a>
+                                            <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-success">Approve</a>
+                                            <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-danger">Reject</a>
+                                            <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-warning">Suspend</a>
                                         </div>
                                     </td>
                                 </tr>

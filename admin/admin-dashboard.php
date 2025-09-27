@@ -1,13 +1,5 @@
 <?php
-// Set session cookie lifetime to 30 days for admin
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30, // 30 days
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-dashboard.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -26,28 +18,17 @@ $db = $database->getConnection();
 $stats = [];
 try {
     // Total users
-    $query = "SELECT COUNT(*) as total_users FROM users";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $stats['total_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
-
+    $stats['total_users'] = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
     // Total products
-    $query = "SELECT COUNT(*) as total_products FROM products WHERE status = 'active'";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $stats['total_products'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_products'];
-
+    $stats['total_products'] = $db->query("SELECT COUNT(*) FROM products WHERE status = 'active'")->fetchColumn();
     // Total orders
-    $query = "SELECT COUNT(*) as total_orders FROM orders";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $stats['total_orders'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_orders'];
-
+    $stats['total_orders'] = $db->query("SELECT COUNT(*) FROM orders")->fetchColumn();
     // Total vendors
-    $query = "SELECT COUNT(*) as total_vendors FROM vendors WHERE status = 'approved'";
-    $stmt = $db->prepare($query);
-    $stmt->execute();
-    $stats['total_vendors'] = $stmt->fetch(PDO::FETCH_ASSOC)['total_vendors'];
+    $stats['total_vendors'] = $db->query("SELECT COUNT(*) FROM vendors WHERE status = 'approved'")->fetchColumn();
+    // Pending vendors
+    $stats['pending_vendors'] = $db->query("SELECT COUNT(*) FROM vendors WHERE status = 'pending'")->fetchColumn();
+    // Total sales
+    $stats['total_sales'] = $db->query("SELECT SUM(total_amount) FROM orders WHERE status = 'delivered'")->fetchColumn() ?? 0;
 
     // Recent orders
     $query = "SELECT o.*, u.username 
@@ -84,23 +65,33 @@ include_once __DIR__ . '/../includes/admin-header.php';
 
 <div class="admin-container">
     <div class="admin-header">
-        <h1>Admin Dashboard</h1>
-        <p>Welcome back, <?php echo $_SESSION['username']; ?>!</p>
-        <a href="admin-profile.php" class="btn btn-admin-profile" style="margin-top:10px;display:inline-block;">
-            <i class="fas fa-user"></i> View Admin Profile
-        </a>
+        <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
+        <p>Here's a quick overview of your platform's activity.</p>
     </div>
 
     <?php if (isset($error)): ?>
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-circle"></i>
-            <?php echo $error; ?>
-        </div>
+        <div class="alert alert-error"><?php echo $error; ?></div>
     <?php endif; ?>
 
     <section class="dashboard-section">
-        <h2 class="section-title">Quick Stats</h2>
+        <h2 class="section-title">Platform Overview</h2>
         <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-info">
+                    <h3>$<?php echo number_format($stats['total_sales'], 2); ?></h3>
+                    <p>Total Revenue</p>
+                </div>
+                <a href="admin-reports.php" class="stat-link"><i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-info">
+                    <h3><?php echo $stats['total_orders']; ?></h3>
+                    <p>Total Orders</p>
+                </div>
+                <a href="admin-orders.php" class="stat-link"><i class="fas fa-arrow-right"></i></a>
+            </div>
             <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
@@ -110,28 +101,12 @@ include_once __DIR__ . '/../includes/admin-header.php';
                 <a href="admin-users.php" class="stat-link">View All</a>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-box"></i></div>
-                <div class="stat-info">
-                    <h3><?php echo $stats['total_products']; ?></h3>
-                    <p>Total Products</p>
-                </div>
-                <a href="admin-products.php" class="stat-link">View All</a>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
-                <div class="stat-info">
-                    <h3><?php echo $stats['total_orders']; ?></h3>
-                    <p>Total Orders</p>
-                </div>
-                <a href="admin-orders.php" class="stat-link">View All</a>
-            </div>
-            <div class="stat-card">
                 <div class="stat-icon"><i class="fas fa-store"></i></div>
                 <div class="stat-info">
                     <h3><?php echo $stats['total_vendors']; ?></h3>
                     <p>Approved Vendors</p>
                 </div>
-                <a href="admin-vendors.php" class="stat-link">View All</a>
+                <a href="admin-vendors.php" class="stat-link"><i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
     </section>
@@ -142,9 +117,7 @@ include_once __DIR__ . '/../includes/admin-header.php';
                 <div class="card">
                     <div class="card-header">
                         <h2>Recent Orders</h2>
-                        <a href="admin-orders.php" class="btn btn-outline btn-sm">
-                            <i class="fas fa-list"></i> View All
-                        </a>
+                        <a href="admin-orders.php" class="btn btn-outline btn-sm">View All</a>
                     </div>
                     <div class="card-body">
                         <?php if (isset($recent_orders) && !empty($recent_orders)): ?>
@@ -155,7 +128,6 @@ include_once __DIR__ . '/../includes/admin-header.php';
                                         <th>Customer</th>
                                         <th>Amount</th>
                                         <th>Status</th>
-                                        <th>Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -169,7 +141,6 @@ include_once __DIR__ . '/../includes/admin-header.php';
                                                     <?php echo ucfirst($order['status']); ?>
                                                 </span>
                                             </td>
-                                            <td><?php echo date('M j, Y', strtotime($order['created_at'])); ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -183,10 +154,8 @@ include_once __DIR__ . '/../includes/admin-header.php';
             <div class="dashboard-column">
                 <div class="card">
                     <div class="card-header">
-                        <h2>Pending Vendor Approvals</h2>
-                        <a href="admin-vendors.php" class="btn btn-outline btn-sm">
-                            <i class="fas fa-list"></i> View All
-                        </a>
+                        <h2>Pending Vendor Approvals (<?php echo $stats['pending_vendors']; ?>)</h2>
+                        <a href="admin-vendors.php?status=pending" class="btn btn-outline btn-sm">View All</a>
                     </div>
                     <div class="card-body">
                         <?php if (isset($pending_vendors) && !empty($pending_vendors)): ?>
@@ -194,18 +163,14 @@ include_once __DIR__ . '/../includes/admin-header.php';
                                 <thead>
                                     <tr>
                                         <th>Business Name</th>
-                                        <th>Owner</th>
-                                        <th>Email</th>
                                         <th>Applied On</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($pending_vendors as $vendor): ?>
-                                        <tr>
+                                        <tr id="vendor-row-<?php echo $vendor['id']; ?>">
                                             <td><strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong></td>
-                                            <td><?php echo htmlspecialchars($vendor['username']); ?></td>
-                                            <td><?php echo htmlspecialchars($vendor['email']); ?></td>
                                             <td><?php echo date('M j, Y', strtotime($vendor['created_at'])); ?></td>
                                             <td>
                                                 <div class="action-buttons">

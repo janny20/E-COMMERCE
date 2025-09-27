@@ -1,13 +1,5 @@
-<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
-session_set_cookie_params([
-    'lifetime' => 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '',
-    'secure' => false,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
+// admin-users.php
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -26,7 +18,12 @@ $db = $database->getConnection();
 $page_title = "Users Management";
 
 // Handle user actions (toggle status, delete)
-if (isset($_GET['action']) && isset($_GET['id'])) {
+if (isset($_GET['action']) && isset($_GET['id']) && isset($_GET['token'])) {
+    // CSRF check
+    if (!hash_equals($_SESSION['csrf_token'], $_GET['token'])) {
+        die('Invalid CSRF token');
+    }
+
     $user_id = $_GET['id'];
     $action = $_GET['action'];
     
@@ -87,6 +84,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 include_once '../includes/admin-header.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <div class="admin-users-container">
     <div class="admin-users-header">
         <h1>Users Management</h1>
@@ -146,10 +144,10 @@ include_once '../includes/admin-header.php';
                                 <td data-label="Actions">
                                     <div class="action-buttons">
                                         <a href="admin-user-details.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">View Details</a>
-                                        <a href="admin-users.php?action=toggle_status&id=<?php echo $user['id']; ?>" class="btn btn-edit">
+                                        <a href="admin-users.php?action=toggle_status&id=<?php echo $user['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-warning">
                                             <?php echo (isset($user['status']) && $user['status'] == 'active') ? 'Deactivate' : 'Activate'; ?>
                                         </a>
-                                        <a href="admin-users.php?action=delete&id=<?php echo $user['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                                        <a href="admin-users.php?action=delete&id=<?php echo $user['id']; ?>&token=<?php echo $_SESSION['csrf_token']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                     </div>
                                 </td>
                             </tr>

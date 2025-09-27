@@ -60,11 +60,6 @@ class Auth {
         if($stmt->rowCount() == 1) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Deny login for rejected or suspended vendors
-            if ($row['user_type'] === 'vendor' && in_array($row['vendor_status'], ['rejected', 'suspended'])) {
-                return false; // Or return a specific error message
-            }
-
             if(password_verify($password, $row['password'])) {
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['user_type'] = $row['user_type'];
