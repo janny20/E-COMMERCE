@@ -54,41 +54,51 @@ $stmt = $db->prepare("SELECT COALESCE(SUM(net_earning), 0) FROM vendor_earnings 
 $stmt->execute([$vendor_id]);
 $total_earnings = $stmt->fetchColumn();
 ?>
-<?php require_once __DIR__ . '/../includes/header.php'; ?>
+<?php 
+$page_title = "Dashboard";
+require_once __DIR__ . '/../includes/header.php'; 
+?>
 
-<div class="vendor-dashboard container">
-  <div class="dashboard-header">
-    <h1>Vendor Dashboard</h1>
-    <p>Welcome, <?=htmlspecialchars($_SESSION['username'] ?? 'Vendor')?></p>
-  </div>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/vendor-dashboard.css">
 
-  <div class="dashboard-stats">
-    <div class="stat-card">
-      <h3>Total Products</h3>
-      <p class="stat-number"><?=htmlspecialchars($products_count)?></p>
-    </div>
-    <div class="stat-card">
-      <h3>Total Orders</h3>
-      <p class="stat-number"><?=htmlspecialchars($orders_count)?></p>
-    </div>
-    <div class="stat-card">
-      <h3>Pending Orders</h3>
-      <p class="stat-number"><?=htmlspecialchars($pending_count)?></p>
-    </div>
-    <div class="stat-card">
-      <h3>Total Earnings</h3>
-      <p class="stat-number">$<?=money($total_earnings)?></p>
-    </div>
-  </div>
+<div class="vendor-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Vendor Dashboard</h1>
+            <p>Welcome back, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Vendor'); ?>!</p>
+        </div>
 
-  <nav class="vendor-nav">
-    <a href="<?php echo BASE_URL; ?>vendor/products.php">Products</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/orders.php">Orders</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/earnings.php">Earnings</a> |
-    <a href="<?php echo BASE_URL; ?>vendor/profile.php">Profile</a> |
-    <a href="<?php echo BASE_URL; ?>pages/logout.php">Logout</a>
-  </nav>
-
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($products_count); ?></p>
+                    <h3>Total Products</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($orders_count); ?></p>
+                    <h3>Total Orders</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($pending_count); ?></p>
+                    <h3>Pending Items</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number">$<?php echo money($total_earnings); ?></p>
+                    <h3>Total Earnings</h3>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
