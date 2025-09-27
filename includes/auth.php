@@ -47,7 +47,8 @@ class Auth {
     
     // Login user
     public function login($email, $password) {
-        $query = "SELECT u.id, u.username, u.password, u.user_type, up.avatar, up.first_name, v.business_name
+        $query = "SELECT u.id, u.username, u.password, u.user_type, u.status as user_status,
+                         up.avatar, up.first_name, v.id as vendor_id, v.business_name, v.status as vendor_status
                   FROM users u
                   LEFT JOIN user_profiles up ON u.id = up.user_id
                   LEFT JOIN vendors v ON u.id = v.user_id
@@ -58,10 +59,20 @@ class Auth {
         
         if($stmt->rowCount() == 1) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Deny login for rejected or suspended vendors
+            if ($row['user_type'] === 'vendor' && in_array($row['vendor_status'], ['rejected', 'suspended'])) {
+                return false; // Or return a specific error message
+            }
+
             if(password_verify($password, $row['password'])) {
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['user_type'] = $row['user_type'];
                 $_SESSION['avatar'] = $row['avatar']; // Can be null
+
+                if ($row['user_type'] === 'vendor') {
+                    $_SESSION['vendor_id'] = $row['vendor_id'];
+                }
 
                 // Set display name based on user type
                 if ($row['user_type'] === 'vendor' && !empty($row['business_name'])) {

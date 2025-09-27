@@ -1,59 +1,92 @@
-<?php
-// vendor/dashboard.php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/middleware.php';
-requireVendor();
+require_once '../includes/config.php';
 
-// Get vendor ID
-
-$vendor_id = $_SESSION['vendor_id'] ?? null;
-// Check vendor approval status
-$vendor_status = null;
-if ($vendor_id) {
-  $stmt = $db->prepare("SELECT status FROM vendors WHERE id = ?");
-  $stmt->execute([$vendor_id]);
-  $vendor_status = $stmt->fetchColumn();
-}
-if ($vendor_status !== 'approved') {
-  require_once __DIR__ . '/../includes/header.php';
-  echo '<div class="vendor-dashboard container" style="margin-top:40px;text-align:center;">';
-  echo '<h2 style="color:#d35400;">Vendor account pending...</h2>';
-  echo '<p>Your account must be approved by the admin before you can access the dashboard.</p>';
-  echo '</div>';
-  require_once __DIR__ . '/../includes/footer.php';
-  exit;
+// 1. Check if user is logged in and is a vendor
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'vendor') {
+    header('Location: ../pages/login.php?error=auth');
+    exit();
 }
 
-// Get database connection
+$user_id = $_SESSION['user_id'];
+
+// 2. Get the vendor's current status from the database
 $database = new Database();
 $db = $database->getConnection();
 
-// products count
-$stmt = $db->prepare("SELECT COUNT(*) as cnt FROM products WHERE vendor_id = ?");
-$stmt->execute([$vendor_id]);
-$products_count = $stmt->fetchColumn();
+$query = "SELECT status FROM vendors WHERE user_id = :user_id";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$vendor = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// order items count
-$stmt = $db->prepare("SELECT COUNT(DISTINCT order_id) FROM order_items WHERE vendor_id = ?");
-$stmt->execute([$vendor_id]);
-$orders_count = $stmt->fetchColumn();
+$vendor_status = $vendor ? $vendor['status'] : 'not_found';
 
-// pending items
-$stmt = $db->prepare("SELECT COUNT(*) FROM order_items oi
-                       JOIN orders o ON o.id = oi.order_id
-                       WHERE oi.vendor_id = ? AND o.status = 'pending'");
-$stmt->execute([$vendor_id]);
-$pending_count = $stmt->fetchColumn();
+// 3. Handle different statuses
+if ($vendor_status === 'rejected' || $vendor_status === 'suspended') {
+    // If they somehow have a session, destroy it and redirect to login
+    session_destroy();
+    header('Location: ../pages/login.php?error=' . $vendor_status);
+    exit();
+}
 
-// total earnings (sum of amounts in vendor_earnings)
-$stmt = $db->prepare("SELECT COALESCE(SUM(net_earning), 0) FROM vendor_earnings WHERE vendor_id = ?");
-$stmt->execute([$vendor_id]);
-$total_earnings = $stmt->fetchColumn();
+// --- If status is 'approved', show the dashboard ---
+if ($vendor_status === 'approved') {
+    // Fetch dashboard stats for approved vendors
+    // Total Products
+    $stmt = $db->prepare("SELECT COUNT(*) FROM products WHERE vendor_id = (SELECT id FROM vendors WHERE user_id = :user_id)");
+    $stmt->execute(['user_id' => $user_id]);
+    $total_products = $stmt->fetchColumn();
+
+    // Total Orders (for this vendor)
+    $stmt = $db->prepare("SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.vendor_id = (SELECT id FROM vendors WHERE user_id = :user_id)");
+    $stmt->execute(['user_id' => $user_id]);
+    $total_orders = $stmt->fetchColumn();
+
+    // Total Sales (for this vendor)
+    $stmt = $db->prepare("SELECT SUM(oi.total) FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.vendor_id = (SELECT id FROM vendors WHERE user_id = :user_id)");
+    $stmt->execute(['user_id' => $user_id]);
+    $total_sales = $stmt->fetchColumn() ?? 0;
+
+    require_once '../includes/header.php';
+    echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/vendor-dashboard.css">';
+    ?>
+    <div class="vendor-dashboard container">
+        <div class="dashboard-header">
+            <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
+            <p>Here's a summary of your store's activity.</p>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Sales</h3>
+                <p>$<?php echo number_format($total_sales, 2); ?></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <p><?php echo $total_orders; ?></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Products</h3>
+                <p><?php echo $total_products; ?></p>
+            </div>
+        </div>
+        <div class="quick-links">
+            <a href="products.php" class="btn btn-primary">Manage Products</a>
+            <a href="orders.php" class="btn btn-primary">View Orders</a>
+            <a href="profile.php" class="btn btn-outline">Edit Profile</a>
+        </div>
+    </div>
+    <?php
+    require_once '../includes/footer.php';
+    exit();
+}
+
+// --- If status is 'pending' or anything else, show a status page ---
+require_once '../includes/header.php';
 ?>
+<<<<<<< HEAD
 <?php 
 $page_title = "Dashboard";
 require_once __DIR__ . '/../includes/header.php'; 
@@ -98,7 +131,28 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
             </div>
         </div>
+=======
+<style>
+    .status-page { text-align: center; padding: 80px 20px; }
+    .status-page h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    .status-page p { font-size: 1.2rem; color: #666; margin-bottom: 2rem; }
+    .status-icon { font-size: 5rem; color: var(--primary-color); margin-bottom: 2rem; }
+</style>
+<div class="container">
+    <div class="status-page">
+        <?php if ($vendor_status === 'pending'): ?>
+            <div class="status-icon"><i class="fas fa-hourglass-half"></i></div>
+            <h1>Application Pending</h1>
+            <p>Your vendor application is currently under review. We will notify you by email once a decision has been made. Thank you for your patience.</p>
+        <?php else: ?>
+            <div class="status-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <h1>Account Issue</h1>
+            <p>There is an issue with your vendor account. Please contact support for assistance.</p>
+        <?php endif; ?>
+        <a href="<?php echo BASE_URL; ?>pages/logout.php" class="btn btn-outline">Logout</a>
+>>>>>>> 03a6e3f92aa402ee81d8999f8d4d4eabc1c67615
     </div>
 </div>
-
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<?php
+require_once '../includes/footer.php';
+?>
