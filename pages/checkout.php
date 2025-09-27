@@ -29,17 +29,9 @@ if (empty($cart_items)) {
     exit();
 }
 
-// Calculate totals
-$subtotal = 0;
-foreach ($cart_items as $item) {
-    $item_total = $item['price'] * $item['quantity'];
-    $subtotal += $item_total;
-}
-
-$shipping = $subtotal > 50 ? 0 : 5.99;
-$tax = $subtotal * 0.08;
-$total = $subtotal + $shipping + $tax;
-
+// Get cart data including totals and coupon info
+$cart_data = getCartData($db, $userId);
+$total = $cart_data['total_raw'] ?? $cart_data['total']; // Assuming getCartData provides raw total
 // Get user data
 $user_query = "SELECT u.*, up.* 
                FROM users u 
@@ -49,6 +41,12 @@ $user_stmt = $db->prepare($user_query);
 $user_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $user_stmt->execute();
 $user_data = $user_stmt->fetch(PDO::FETCH_ASSOC);
+
+// Get user's saved addresses
+$addresses_query = "SELECT * FROM user_addresses WHERE user_id = :user_id ORDER BY is_default DESC, id DESC";
+$addresses_stmt = $db->prepare($addresses_query);
+$addresses_stmt->execute(['user_id' => $userId]);
+$saved_addresses = $addresses_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Include header
 require_once '../includes/header.php';
@@ -89,103 +87,123 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                     <div class="checkout-section">
                         <h2 class="section-title">Shipping Information</h2>
                         <div class="section-content">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="first_name">First Name *</label>
-                                    <input type="text" id="first_name" name="first_name" required 
-                                           value="<?php echo htmlspecialchars($user_data['first_name'] ?? ''); ?>">
+                            <?php if (!empty($saved_addresses)): ?>
+                                <div class="address-selector">
+                                    <?php foreach ($saved_addresses as $address): ?>
+                                        <div class="address-option">
+                                            <input type="radio" name="selected_address_id" value="<?php echo $address['id']; ?>" id="address_<?php echo $address['id']; ?>" <?php echo $address['is_default'] ? 'checked' : ''; ?>>
+                                            <label for="address_<?php echo $address['id']; ?>">
+                                                <strong><?php echo htmlspecialchars($address['label'] ?: $address['full_name']); ?></strong>
+                                                <p><?php echo htmlspecialchars($address['address_line_1'] . ', ' . $address['city']); ?></p>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                    <div class="address-option">
+                                        <input type="radio" name="selected_address_id" value="new" id="address_new">
+                                        <label for="address_new">
+                                            <strong><i class="fas fa-plus"></i> Use a new address</strong>
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="last_name">Last Name *</label>
-                                    <input type="text" id="last_name" name="last_name" required 
-                                           value="<?php echo htmlspecialchars($user_data['last_name'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email Address *</label>
-                                    <input type="email" id="email" name="email" required 
-                                           value="<?php echo htmlspecialchars($user_data['email'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="phone">Phone Number *</label>
-                                    <input type="tel" id="phone" name="phone" required 
-                                           value="<?php echo htmlspecialchars($user_data['phone'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="shipping_address">Shipping Address *</label>
-                                    <textarea id="shipping_address" name="shipping_address" rows="3" required><?php echo htmlspecialchars($user_data['address'] ?? ''); ?></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="city">City *</label>
-                                    <input type="text" id="city" name="city" required 
-                                           value="<?php echo htmlspecialchars($user_data['city'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="state">State *</label>
-                                    <input type="text" id="state" name="state" required 
-                                           value="<?php echo htmlspecialchars($user_data['state'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="zip_code">ZIP Code *</label>
-                                    <input type="text" id="zip_code" name="zip_code" required 
-                                           value="<?php echo htmlspecialchars($user_data['zip_code'] ?? ''); ?>">
-                                </div>
-                                <div class="form-group">
-                                    <label for="country">Country *</label>
-                                    <select id="country" name="country" required>
-                                        <option value="">Select Country</option>
-                                        <option value="US" <?php echo ($user_data['country'] ?? '') == 'US' ? 'selected' : ''; ?>>United States</option>
-                                        <option value="UK" <?php echo ($user_data['country'] ?? '') == 'UK' ? 'selected' : ''; ?>>United Kingdom</option>
-                                        <option value="CA" <?php echo ($user_data['country'] ?? '') == 'CA' ? 'selected' : ''; ?>>Canada</option>
-                                        <option value="AU" <?php echo ($user_data['country'] ?? '') == 'AU' ? 'selected' : ''; ?>>Australia</option>
-                                        <option value="NG" <?php echo ($user_data['country'] ?? '') == 'NG' ? 'selected' : ''; ?>>Nigeria</option>
-                                    </select>
+                            <?php endif; ?>
+
+                            <div id="newAddressForm" class="<?php echo !empty($saved_addresses) ? 'hidden' : ''; ?>">
+                                <h4 class="new-address-title" style="<?php echo empty($saved_addresses) ? 'display:none;' : ''; ?>">New Address Details</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="full_name">Full Name *</label>
+                                        <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars(($user_data['first_name'] ?? '') . ' ' . ($user_data['last_name'] ?? '')); ?>" autocomplete="name">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number *</label>
+                                        <input type="tel" id="phone" name="phone" value="<?php echo htmlspecialchars($user_data['phone'] ?? ''); ?>" autocomplete="tel">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="address_line_1">Address Line 1 *</label>
+                                        <input type="text" id="address_line_1" name="address_line_1" value="<?php echo htmlspecialchars($user_data['address'] ?? ''); ?>" autocomplete="street-address">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city">City *</label>
+                                        <input type="text" id="city" name="city" value="<?php echo htmlspecialchars($user_data['city'] ?? ''); ?>" autocomplete="address-level2">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="state">State *</label>
+                                        <input type="text" id="state" name="state" value="<?php echo htmlspecialchars($user_data['state'] ?? ''); ?>" autocomplete="address-level1">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="zip_code">ZIP Code *</label>
+                                        <input type="text" id="zip_code" name="zip_code" value="<?php echo htmlspecialchars($user_data['zip_code'] ?? ''); ?>" autocomplete="postal-code">
+                                        <div class="error-message"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="country">Country *</label>
+                                        <select id="country" name="country" autocomplete="country">
+                                            <option value="">Select Country</option>
+                                            <option value="US" <?php echo ($user_data['country'] ?? '') == 'US' ? 'selected' : ''; ?>>United States</option>
+                                            <option value="UK" <?php echo ($user_data['country'] ?? '') == 'UK' ? 'selected' : ''; ?>>United Kingdom</option>
+                                            <option value="CA" <?php echo ($user_data['country'] ?? '') == 'CA' ? 'selected' : ''; ?>>Canada</option>
+                                            <option value="AU" <?php echo ($user_data['country'] ?? '') == 'AU' ? 'selected' : ''; ?>>Australia</option>
+                                            <option value="NG" <?php echo ($user_data['country'] ?? '') == 'NG' ? 'selected' : ''; ?>>Nigeria</option>
+                                        </select>
+                                        <div class="error-message"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="checkout-section">
-                        <h2 class="section-title">Payment Method</h2>
+                        <h2 class="section-title">Payment Method *</h2>
                         <div class="section-content">
                             <div class="payment-methods">
                                 <div class="payment-method">
-                                    <input type="radio" id="payment_card" name="payment_method" value="card" checked>
+                                    <input type="radio" id="payment_card" name="payment_method" value="card" checked required>
                                     <label for="payment_card">
                                         <i class="fas fa-credit-card"></i>
                                         <span>Credit/Debit Card</span>
                                     </label>
-                                    <div class="payment-details">
+                                    <div class="payment-details" id="card-details">
                                         <div class="form-grid">
                                             <div class="form-group full-width">
                                                 <label for="card_number">Card Number *</label>
-                                                <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456">
+                                                <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number">
+                                                <div class="error-message"></div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="card_name">Name on Card *</label>
-                                                <input type="text" id="card_name" name="card_name" placeholder="John Doe">
+                                                <input type="text" id="card_name" name="card_name" placeholder="John Doe" autocomplete="cc-name">
+                                                <div class="error-message"></div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="card_expiry">Expiry Date *</label>
-                                                <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY">
+                                                <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY" autocomplete="cc-exp">
+                                                <div class="error-message"></div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="card_cvv">CVV *</label>
-                                                <input type="text" id="card_cvv" name="card_cvv" placeholder="123">
+                                                <input type="text" id="card_cvv" name="card_cvv" placeholder="123" inputmode="numeric" autocomplete="cc-csc">
+                                                <div class="error-message"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="payment-method">
-                                    <input type="radio" id="payment_momo" name="payment_method" value="mobile_money">
+                                    <input type="radio" id="payment_momo" name="payment_method" value="mobile_money" required>
                                     <label for="payment_momo">
                                         <i class="fas fa-mobile-alt"></i>
                                         <span>Mobile Money (MTN, Telecel)</span>
                                     </label>
-                                    <div class="payment-details">
+                                    <div class="payment-details" id="momo-details">
                                         <div class="form-group">
                                             <label for="momo_number">Phone Number *</label>
                                             <input type="tel" id="momo_number" name="momo_number" placeholder="024 123 4567">
+                                            <div class="error-message"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="momo_network">Network *</label>
@@ -193,6 +211,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                                 <option value="mtn">MTN Mobile Money</option>
                                                 <option value="telecel">Telecel Cash</option>
                                             </select>
+                                            <div class="error-message"></div>
                                         </div>
                                         <p class="form-hint">You will receive a prompt on your phone to approve the payment.</p>
                                     </div>
@@ -200,7 +219,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 
                                 <div class="payment-method">
                                     <input type="radio" id="payment_paypal" name="payment_method" value="paypal">
-                                    <label for="payment_paypal">
+                                    <label for="payment_paypal" class="payment-label-simple">
                                         <i class="fab fa-paypal"></i>
                                         <span>PayPal</span>
                                     </label>
@@ -208,7 +227,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 
                                 <div class="payment-method">
                                     <input type="radio" id="payment_bank" name="payment_method" value="bank_transfer">
-                                    <label for="payment_bank">
+                                    <label for="payment_bank" class="payment-label-simple">
                                         <i class="fas fa-university"></i>
                                         <span>Bank Transfer</span>
                                     </label>
@@ -216,7 +235,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 
                                 <div class="payment-method">
                                     <input type="radio" id="payment_cod" name="payment_method" value="cash_on_delivery">
-                                    <label for="payment_cod">
+                                    <label for="payment_cod" class="payment-label-simple">
                                         <i class="fas fa-money-bill-wave"></i>
                                         <span>Cash on Delivery</span>
                                     </label>
@@ -231,6 +250,7 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                             <div class="form-group">
                                 <label for="order_notes">Additional Notes (Optional)</label>
                                 <textarea id="order_notes" name="order_notes" rows="3" placeholder="Special instructions for delivery..."></textarea>
+                                <div class="error-message"></div>
                             </div>
                         </div>
                     </div>
@@ -287,8 +307,14 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="coupon-form">
-                                <input type="text" placeholder="Enter coupon code" class="coupon-input">
-                                <button type="button" class="btn btn-outline coupon-apply">Apply</button>
+                                <input type="text" placeholder="Enter coupon code" class="coupon-input" value="<?php echo htmlspecialchars($cart_data['coupon_code'] ?? ''); ?>">
+                                <button type="button" class="btn btn-outline coupon-apply-checkout">Apply</button>
+                            </div>
+                            <div class="applied-coupon-checkout" style="<?php echo $cart_data['coupon_code'] ? '' : 'display: none;'; ?>">
+                                <span class="applied-coupon-info">
+                                    <i class="fas fa-check-circle text-success"></i> Coupon "<strong><span class="coupon-code-text-checkout"><?php echo htmlspecialchars($cart_data['coupon_code'] ?? ''); ?></span></strong>" applied!
+                                </span>
+                                <button type="button" class="btn-link remove-coupon-btn-checkout">Remove</button>
                             </div>
                         </div>
 
@@ -321,95 +347,8 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/checkout.css
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Payment method toggle
-    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-    const paymentDetails = document.querySelectorAll('.payment-details');
-    
-    paymentMethods.forEach(method => {
-        method.addEventListener('change', function() {
-            paymentDetails.forEach(detail => {
-                detail.style.display = 'none';
-            });
-            
-            const selectedDetails = this.parentElement.querySelector('.payment-details');
-            if (selectedDetails) {
-                selectedDetails.style.display = 'block';
-            }
-        });
-    });
-    
-    // Show card details by default
-    document.querySelector('#payment_card').dispatchEvent(new Event('change'));
-    
-    // Coupon toggle
-    const couponToggle = document.querySelector('.coupon-toggle');
-    const couponForm = document.querySelector('.coupon-form');
-    
-    if (couponToggle && couponForm) {
-        couponToggle.addEventListener('click', function() {
-            couponForm.classList.toggle('active');
-            this.querySelector('.fa-chevron-down').classList.toggle('active');
-        });
-    }
-    
-    // Form validation
-    const checkoutForm = document.querySelector('.checkout-form');
-    const placeOrderBtn = document.querySelector('.btn-place-order');
-    
-    checkoutForm.addEventListener('submit', function(e) {
-        // The form will be submitted after validation, so we only prevent it if invalid.
-        
-        // Basic validation
-        let isValid = true;
-        const requiredFields = this.querySelectorAll('[required]');
-        
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                field.style.borderColor = 'var(--danger-color)';
-                // Only mark as invalid if the field is visible
-                if (field.offsetParent !== null) {
-                    isValid = false;
-                }
-            } else {
-                field.style.borderColor = '';
-            }
-        });
-        
-        if (!isValid) {
-            e.preventDefault(); // Stop form submission
-            alert('Please fill in all required fields.');
-        } else {
-            // If form is valid, show loading state
-            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            placeOrderBtn.disabled = true;
-        }
-    });
-    
-    // Card number formatting
-    const cardNumberInput = document.getElementById('card_number');
-    if (cardNumberInput) {
-        cardNumberInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(\d{4})/g, '$1 ').trim();
-            e.target.value = value.substring(0, 19);
-        });
-    }
-    
-    // Expiry date formatting
-    const expiryInput = document.getElementById('card_expiry');
-    if (expiryInput) {
-        expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            e.target.value = value.substring(0, 5);
-        });
-    }
-});
-</script>
+<!-- Page-specific JavaScript -->
+<script src="<?php echo BASE_URL; ?>assets/js/pages/checkout.js"></script>
 
 <?php
 // Include footer

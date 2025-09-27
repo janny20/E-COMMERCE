@@ -162,6 +162,73 @@
     box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
 }
 
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+    border-color: var(--danger-color);
+}
+
+.error-message {
+    color: var(--danger-color);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    margin-top: var(--spacing-xs);
+    min-height: 1em;
+}
+
+.address-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.address-option {
+    position: relative;
+}
+
+.address-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.address-option label {
+    display: block;
+    padding: var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast);
+    height: 100%;
+}
+
+.address-option label strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.address-option label p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.address-option input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background-color: var(--primary-light);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+#newAddressForm.hidden {
+    display: none;
+}
+
+.new-address-title { margin-top: var(--spacing-lg); font-size: 1.2rem; font-weight: 600; border-top: 1px solid var(--border-color); padding-top: var(--spacing-lg); }
+
 .payment-methods {
     display: flex;
     flex-direction: column;
@@ -171,6 +238,7 @@
 .payment-method {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
+    transition: all var(--transition-fast);
     overflow: hidden;
 }
 
@@ -178,7 +246,8 @@
     display: none;
 }
 
-.payment-method label {
+.payment-method label,
+.payment-method .payment-label-simple {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
@@ -188,13 +257,19 @@
     margin: 0;
 }
 
-.payment-method label:hover {
+.payment-method label:hover,
+.payment-method .payment-label-simple:hover {
     background: var(--bg-light);
 }
 
-.payment-method input[type="radio"]:checked + label {
-    background: var(--primary-color);
-    color: var(--text-white);
+.payment-method.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.payment-method.active > label,
+.payment-method.active > .payment-label-simple {
+    background: var(--primary-light);
 }
 
 .payment-method label i {
@@ -203,9 +278,16 @@
 }
 
 .payment-details {
-    display: none;
+    max-height: 0;
+    overflow: hidden;
     padding: var(--spacing-md);
     background: var(--bg-light);
+    transition: all 0.4s ease-in-out;
+}
+
+.payment-method.active .payment-details {
+    max-height: 500px; /* Adjust as needed */
+    padding: var(--spacing-md);
     border-top: 1px solid var(--border-color);
 }
 

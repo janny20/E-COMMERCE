@@ -39,10 +39,21 @@
                 <div class="footer-column">
                     <h3>My Account</h3>
                     <ul class="footer-links">
+                        <li><a href="<?php echo BASE_URL; ?>pages/about.php">About Us</a></li>
                         <li><a href="<?php echo BASE_URL; ?>pages/profile.php">My Profile</a></li>
                         <li><a href="<?php echo BASE_URL; ?>pages/orders.php">My Orders</a></li>
                         <li><a href="<?php echo BASE_URL; ?>pages/wishlist.php">Wishlist</a></li>
                         <li><a href="<?php echo BASE_URL; ?>pages/cart.php">Shopping Cart</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>pages/contact.php">Contact Us</a></li>
+                        <li><a href="#">Shipping Information</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
                     </ul>
                 </div>
                 

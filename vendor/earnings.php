@@ -41,7 +41,9 @@ $earnings_stmt = $db->prepare($earnings_sql);
 $earnings_stmt->execute(['vendor_id' => $vendor_id]);
 $earnings = $earnings_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$page_title = "My Earnings";
 require_once __DIR__ . '/../includes/header.php';
+
 ?>
 
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/vendor-dashboard.css">
@@ -68,7 +70,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
         <div class="stat-card">
             <h3>Request Payout</h3>
-            <button class="btn btn-primary" style="margin-top: 1rem;">Request Payout</button>
+            <button class="btn btn-primary" id="requestPayoutBtn" style="margin-top: 1rem;">Request Payout</button>
         </div>
     </div>
 
@@ -108,5 +110,78 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </div>
+
+<!-- Payout Modal -->
+<div class="modal" id="payoutModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Request Payout</h3>
+            <button class="modal-close" id="payoutModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="payout-modal-messages"></div>
+            <form id="payoutForm" method="POST" action="<?php echo BASE_URL; ?>ajax/request_payout.php">
+                <div class="form-group">
+                    <label for="payout_amount">Amount to Withdraw</label>
+                    <input type="number" id="payout_amount" name="amount" class="form-control" step="0.01" min="1.00" max="<?php echo $stats['total_earnings']; ?>" required>
+                    <small>Available for withdrawal: $<?php echo money($stats['total_earnings']); ?></small>
+                </div>
+                <div class="form-group">
+                    <label for="payout_method">Payout Method</label>
+                    <select id="payout_method" name="payout_method" class="form-control" required>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                    <small>Ensure your payout details are up-to-date in your profile settings.</small>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payoutModal = document.getElementById('payoutModal');
+    if (!payoutModal) return;
+
+    const openBtn = document.getElementById('requestPayoutBtn');
+    const closeBtn = document.getElementById('payoutModalClose');
+    const form = document.getElementById('payoutForm');
+
+    const openModal = () => payoutModal.classList.add('show');
+    const closeModal = () => payoutModal.classList.remove('show');
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    payoutModal.addEventListener('click', (e) => {
+        if (e.target === payoutModal) closeModal();
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Submitting...';
+
+        fetch(form.action, { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                showNotification(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal();
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Request';
+            });
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

@@ -5,7 +5,7 @@
 
 .products-header {
     display: flex;
-    justify-content: between;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
     flex-wrap: wrap;
@@ -18,7 +18,7 @@
 }
 
 .add-product-btn {
-    background: var(--success-color);
+    background: var(--primary-color);
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -27,6 +27,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.add-product-btn:hover {
+    background-color: var(--primary-dark);
 }
 
 .products-toolbar {
@@ -67,62 +72,68 @@
     border-radius: 5px;
 }
 
-.products-table {
+.products-table-container {
     background: white;
     border-radius: 10px;
     box-shadow: var(--shadow);
-    overflow: hidden;
+    overflow-x: auto; /* For responsive tables */
 }
 
-.table-header {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr auto;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--light-bg);
-    font-weight: 600;
+.products-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-.table-row {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr auto;
-    gap: 1rem;
+.products-table th, .products-table td {
     padding: 1rem;
+    text-align: left;
     border-bottom: 1px solid var(--border-color);
-    align-items: center;
 }
 
-.table-row:last-child {
+.products-table th {
+    background: var(--bg-light);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.products-table tr:last-child td {
     border-bottom: none;
 }
 
-.product-image {
-    width: 50px;
-    height: 50px;
+.products-table tbody tr:hover {
+    background-color: var(--bg-light);
+}
+
+.product-image-thumb {
+    width: 60px;
+    height: 60px;
     object-fit: cover;
     border-radius: 5px;
+    border: 1px solid var(--border-color);
 }
 
 .status-badge {
-    padding: 0.25rem 0.5rem;
+    padding: 0.3rem 0.7rem;
     border-radius: 15px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 500;
+    display: inline-block;
 }
 
 .status-active {
-    background: #e8f5e8;
-    color: #2e7d32;
+    background: var(--success-light);
+    color: var(--success-dark);
 }
 
 .status-inactive {
-    background: #ffebee;
-    color: #c62828;
+    background: var(--danger-light);
+    color: var(--danger-dark);
 }
 
-.status-pending {
-    background: #fff3e0;
-    color: #ef6c00;
+.status-draft {
+    background: var(--info-light);
+    color: var(--info-dark);
 }
 
 .action-buttons {
@@ -130,16 +141,33 @@
     gap: 0.5rem;
 }
 
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+.action-buttons .btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
 }
 
-.pagination {
+.action-buttons .btn-icon:hover {
+    background-color: var(--bg-light);
+    color: var(--primary-color);
+}
+
+.action-buttons .btn-icon.delete-btn:hover {
+    color: var(--danger-color);
+    background-color: var(--danger-light);
+}
+
+.pagination-container {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
     margin-top: 2rem;
+    padding: 1rem;
 }
 
 .pagination-item {
@@ -147,7 +175,8 @@
     border: 1px solid var(--border-color);
     border-radius: 5px;
     text-decoration: none;
-    color: var(--text-color);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
 }
 
 .pagination-item.active {
@@ -156,7 +185,113 @@
     border-color: var(--primary-color);
 }
 
+.pagination-item:hover:not(.active):not(.disabled) {
+    background-color: var(--bg-light);
+    border-color: var(--primary-color);
+}
+
 .pagination-item.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    color: var(--text-light);
+    pointer-events: none;
+    background-color: var(--bg-light);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--border-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-state h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .products-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .search-form {
+        width: 100%;
+    }
+    .search-input {
+        min-width: unset;
+        width: 100%;
+    }
+    .products-table-container {
+        border-radius: 0; /* Remove border-radius for full width on small screens */
+    }
+    .products-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .products-table thead {
+        display: none; /* Hide table headers on small screens */
+    }
+    .products-table tbody, .products-table tr, .products-table td {
+        display: block;
+        width: 100%;
+    }
+    .products-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+    }
+    .products-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    .products-table td:last-child {
+        border-bottom: none;
+    }
+    .products-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        width: calc(50% - 1rem);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .action-buttons {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .products-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .add-product-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
