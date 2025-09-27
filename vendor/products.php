@@ -1,4 +1,4 @@
-0,0 @@
+<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -132,14 +132,14 @@ require_once '../includes/header.php';
                         <tbody>
                             <?php foreach ($products as $product): ?>
                                 <tr data-product-id="<?php echo $product['id']; ?>">
-                                    <td data-label="Image">
+                                    <td>
                                         <?php $img = !empty($product['images']) ? explode(',', $product['images'])[0] : 'default.jpg'; ?>
                                         <img src="<?php echo BASE_URL . 'uploads/products/' . htmlspecialchars($img); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-image-thumb">
                                     </td>
                                     <td data-label="Product Name"><?php echo htmlspecialchars($product['name']); ?></td>
                                     <td data-label="Category"><?php echo htmlspecialchars($product['category_name'] ?? 'N/A'); ?></td>
                                     <td data-label="Price">$<?php echo number_format($product['price'], 2); ?></td>
-                                    <td data-label="Stock"><?php echo $product['quantity']; ?></td>
+                                    <td data-label="Stock"><?php echo htmlspecialchars($product['quantity']); ?></td>
                                     <td data-label="Status">
                                         <span class="status-badge status-<?php echo htmlspecialchars($product['status']); ?>">
                                             <?php echo ucfirst(htmlspecialchars($product['status'])); ?>
@@ -219,5 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once '../includes/footer.php';
 ?>

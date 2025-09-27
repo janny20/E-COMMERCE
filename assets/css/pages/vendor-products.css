@@ -1,297 +1,182 @@
 /* assets/css/pages/vendor-products.css */
-.vendor-products {
-    padding: 2rem 0;
+
+.vendor-products .container {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
 }
 
 .products-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--spacing-xl);
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--spacing-lg);
 }
 
 .products-title {
-    font-size: 2rem;
-    color: var(--text-color);
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
 }
 
 .add-product-btn {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.3s ease;
-}
-
-.add-product-btn:hover {
-    background-color: var(--primary-dark);
+    gap: var(--spacing-xs);
 }
 
 .products-toolbar {
-    background: white;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: var(--spacing-lg);
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--spacing-md);
 }
 
-.search-form {
+.products-toolbar .search-form {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
+    flex-grow: 1;
+    max-width: 400px;
 }
 
-.search-input {
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    min-width: 250px;
-    transition: all var(--transition-fast);
+.products-toolbar .search-input {
+    width: 100%;
 }
 
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-}
-
-.filter-select {
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+.products-toolbar .filter-options {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
 }
 
 .products-table-container {
-    background: white;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    overflow-x: auto; /* For responsive tables */
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
 }
 
 .products-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
+    text-align: left;
 }
 
-.products-table th, .products-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
+.products-table thead {
+    background-color: var(--bg-light);
 }
 
 .products-table th {
-    background: var(--bg-light);
+    padding: var(--spacing-md) var(--spacing-lg);
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.5px;
 }
 
-.products-table tr:last-child td {
+.products-table td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.products-table tbody tr:last-child td {
     border-bottom: none;
 }
 
 .products-table tbody tr:hover {
-    background-color: var(--bg-light);
+    background-color: var(--primary-light);
 }
 
 .product-image-thumb {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
 }
 
 .status-badge {
-    padding: 0.3rem 0.7rem;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: capitalize;
 }
 
-.status-active {
-    background: var(--success-light);
+.status-badge.status-active {
+    background-color: var(--success-light);
     color: var(--success-dark);
 }
 
-.status-inactive {
-    background: var(--danger-light);
-    color: var(--danger-dark);
-}
-
-.status-draft {
-    background: var(--info-light);
-    color: var(--info-dark);
+.status-badge.status-inactive,
+.status-badge.status-draft {
+    background-color: var(--warning-light);
+    color: var(--warning-dark);
 }
 
 .action-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
 }
 
-.action-buttons .btn-icon {
+.btn-icon {
     background: none;
     border: none;
-    font-size: 1.1rem;
     cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: all var(--transition-fast);
     color: var(--text-secondary);
+    font-size: 1.1rem;
+    padding: 5px;
+    transition: color var(--transition-fast);
 }
 
-.action-buttons .btn-icon:hover {
-    background-color: var(--bg-light);
+.btn-icon:hover {
     color: var(--primary-color);
 }
 
-.action-buttons .btn-icon.delete-btn:hover {
+.btn-icon.delete-btn:hover {
     color: var(--danger-color);
-    background-color: var(--danger-light);
 }
 
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    padding: 1rem;
-}
-
-.pagination-item {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-}
-
-.pagination-item.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.pagination-item:hover:not(.active):not(.disabled) {
-    background-color: var(--bg-light);
-    border-color: var(--primary-color);
-}
-
-.pagination-item.disabled {
-    color: var(--text-light);
-    pointer-events: none;
-    background-color: var(--bg-light);
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background-color: var(--bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow);
-}
-
-.empty-state-icon {
-    font-size: 3rem;
-    color: var(--border-color);
-    margin-bottom: var(--spacing-lg);
-}
-
-.empty-state h2 {
-    font-size: 1.8rem;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.empty-state p {
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-xl);
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Responsive */
+/* Responsive Styles */
 @media (max-width: 768px) {
-    .products-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .search-form {
-        width: 100%;
-    }
-    .search-input {
-        min-width: unset;
-        width: 100%;
-    }
-    .products-table-container {
-        border-radius: 0; /* Remove border-radius for full width on small screens */
-    }
-    .products-table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
     .products-table thead {
-        display: none; /* Hide table headers on small screens */
+        display: none;
     }
-    .products-table tbody, .products-table tr, .products-table td {
+
+    .products-table, .products-table tbody, .products-table tr, .products-table td {
         display: block;
         width: 100%;
     }
+
     .products-table tr {
-        margin-bottom: 1rem;
+        margin-bottom: var(--spacing-lg);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius);
-        box-shadow: var(--shadow-sm);
     }
+
     .products-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         text-align: right;
-        padding-left: 50%;
-        position: relative;
-        border-bottom: 1px dashed var(--border-color);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 1px solid var(--border-color);
     }
+
     .products-table td:last-child {
         border-bottom: none;
     }
+
     .products-table td::before {
         content: attr(data-label);
-        position: absolute;
-        left: 1rem;
-        width: calc(50% - 1rem);
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
         font-weight: 600;
+        text-align: left;
         color: var(--text-primary);
-    }
-    .action-buttons {
-        justify-content: flex-end;
-    }
-}
-
-@media (max-width: 480px) {
-    .products-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .add-product-btn {
-        width: 100%;
-        justify-content: center;
     }
 }
