@@ -25,14 +25,6 @@ $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $vendor_status = $vendor ? $vendor['status'] : 'not_found';
 
-// 3. Handle different statuses
-if ($vendor_status === 'rejected' || $vendor_status === 'suspended') {
-    // If they somehow have a session, destroy it and redirect to login
-    session_destroy();
-    header('Location: ../pages/login.php?error=' . $vendor_status);
-    exit();
-}
-
 // --- If status is 'approved', show the dashboard ---
 if ($vendor_status === 'approved') {
     // Fetch dashboard stats for approved vendors
@@ -99,6 +91,14 @@ require_once '../includes/header.php';
             <div class="status-icon"><i class="fas fa-hourglass-half"></i></div>
             <h1>Application Pending</h1>
             <p>Your vendor application is currently under review. We will notify you by email once a decision has been made. Thank you for your patience.</p>
+        <?php elseif ($vendor_status === 'rejected'): ?>
+            <div class="status-icon" style="color: var(--danger-color);"><i class="fas fa-times-circle"></i></div>
+            <h1>Application Rejected</h1>
+            <p>We regret to inform you that your vendor application has been rejected. Please contact support if you believe this is an error.</p>
+        <?php elseif ($vendor_status === 'suspended'): ?>
+            <div class="status-icon" style="color: var(--warning-color);"><i class="fas fa-ban"></i></div>
+            <h1>Account Suspended</h1>
+            <p>Your vendor account has been suspended. You are unable to access your dashboard or sell products. Please contact support for more information.</p>
         <?php else: ?>
             <div class="status-icon"><i class="fas fa-exclamation-circle"></i></div>
             <h1>Account Issue</h1>
