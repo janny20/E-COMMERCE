@@ -1,5 +1,13 @@
 <link rel="stylesheet" href="../assets/css/pages/admin-users.css">
 <?php
+session_set_cookie_params([
+    'lifetime' => 60 * 60 * 24 * 30,
+    'path' => '/',
+    'domain' => '',
+    'secure' => false,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';

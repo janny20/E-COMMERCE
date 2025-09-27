@@ -1,4 +1,12 @@
 <?php
+session_set_cookie_params([
+    'lifetime' => 60 * 60 * 24 * 30,
+    'path' => '/',
+    'domain' => '',
+    'secure' => false,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -20,22 +28,29 @@ $page_title = "Vendors Management";
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $vendor_id = $_GET['id'];
     $action = $_GET['action'];
-    
     $valid_statuses = ['approved', 'rejected', 'suspended'];
-    
     if (in_array($action, $valid_statuses)) {
         $query = "UPDATE vendors SET status = :status WHERE id = :id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':status', $action);
-        $stmt->bindParam(':id', $vendor_id);
-        
+        $stmt->bindParam(':id', $vendor_id, PDO::PARAM_INT);
         if ($stmt->execute()) {
-            $success = "Vendor status updated successfully.";
+            $_SESSION['vendor_status_message'] = "Vendor status updated successfully.";
         } else {
-            $error = "Error updating vendor status.";
+            $_SESSION['vendor_status_message'] = "Error updating vendor status.";
         }
+
+        // Redirect back to the referring page (dashboard or vendors list)
+        $redirect_url = 'admin-vendors.php';
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'admin-dashboard.php') !== false) {
+            $redirect_url = 'admin-dashboard.php';
+        }
+        header('Location: ' . $redirect_url);
+        exit();
     } else {
-        $error = "Invalid action.";
+        $_SESSION['vendor_status_message'] = "Invalid action.";
+        header('Location: admin-vendors.php');
+        exit();
     }
 }
 
@@ -73,12 +88,8 @@ include_once '../includes/admin-header.php';
         <p>Manage vendor accounts and approvals</p>
     </div>
 
-    <?php if (isset($error)): ?>
-        <div class="alert alert-error"><?php echo $error; ?></div>
-    <?php endif; ?>
-
-    <?php if (isset($success)): ?>
-        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php if (!empty($_SESSION['vendor_status_message'])): ?>
+        <div class="alert alert-success"><?php echo $_SESSION['vendor_status_message']; unset($_SESSION['vendor_status_message']); ?></div>
     <?php endif; ?>
 
     <div class="card">
@@ -113,57 +124,54 @@ include_once '../includes/admin-header.php';
             <h2>All Vendors</h2>
         </div>
         <div class="card-body">
-            <?php if (!empty($vendors)): ?>
-                <table class="users-table">
-                    <thead>
-                        <tr>
-                            <th>Business Name</th>
-                            <th>Owner</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Joined Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($vendors as $vendor): ?>
+            <div style="overflow-x: auto;">
+                <?php if (!empty($vendors)): ?>
+                    <table class="users-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong>
-                                    <?php if (!empty($vendor['business_logo'])): ?>
-                                        <div class="vendor-logo">
-                                            <img src="../../assets/images/vendors/<?php echo $vendor['business_logo']; ?>" alt="<?php echo htmlspecialchars($vendor['business_name']); ?>" width="50">
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo htmlspecialchars($vendor['username']); ?></td>
-                                <td><?php echo htmlspecialchars($vendor['email']); ?></td>
-                                <td>
-                                    <span class="user-status <?php echo $vendor['status']; ?>">
-                                        <?php echo ucfirst($vendor['status']); ?>
-                                    </span>
-                                </td>
-                                <td><?php echo date('M j, Y', strtotime($vendor['joined_date'])); ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-edit">View Details</a>
-                                        <div class="dropdown">
-                                            <button class="btn btn-edit dropdown-toggle">Change Status</button>
-                                            <div class="dropdown-content">
-                                                <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>">Approve</a>
-                                                <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>">Reject</a>
-                                                <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>">Suspend</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
+                                <th>Business Name</th>
+                                <th>Owner</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Joined Date</th>
+                                <th>Actions</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p class="text-center">No vendors found.</p>
-            <?php endif; ?>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($vendors as $vendor): ?>
+                                <tr>
+                                    <td>
+                                        <strong><?php echo htmlspecialchars($vendor['business_name']); ?></strong>
+                                        <?php if (!empty($vendor['business_logo'])): ?>
+                                            <div class="vendor-logo">
+                                                <img src="../../assets/images/vendors/<?php echo $vendor['business_logo']; ?>" alt="<?php echo htmlspecialchars($vendor['business_name']); ?>" width="50">
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($vendor['username']); ?></td>
+                                    <td><?php echo htmlspecialchars($vendor['email']); ?></td>
+                                    <td>
+                                        <span class="user-status <?php echo $vendor['status']; ?>">
+                                            <?php echo ucfirst($vendor['status']); ?>
+                                        </span>
+                                    </td>
+                                    <td><?php echo date('M j, Y', strtotime($vendor['joined_date'])); ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="admin-vendor-details.php?id=<?php echo $vendor['id']; ?>" class="btn btn-edit">View Details</a>
+                                            <a href="admin-vendors.php?action=approved&id=<?php echo $vendor['id']; ?>" class="btn btn-success">Approve</a>
+                                            <a href="admin-vendors.php?action=rejected&id=<?php echo $vendor['id']; ?>" class="btn btn-danger">Reject</a>
+                                            <a href="admin-vendors.php?action=suspended&id=<?php echo $vendor['id']; ?>" class="btn btn-warning">Suspend</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p class="text-center">No vendors found.</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>

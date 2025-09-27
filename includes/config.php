@@ -28,7 +28,7 @@ error_reporting(E_ALL);
 
 // Base URL
 
-define('BASE_URL', 'http://localhost/multi-vendor-ecommerce/');
+define('BASE_URL', 'http://localhost/E-COMMERCE/');
 
 
 

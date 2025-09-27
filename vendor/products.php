@@ -12,7 +12,11 @@ requireVendor();
 $database = new Database();
 $db = $database->getConnection();
 
-$vendor_id = $_SESSION['vendor_id'];
+$vendor_id = $_SESSION['vendor_id'] ?? null;
+if (!$vendor_id) {
+    // This is a fallback in case the session is not set correctly.
+    die("Error: Vendor ID not found in session. Please log out and log back in.");
+}
 
 // Get filter values from URL
 $search_query = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -44,7 +48,13 @@ $products_sql .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
 $products_stmt = $db->prepare($products_sql);
 $products_stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $products_stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$products_stmt->execute($params);
+
+// Bind the rest of the parameters from the $params array
+foreach ($params as $key => &$val) {
+    $products_stmt->bindParam($key, $val);
+}
+
+$products_stmt->execute();
 $products = $products_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $total_count = $db->query("SELECT FOUND_ROWS()")->fetchColumn();
