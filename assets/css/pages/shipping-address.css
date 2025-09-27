@@ -1,0 +1,113 @@
+/* assets/css/pages/shipping-address.css */
+
+.address-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.address-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.address-card {
+    background-color: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all var(--transition-fast);
+}
+
+.address-card.default {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.default-badge {
+    position: absolute;
+    top: -1px;
+    right: var(--spacing-lg);
+    background-color: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.address-details {
+    flex-grow: 1;
+    margin-bottom: var(--spacing-md);
+}
+
+.address-details p {
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.address-details .address-label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.address-details strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.address-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--spacing-md);
+}
+
+.address-actions .btn-link {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+}
+
+.address-actions .btn-link:hover {
+    text-decoration: underline;
+}
+
+.address-actions .btn-delete-address {
+    color: var(--danger-color);
+    margin-left: auto;
+}
+
+.address-list .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--border-color);
+    margin-bottom: var(--spacing-md);
+}
+
+#addressModal .form-grid {
+    grid-template-columns: 1fr 1fr;
+}

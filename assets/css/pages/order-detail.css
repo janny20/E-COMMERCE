@@ -1,0 +1,47 @@
+/* assets/css/pages/order-detail.css */
+
+.order-item {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 80px 1fr auto auto;
+    gap: var(--spacing-md);
+}
+
+.item-review-action {
+    min-width: 120px;
+    text-align: right;
+}
+
+/* Review Modal Styles */
+.star-rating {
+    font-size: 1.8rem;
+    color: #ffc107;
+    cursor: pointer;
+}
+
+.star-rating i {
+    transition: all 0.2s ease;
+}
+
+.star-rating i:hover {
+    transform: scale(1.2);
+}
+
+.modal .form-actions {
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .order-item {
+        grid-template-columns: 80px 1fr;
+        grid-template-areas: 
+            "image info"
+            "image price"
+            "image review";
+    }
+    .item-image { grid-area: image; }
+    .item-info { grid-area: info; }
+    .item-price { grid-area: price; }
+    .item-review-action { grid-area: review; text-align: left; margin-top: var(--spacing-sm); }
+}
