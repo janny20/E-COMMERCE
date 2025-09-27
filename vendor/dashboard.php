@@ -1,18 +1,19 @@
+<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once '../includes/config.php';
 
-// 1. Check if user is logged in and is a vendor
+// Check if user is logged in and is a vendor
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'vendor') {
-    header('Location: ../pages/login.php?error=auth');
+    header('Location: ' . BASE_URL . 'pages/login.php');
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
+$vendor_id = $_SESSION['vendor_id']; // Assuming this is set on login
 
-// 2. Get the vendor's current status from the database
 $database = new Database();
 $db = $database->getConnection();
 
@@ -24,6 +25,14 @@ $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $vendor_status = $vendor ? $vendor['status'] : 'not_found';
 
+// 3. Handle different statuses
+if ($vendor_status === 'rejected' || $vendor_status === 'suspended') {
+    // If they somehow have a session, destroy it and redirect to login
+    session_destroy();
+    header('Location: ../pages/login.php?error=' . $vendor_status);
+    exit();
+}
+
 // --- If status is 'approved', show the dashboard ---
 if ($vendor_status === 'approved') {
     // Fetch dashboard stats for approved vendors
@@ -32,53 +41,21 @@ if ($vendor_status === 'approved') {
     $stmt->execute(['user_id' => $user_id]);
     $total_products = $stmt->fetchColumn();
 
-    // Total Orders (for this vendor)
-    $stmt = $db->prepare("SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.vendor_id = (SELECT id FROM vendors WHERE user_id = :user_id)");
-    $stmt->execute(['user_id' => $user_id]);
-    $total_orders = $stmt->fetchColumn();
+// Total Orders (for this vendor)
+$stmt = $db->prepare("SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi WHERE oi.vendor_id = :vendor_id");
+$stmt->execute(['vendor_id' => $vendor_id]);
+$orders_count = $stmt->fetchColumn();
 
-    // Total Sales (for this vendor)
-    $stmt = $db->prepare("SELECT SUM(oi.total) FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE p.vendor_id = (SELECT id FROM vendors WHERE user_id = :user_id)");
-    $stmt->execute(['user_id' => $user_id]);
-    $total_sales = $stmt->fetchColumn() ?? 0;
+// Pending Items (items in orders that are 'processing' or 'confirmed')
+$stmt = $db->prepare("SELECT COUNT(*) FROM order_items WHERE vendor_id = :vendor_id AND status IN ('processing', 'confirmed')");
+$stmt->execute(['vendor_id' => $vendor_id]);
+$pending_count = $stmt->fetchColumn();
 
-    require_once '../includes/header.php';
-    echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/vendor-dashboard.css">';
-    ?>
-    <div class="vendor-dashboard container">
-        <div class="dashboard-header">
-            <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
-            <p>Here's a summary of your store's activity.</p>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Sales</h3>
-                <p>$<?php echo number_format($total_sales, 2); ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>Total Orders</h3>
-                <p><?php echo $total_orders; ?></p>
-            </div>
-            <div class="stat-card">
-                <h3>Total Products</h3>
-                <p><?php echo $total_products; ?></p>
-            </div>
-        </div>
-        <div class="quick-links">
-            <a href="products.php" class="btn btn-primary">Manage Products</a>
-            <a href="orders.php" class="btn btn-primary">View Orders</a>
-            <a href="profile.php" class="btn btn-outline">Edit Profile</a>
-        </div>
-    </div>
-    <?php
-    require_once '../includes/footer.php';
-    exit();
-}
-
-// --- If status is 'pending' or anything else, show a status page ---
-require_once '../includes/header.php';
+// Total Earnings
+$stmt = $db->prepare("SELECT COALESCE(SUM(net_earning), 0) FROM vendor_earnings WHERE vendor_id = :vendor_id");
+$stmt->execute(['vendor_id' => $vendor_id]);
+$total_earnings = $stmt->fetchColumn();
 ?>
-<<<<<<< HEAD
 <?php 
 $page_title = "Dashboard";
 require_once __DIR__ . '/../includes/header.php'; 
@@ -136,14 +113,6 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="status-icon"><i class="fas fa-hourglass-half"></i></div>
             <h1>Application Pending</h1>
             <p>Your vendor application is currently under review. We will notify you by email once a decision has been made. Thank you for your patience.</p>
-        <?php elseif ($vendor_status === 'rejected'): ?>
-            <div class="status-icon" style="color: var(--danger-color);"><i class="fas fa-times-circle"></i></div>
-            <h1>Application Rejected</h1>
-            <p>We regret to inform you that your vendor application has been rejected. Please contact support if you believe this is an error.</p>
-        <?php elseif ($vendor_status === 'suspended'): ?>
-            <div class="status-icon" style="color: var(--warning-color);"><i class="fas fa-ban"></i></div>
-            <h1>Account Suspended</h1>
-            <p>Your vendor account has been suspended. You are unable to access your dashboard or sell products. Please contact support for more information.</p>
         <?php else: ?>
             <div class="status-icon"><i class="fas fa-exclamation-circle"></i></div>
             <h1>Account Issue</h1>
