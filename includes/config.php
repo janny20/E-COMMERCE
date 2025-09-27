@@ -34,9 +34,9 @@ define('BASE_URL', 'http://localhost/E-COMMERCE/');
 
 // Database configuration
 
-// Change port if your MySQL is not on 3306 (e.g., 'localhost:3307')
+// Change port if your MySQL is on 3306 (e.g., 'localhost:3306')
 
-define('DB_HOST', 'localhost:3306'); // MySQL is running on port 3307
+define('DB_HOST', 'localhost:3306'); // MySQL is running on port 3306 by default in XAMPP
 
 define('DB_NAME', 'ecommerce_db');
 
@@ -102,33 +102,4 @@ $username = $isLoggedIn ? $_SESSION['username'] : '';
 $userType = $isLoggedIn ? $_SESSION['user_type'] : '';
 
 $userId = $isLoggedIn ? $_SESSION['user_id'] : 0;
-
-
-
-// Get cart count if user is logged in
-
-$cartCount = 0;
-
-if ($isLoggedIn) {
-
-    $database = new Database();
-
-    $db = $database->getConnection();
-
-    
-
-    $query = "SELECT COUNT(*) as count FROM cart WHERE user_id = :user_id";
-
-    $stmt = $db->prepare($query);
-
-    $stmt->bindParam(":user_id", $userId);
-
-    $stmt->execute();
-
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $cartCount = $result['count'];
-
-}
-
 ?>

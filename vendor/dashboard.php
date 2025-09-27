@@ -1,4 +1,3 @@
-<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -79,6 +78,52 @@ if ($vendor_status === 'approved') {
 // --- If status is 'pending' or anything else, show a status page ---
 require_once '../includes/header.php';
 ?>
+<<<<<<< HEAD
+<?php 
+$page_title = "Dashboard";
+require_once __DIR__ . '/../includes/header.php'; 
+?>
+
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/vendor-dashboard.css">
+
+<div class="vendor-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Vendor Dashboard</h1>
+            <p>Welcome back, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Vendor'); ?>!</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($products_count); ?></p>
+                    <h3>Total Products</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($orders_count); ?></p>
+                    <h3>Total Orders</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number"><?php echo htmlspecialchars($pending_count); ?></p>
+                    <h3>Pending Items</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                <div class="stat-info">
+                    <p class="stat-number">$<?php echo money($total_earnings); ?></p>
+                    <h3>Total Earnings</h3>
+                </div>
+            </div>
+        </div>
+=======
 <style>
     .status-page { text-align: center; padding: 80px 20px; }
     .status-page h1 { font-size: 2.5rem; margin-bottom: 1rem; }
@@ -105,6 +150,7 @@ require_once '../includes/header.php';
             <p>There is an issue with your vendor account. Please contact support for assistance.</p>
         <?php endif; ?>
         <a href="<?php echo BASE_URL; ?>pages/logout.php" class="btn btn-outline">Logout</a>
+>>>>>>> 03a6e3f92aa402ee81d8999f8d4d4eabc1c67615
     </div>
 </div>
 <?php

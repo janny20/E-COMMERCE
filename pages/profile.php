@@ -117,110 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_avatar'])) {
     exit();
 }
 
-// Handle AJAX password change
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password_ajax'])) {
-    header('Content-Type: application/json');
-    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
-
-    if (!isset($_SESSION['user_id'])) {
-        $response['message'] = 'Authentication error. Please log in again.';
-        echo json_encode($response);
-        exit();
-    }
-    $ajaxUserId = $_SESSION['user_id'];
-
-    $database = new Database();
-    $db = $database->getConnection();
-
-    $current_password = $_POST['current_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
-        $response['message'] = 'Please fill in all password fields.';
-    } elseif (strlen($new_password) < 6) {
-        $response['message'] = 'New password must be at least 6 characters long.';
-    } elseif ($new_password !== $confirm_password) {
-        $response['message'] = 'New passwords do not match.';
-    } else {
-        // Fetch current user's password from DB
-        $pass_query = "SELECT password FROM users WHERE id = :user_id";
-        $pass_stmt = $db->prepare($pass_query);
-        $pass_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
-        $pass_stmt->execute();
-        $user_pass_data = $pass_stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user_pass_data && password_verify($current_password, $user_pass_data['password'])) {
-            // Current password is correct, update to new password
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $update_pass_query = "UPDATE users SET password = :password WHERE id = :user_id";
-            $update_pass_stmt = $db->prepare($update_pass_query);
-            $update_pass_stmt->bindParam(':password', $hashed_password);
-            $update_pass_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
-
-            if ($update_pass_stmt->execute()) {
-                $response['success'] = true;
-                $response['message'] = 'Password updated successfully!';
-            } else {
-                $response['message'] = 'Failed to update password. Please try again.';
-            }
-        } else {
-            $response['message'] = 'Incorrect current password.';
-        }
-    }
-    
-    echo json_encode($response);
-    exit();
-}
-
-// Handle AJAX preferences update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_preferences_ajax'])) {
-    header('Content-Type: application/json');
-    $response = ['success' => false, 'message' => 'An unknown error occurred.'];
-
-    if (!isset($_SESSION['user_id'])) {
-        $response['message'] = 'Authentication error. Please log in again.';
-        echo json_encode($response);
-        exit();
-    }
-    $ajaxUserId = $_SESSION['user_id'];
-
-    $database = new Database();
-    $db = $database->getConnection();
-
-    $setting = $_POST['setting'] ?? '';
-    $value = ($_POST['value'] ?? 'false') === 'true' ? 1 : 0; // Convert JS boolean string to 1/0
-
-    // Whitelist of allowed settings to prevent arbitrary column updates
-    $allowed_settings = ['email_notifications', 'sms_notifications', 'marketing_communications'];
-
-    if (in_array($setting, $allowed_settings)) {
-        // Use "upsert" logic since user_profiles might not exist
-        $check_profile_query = "SELECT id FROM user_profiles WHERE user_id = :user_id";
-        $check_stmt = $db->prepare($check_profile_query);
-        $check_stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
-        $check_stmt->execute();
-        $profile_exists = $check_stmt->fetch();
-
-        $query = $profile_exists ? "UPDATE user_profiles SET `$setting` = :value WHERE user_id = :user_id" : "INSERT INTO user_profiles (user_id, `$setting`) VALUES (:user_id, :value)";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':value', $value, PDO::PARAM_INT);
-        $stmt->bindParam(':user_id', $ajaxUserId, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            $response['success'] = true;
-            $response['message'] = 'Preference updated.';
-        } else {
-            $response['message'] = 'Failed to update preference.';
-        }
-    } else {
-        $response['message'] = 'Invalid preference setting.';
-    }
-
-    echo json_encode($response);
-    exit();
-}
-
 // --- END AJAX HANDLERS ---
 
 // Get user data
@@ -326,7 +222,7 @@ $orders_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $orders_stmt->execute();
 $orders_count = $orders_stmt->fetchColumn();
 
-$reviews_stmt = $db->prepare("SELECT COUNT(*) FROM reviews WHERE user_id = :user_id AND status = 'approved'");
+$reviews_stmt = $db->prepare("SELECT COUNT(*) FROM reviews WHERE user_id = :user_id");
 $reviews_stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 $reviews_stmt->execute();
 $reviews_count = $reviews_stmt->fetchColumn();
@@ -399,6 +295,10 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                     <a href="<?php echo BASE_URL; ?>pages/orders.php" class="nav-item">
                         <i class="fas fa-shopping-bag"></i>
                         <span>My Orders (<?php echo $orders_count; ?>)</span>
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>pages/my-reviews.php" class="nav-item">
+                        <i class="fas fa-star"></i>
+                        <span>My Reviews (<?php echo $reviews_count; ?>)</span>
                     </a>
                     <a href="<?php echo BASE_URL; ?>pages/wishlist.php" class="nav-item">
                         <i class="fas fa-heart"></i>
@@ -480,183 +380,17 @@ echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/css/pages/profile.css"
                         </div>
                     </form>
                 </div>
-
-                <div class="profile-section">
-                    <h2 class="section-title">Security</h2>
-                    <div class="security-settings">
-                        <div class="security-item">
-                            <div class="security-info">
-                                <h3>Change Password</h3>
-                                <p>Update your password to keep your account secure</p>
-                            </div>
-                            <div class="preference-actions">
-                                <button class="btn btn-outline" onclick="openPasswordModal()">Change Password</button>
-                            </div>
-                        </div>
-                        
-                        <div class="security-item">
-                            <div class="security-info">
-                                <h3>Two-Factor Authentication</h3>
-                                <p>Add an extra layer of security to your account</p>
-                            </div>
-                            <div class="preference-actions">
-                                <span class="preference-status"></span>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="2fa_toggle" class="toggle-input" disabled>
-                                    <label for="2fa_toggle" class="toggle-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-section">
-                    <h2 class="section-title">Account Preferences</h2>
-                    <div class="preferences-settings">
-                        <div class="preference-item">
-                            <div class="preference-info">
-                                <h3>Email Notifications</h3>
-                                <p>Manage what emails you receive from us</p>
-                            </div>
-                            <div class="preference-actions">
-                                <span class="preference-status"></span>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="email_notifications" class="toggle-input" <?php echo !empty($user_data['email_notifications']) ? 'checked' : ''; ?>>
-                                    <label for="email_notifications" class="toggle-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="preference-item">
-                            <div class="preference-info">
-                                <h3>SMS Notifications</h3>
-                                <p>Receive order updates via SMS</p>
-                            </div>
-                            <div class="preference-actions">
-                                <span class="preference-status"></span>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="sms_notifications" class="toggle-input" <?php echo !empty($user_data['sms_notifications']) ? 'checked' : ''; ?>>
-                                    <label for="sms_notifications" class="toggle-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="preference-item">
-                            <div class="preference-info">
-                                <h3>Marketing Communications</h3>
-                                <p>Receive offers and promotional emails</p>
-                            </div>
-                            <div class="preference-actions">
-                                <span class="preference-status"></span>
-                                <div class="toggle-switch">
-                                    <input type="checkbox" id="marketing_communications" class="toggle-input" <?php echo !empty($user_data['marketing_communications']) ? 'checked' : ''; ?>>
-                                    <label for="marketing_communications" class="toggle-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Password Modal -->
-<div class="modal" id="passwordModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Change Password</h3>
-            <button class="modal-close" id="passwordModalClose">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="password-modal-messages"></div>
-            <form class="password-form" id="passwordChangeForm">
-                <div class="form-group">
-                    <label for="current_password">Current Password</label>
-                    <input type="password" id="current_password" name="current_password" required>
-                </div>
-                <div class="form-group">
-                    <label for="new_password">New Password</label>
-                    <input type="password" id="new_password" name="new_password" required minlength="6">
-                </div>
-                <div class="form-group">
-                    <label for="confirm_password">Confirm New Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Update Password</button>
-                    <button type="button" class="btn btn-outline" id="passwordModalCancel">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
-// --- Password Modal ---
-// Make functions global so the onclick attribute can find them
-function openPasswordModal() {
-    const modal = document.getElementById('passwordModal');
-    if (modal) modal.classList.add('show');
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     /**
      * Initializes all interactive components on the profile page.
      */
     function initProfilePage() {
-
-        // --- Password Modal ---
-        function initPasswordModal() {
-            const modal = document.getElementById('passwordModal');
-            if (!modal) return;
-
-            const form = document.getElementById('passwordChangeForm');
-            const closeBtn = document.getElementById('passwordModalClose');
-            const cancelBtn = document.getElementById('passwordModalCancel');
-
-            window.closePasswordModal = () => modal.classList.remove('show');
-
-            closeBtn.addEventListener('click', window.closePasswordModal);
-            cancelBtn.addEventListener('click', window.closePasswordModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) window.closePasswordModal();
-            });
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const submitButton = form.querySelector('button[type="submit"]');
-                const messageContainer = document.getElementById('password-modal-messages');
-                const formData = new FormData(form);
-                formData.append('change_password_ajax', '1');
-
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<span class="loading"></span> Updating...';
-                messageContainer.innerHTML = '';
-
-                fetch(window.location.href, { method: 'POST', body: formData })
-                    .then(response => response.json())
-                    .then(data => {
-                        const alertClass = data.success ? 'alert-success' : 'alert-error';
-                        messageContainer.innerHTML = `<div class="alert ${alertClass}">${data.message}</div>`;
-                        if (data.success) {
-                            form.reset();
-                            setTimeout(() => {
-                                window.closePasswordModal();
-                                messageContainer.innerHTML = '';
-                            }, 2000);
-                        }
-                    })
-                    .catch(error => {
-                        messageContainer.innerHTML = `<div class="alert alert-error">A network error occurred.</div>`;
-                        console.error('Error:', error);
-                    })
-                    .finally(() => {
-                        submitButton.disabled = false;
-                        submitButton.innerHTML = 'Update Password';
-                    });
-            });
-        }
 
         // --- Avatar Auto-Upload ---
         function initAvatarUpload() {
@@ -725,9 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // --- Initialize all components ---
-        initPasswordModal();
         initAvatarUpload();
-        // Add other initializations here if needed (e.g., for preference toggles)
     }
 
     // Run the initializer

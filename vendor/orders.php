@@ -38,8 +38,10 @@ $stmt = $db->prepare($sql);
 $stmt->execute(['vendor_id' => $vendor_id]);
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-?>
-<?php require_once __DIR__ . '/../includes/header.php'; ?>
+?> 
+<?php 
+$page_title = "My Orders";
+require_once __DIR__ . '/../includes/header.php'; ?>
 
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/vendor-dashboard.css">
 

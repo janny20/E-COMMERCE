@@ -1,139 +1,167 @@
+0,0 @@
 <?php
-// pages/order-detail.php - Customer-facing order detail page
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 require_once '../includes/config.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: ' . BASE_URL . 'pages/login.php');
-    exit();
-}
-
-$customer_id = $_SESSION['user_id'];
-$order_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-if (!$order_id) {
+// Check if user is logged in and an order ID is provided
+if (!$isLoggedIn || !isset($_GET['id'])) {
     header('Location: ' . BASE_URL . 'pages/orders.php');
     exit();
 }
 
+$order_id = intval($_GET['id']);
+$user_id = $_SESSION['user_id'];
+
 $database = new Database();
 $db = $database->getConnection();
 
-$order = null;
-$order_items = [];
+// Fetch the order details, ensuring it belongs to the current user
+$order_query = "SELECT * FROM orders WHERE id = :order_id AND customer_id = :user_id";
+$order_stmt = $db->prepare($order_query);
+$order_stmt->execute(['order_id' => $order_id, 'user_id' => $user_id]);
+$order = $order_stmt->fetch(PDO::FETCH_ASSOC);
 
-try {
-    // Fetch main order details, ensuring it belongs to the logged-in customer
-    $order_sql = "SELECT * FROM orders WHERE id = :order_id AND customer_id = :customer_id";
-    $order_stmt = $db->prepare($order_sql);
-    $order_stmt->execute(['order_id' => $order_id, 'customer_id' => $customer_id]);
-    $order = $order_stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($order) {
-        // Fetch all items for this order
-        $items_sql = "SELECT oi.*, p.name as product_name, p.images, v.business_name
-                      FROM order_items oi
-                      JOIN products p ON oi.product_id = p.id
-                      JOIN vendors v ON oi.vendor_id = v.id
-                      WHERE oi.order_id = :order_id";
-        $items_stmt = $db->prepare($items_sql);
-        $items_stmt->execute(['order_id' => $order_id]);
-        $order_items = $items_stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-} catch (PDOException $e) {
-    error_log("Customer Order Detail Error: " . $e->getMessage());
-    die("An error occurred while fetching your order details.");
-}
-
+// If order not found, redirect
 if (!$order) {
-    header('Location: ' . BASE_URL . 'pages/orders.php?error=not_found');
+    header('Location: ' . BASE_URL . 'pages/orders.php');
     exit();
 }
+
+// Fetch order items
+$items_query = "SELECT oi.*, p.name as product_name, p.images, r.id as review_id
+                FROM order_items oi 
+                JOIN products p ON oi.product_id = p.id
+                LEFT JOIN reviews r ON r.product_id = oi.product_id AND r.user_id = :user_id
+                WHERE oi.order_id = :order_id";
+$items_stmt = $db->prepare($items_query);
+$items_stmt->execute(['order_id' => $order_id, 'user_id' => $user_id]);
+$order_items = $items_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 require_once '../includes/header.php';
 ?>
 
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/orders.css">
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/customer-order-detail.css">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/order-success.css">
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pages/order-detail.css">
 
-<main class="orders-page">
+<div class="order-success-page">
     <div class="container">
-        <div class="orders-header">
+        <div class="success-header">
             <h1>Order Details</h1>
-            <p><a href="<?php echo BASE_URL; ?>pages/orders.php">&larr; Back to My Orders</a></p>
+            <p>Order Number: <strong>#<?php echo htmlspecialchars($order['order_number']); ?></strong></p>
+            <p>Placed on: <?php echo date('F j, Y', strtotime($order['created_at'])); ?></p>
         </div>
 
-        <div class="order-detail-card">
-            <div class="order-detail-header">
-                <div class="detail-group">
-                    <span>ORDER NUMBER</span>
-                    <strong><?php echo htmlspecialchars($order['order_number']); ?></strong>
-                </div>
-                <div class="detail-group">
-                    <span>DATE PLACED</span>
-                    <strong><?php echo date('M d, Y', strtotime($order['created_at'])); ?></strong>
-                </div>
-                <div class="detail-group">
-                    <span>TOTAL AMOUNT</span>
-                    <strong>$<?php echo money($order['total_amount']); ?></strong>
-                </div>
-                <div class="detail-group">
-                    <span>OVERALL STATUS</span>
-                    <strong class="status-badge status-<?php echo str_replace('_', '-', $order['status']); ?>"><?php echo ucwords(str_replace('_', ' ', $order['status'])); ?></strong>
-                </div>
-            </div>
-
-            <div class="order-detail-body">
-                <div class="order-items-list">
-                    <h3>Items in this Order</h3>
-                    <?php foreach ($order_items as $item): ?>
-                        <div class="order-item-row">
-                            <div class="item-product-info">
-                                <?php $img = !empty($item['images']) ? explode(',', $item['images'])[0] : 'default.jpg'; ?>
-                                <img src="<?php echo BASE_URL . 'assets/images/products/' . htmlspecialchars($img); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>">
-                                <div>
-                                    <a href="<?php echo BASE_URL; ?>pages/product-detail.php?id=<?php echo $item['product_id']; ?>" class="item-name"><?php echo htmlspecialchars($item['product_name']); ?></a>
-                                    <p class="item-vendor">Sold by: <a href="<?php echo BASE_URL; ?>pages/vendor.php?id=<?php echo $item['vendor_id']; ?>"><?php echo htmlspecialchars($item['business_name']); ?></a></p>
-                                    <p class="item-price-qty">$<?php echo money($item['price']); ?> &times; <?php echo $item['quantity']; ?></p>
+        <div class="order-summary-container">
+            <div class="order-details-main">
+                <div class="order-items-section">
+                    <h2>Items in this Order</h2>
+                    <div class="order-items-list">
+                        <?php foreach ($order_items as $item): ?>
+                            <div class="order-item">
+                                <div class="item-image">
+                                    <?php $img = !empty($item['images']) ? explode(',', $item['images'])[0] : 'default.jpg'; ?>
+                                    <img src="<?php echo BASE_URL . 'assets/images/products/' . htmlspecialchars($img); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>">
+                                </div>
+                                <div class="item-info">
+                                    <h4 class="item-name"><?php echo htmlspecialchars($item['product_name']); ?></h4>
+                                    <p class="item-qty">Quantity: <?php echo $item['quantity']; ?></p>
+                                </div>
+                                <div class="item-price">$<?php echo number_format($item['price'], 2); ?></div>
+                                <div class="item-review-action">
+                                    <?php if ($order['status'] === 'delivered'): ?>
+                                        <?php if ($item['review_id']): ?>
+                                            <button class="btn btn-sm btn-outline-success" disabled><i class="fas fa-check"></i> Reviewed</button>
+                                        <?php else: ?>
+                                            <button class="btn btn-sm btn-primary btn-write-review" 
+                                                    data-product-id="<?php echo $item['product_id']; ?>" 
+                                                    data-product-name="<?php echo htmlspecialchars($item['product_name']); ?>">
+                                                Write a Review
+                                            </button>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                            <div class="item-status-info">
-                                <p class="item-status status-<?php echo $item['status']; ?>"><?php echo ucfirst($item['status']); ?></p>
-                                <?php if ($item['status'] === 'shipped' && !empty($item['tracking_number'])): ?>
-                                    <a href="<?php echo getTrackingUrl($item['shipping_carrier'], $item['tracking_number']); ?>" target="_blank" class="btn btn-sm btn-outline btn-track">
-                                        <i class="fas fa-truck"></i> Track Package
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
+            </div>
 
-                <div class="order-summary-panels">
-                    <div class="summary-panel">
-                        <h4>Shipping Address</h4>
-                        <address><?php echo nl2br(htmlspecialchars($order['shipping_address'])); ?></address>
-                    </div>
-                    <div class="summary-panel">
-                        <h4>Payment Information</h4>
-                        <p><strong>Payment Method:</strong> <?php echo ucwords(str_replace('_', ' ', $order['payment_method'])); ?></p>
-                        <p><strong>Payment Status:</strong> <?php echo ucfirst($order['payment_status']); ?></p>
-                    </div>
-                    <div class="summary-panel">
-                        <h4>Order Summary</h4>
-                        <div class="total-row"><span>Subtotal:</span> <span>$<?php echo money($order['total_amount'] - $order['shipping_amount'] - $order['tax_amount']); ?></span></div>
-                        <div class="total-row"><span>Shipping:</span> <span>$<?php echo money($order['shipping_amount']); ?></span></div>
-                        <div class="total-row"><span>Tax:</span> <span>$<?php echo money($order['tax_amount']); ?></span></div>
-                        <div class="total-row grand-total"><span>Total:</span> <span>$<?php echo money($order['total_amount']); ?></span></div>
+            <div class="order-details-sidebar">
+                <div class="detail-card">
+                    <h3>Shipping Information</h3>
+                    <p>
+                        <strong><?php echo htmlspecialchars($order['shipping_name']); ?></strong><br>
+                        <?php echo htmlspecialchars($order['shipping_address']); ?><br>
+                        <?php echo htmlspecialchars($order['shipping_city']); ?>, <?php echo htmlspecialchars($order['shipping_state']); ?> <?php echo htmlspecialchars($order['shipping_zip']); ?><br>
+                        <?php echo htmlspecialchars($order['shipping_country']); ?>
+                    </p>
+                </div>
+                <div class="detail-card">
+                    <h3>Payment Method</h3>
+                    <p><?php echo ucwords(str_replace('_', ' ', htmlspecialchars($order['payment_method']))); ?></p>
+                </div>
+                <div class="detail-card totals-card">
+                    <h3>Order Summary</h3>
+                    <div class="totals-grid">
+                        <span>Subtotal</span>
+                        <span>$<?php echo number_format($order['subtotal'], 2); ?></span>
+                        <span>Shipping</span>
+                        <span>$<?php echo number_format($order['shipping_cost'], 2); ?></span>
+                        <span>Tax</span>
+                        <span>$<?php echo number_format($order['tax_amount'], 2); ?></span>
+                        <strong class="grand-total">Total</strong>
+                        <strong class="grand-total">$<?php echo number_format($order['total_amount'], 2); ?></strong>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
 
-<?php require_once '../includes/footer.php'; ?>
+        <div class="success-actions">
+            <a href="<?php echo BASE_URL; ?>pages/orders.php" class="btn btn-primary">Back to My Orders</a>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal" id="reviewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="reviewModalTitle">Write a Review</h3>
+            <button class="modal-close" id="reviewModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="reviewForm">
+                <input type="hidden" id="reviewProductId" name="product_id">
+                <div class="form-group">
+                    <label for="reviewRating">Your Rating</label>
+                    <div class="star-rating">
+                        <i class="far fa-star" data-value="1"></i>
+                        <i class="far fa-star" data-value="2"></i>
+                        <i class="far fa-star" data-value="3"></i>
+                        <i class="far fa-star" data-value="4"></i>
+                        <i class="far fa-star" data-value="5"></i>
+                    </div>
+                    <input type="hidden" name="rating" id="reviewRating" required>
+                    <div class="error-message" id="ratingError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="reviewComment">Your Review</label>
+                    <textarea name="comment" id="reviewComment" rows="5" class="form-control" placeholder="Tell us what you think about the product..." required></textarea>
+                    <div class="error-message" id="commentError"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="<?php echo BASE_URL; ?>assets/js/pages/order-detail.js"></script>
+
+<?php
+require_once '../includes/footer.php';
+?>

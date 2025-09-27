@@ -184,4 +184,59 @@ function getTrackingUrl($carrier, $tracking_number) {
             return "https://www.google.com/search?q={$encoded_tracking}";
     }
 }
+
+// Function to get detailed cart data including totals, tax, shipping, and discounts
+function getCartData($db, $user_id) {
+    $query = "SELECT c.product_id, c.quantity, p.price
+              FROM cart c
+              JOIN products p ON c.product_id = p.id
+              WHERE c.user_id = :user_id";
+    $stmt = $db->prepare($query);
+    $stmt->execute(['user_id' => $user_id]);
+    $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $subtotal = 0;
+    foreach ($cart_items as $item) {
+        $subtotal += $item['price'] * $item['quantity'];
+    }
+    
+    // Apply coupon if one is active in the session
+    $discount = 0;
+    $coupon_code = null;
+    $active_coupon = $_SESSION['cart_coupon'] ?? null;
+    
+    if ($active_coupon) {
+        if ($active_coupon['type'] === 'percentage') {
+            $discount = $subtotal * ($active_coupon['value'] / 100);
+        } elseif ($active_coupon['type'] === 'fixed') {
+            $discount = $active_coupon['value'];
+        }
+        $discount = min($subtotal, $discount);
+        $coupon_code = $active_coupon['code'];
+    }
+    
+    $subtotal_after_discount = $subtotal - $discount;
+    $free_shipping_threshold = 50.00;
+    $shipping_cost = ($subtotal_after_discount > $free_shipping_threshold || $subtotal_after_discount == 0) ? 0 : 5.99;
+    $amount_needed = max(0, $free_shipping_threshold - $subtotal_after_discount);
+    $tax_amount = $subtotal_after_discount * 0.08;
+    $total_amount = $subtotal_after_discount + $shipping_cost + $tax_amount;
+
+    return [ 'subtotal_raw' => $subtotal, 'subtotal' => number_format($subtotal, 2), 'discount' => number_format($discount, 2), 'coupon_code' => $coupon_code, 'shipping' => number_format($shipping_cost, 2), 'tax' => number_format($tax_amount, 2), 'total' => number_format($total_amount, 2), 'amountNeededForFreeShipping' => $amount_needed, 'freeShippingThreshold' => $free_shipping_threshold, 'cartCount' => getCartTotalItems($db, $user_id) ];
+}
+
+// Function to log order status changes
+function logOrderStatus($db, $order_id, $status, $notes = '') {
+    try {
+        $sql = "INSERT INTO order_status_history (order_id, status, notes) VALUES (:order_id, :status, :notes)";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            'order_id' => $order_id,
+            'status' => $status,
+            'notes' => $notes
+        ]);
+    } catch (PDOException $e) {
+        error_log("Failed to log order status: " . $e->getMessage());
+    }
+}
 ?>
